@@ -2,13 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package projeto01;
+package projeto01; 
 
 import java.util.Scanner;
 
 /**
  *
- * @author CAUPT - ALUNOS
+ * @author barbrete e kitotsui
  */
 public class Main {
 
@@ -54,7 +54,7 @@ public class Main {
                     System.out.println("FINALIZANDO O PROGRAMA...OBRIGADO POR UTILIZAR.");
                     break;
                 default:
-                    System.out.println("escola uma opcao valida");
+                    System.out.println("Escolha uma opcao valida");
                     break;
             }
         }
