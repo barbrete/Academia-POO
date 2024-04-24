@@ -30,13 +30,27 @@ public class GUI {
         return Integer.parseInt(scanner.nextLine());
     }
 
-    public void exibirMenuCruds() {
+    public int exibirMenuCruds() {
         System.out.println("\n=============== MENU GERAL ================");
-        System.out.println("1 - CRUD PESSOA");
-        //System.out.println("2 - CRUD ACADEMIA");
-       //System.out.println("3 - CRUD EXERCICIOS");
-        //System.out.println("4 - CRUD TREINO");
+        System.out.println("1 - CRUD ACADEMIA");
+        System.out.println("2 - CRUD PESSOA");
+        System.out.println("3 - VOLTAR AO MENU ANTERIOR");
+        System.out.println("OPCAO...:  ");
+
+        return Integer.parseInt(scanner.nextLine());
+    }
+
+    public int menuCrudAcademia(){
+        System.out.println("\n=============== CRUD ACADEMIA ================");
+        System.out.println("1 - CRIAR ACADEMIA");
+        System.out.println("2 - MOSTRAR ACADEMIA");
+        System.out.println("3 - ALTERAR ACADEMIA");
+        System.out.println("4 - EXCLUIR ACADEMIA");
         System.out.println("5 - VOLTAR AO MENU ANTERIOR");
+
+        System.out.println("OPCAO...:  ");
+
+        return Integer.parseInt(scanner.nextLine());
     }
 
     public int receberOpcaoMenuCruds() {
@@ -47,14 +61,6 @@ public class GUI {
     public void exibirMensagem(String mensagem) {
         System.out.println(mensagem);
     }
-
-   
-
-   
-
-  
-
-
 
    
 }
