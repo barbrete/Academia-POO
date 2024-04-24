@@ -3,47 +3,89 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package mvcAcademia.model;
+
 import java.time.LocalDateTime;
 
+/**
+ *
+ * @author barbrete e kitotsui
+ */
+
 public class AcademiaDAO {
-   
-    
-   private Academia academia = new Academia();
 
-     public AcademiaDAO() {
-        this.academia = new Academia();
-        this.academia.setNome("BRASIL FITNESS");
-        this.academia.setEndereco("RUA BRASILIA");
-        this.academia.setDataCriacao(LocalDateTime.now());
-        this.academia.setDataModificacao(LocalDateTime.now());
-    }
-    
-    public Academia getAcademia() {
-        return academia;
-    }
+    private Academia[] academias = new Academia[5];
 
-    public void setAcademia(Academia academia) {
-        this.academia = academia;
-    }
+    public AcademiaDAO() {
+        Academia academia1 = new Academia();
+        academia1.setNome("BRASIL FITNESS");
+        academia1.setEndereco("RUA BRASILIA");
+        academia1.setDataCriacao(LocalDateTime.now());
+        academia1.setDataModificacao(LocalDateTime.now());
+        adiciona(academia1);
 
-    public void criarAcademia(String nome, String endereco) {
-        this.academia = new Academia();
-        this.academia.setNome(nome);
-        this.academia.setEndereco(endereco);
-        this.academia.setDataCriacao(LocalDateTime.now());
-        this.academia.setDataModificacao(LocalDateTime.now());
+        Academia academia2 = new Academia();
+        academia2.setNome("GYM MASTER");
+        academia2.setEndereco("RUA FERNANDO COSTA");
+        academia2.setDataCriacao(LocalDateTime.now());
+        academia2.setDataModificacao(LocalDateTime.now());
+        adiciona(academia2);
+
+        Academia academia3 = new Academia();
+        academia3.setNome("ACADEMIA EQUILIBRIO");
+        academia3.setEndereco("AVENIDA MARANHAO");
+        academia3.setDataCriacao(LocalDateTime.now());
+        academia3.setDataModificacao(LocalDateTime.now());
+        adiciona(academia3);
     }
 
-    public void mostrarAcademia() {
-        System.out.println(this.academia);
+    public boolean adiciona(Academia academia) {
+        int proximaPosicaoLivre = proximaPosicaoLivre();
+        if (proximaPosicaoLivre != -1) {
+            academias[proximaPosicaoLivre] = academia;
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void excluirAcademia() {
-        this.academia = null;
+    public void mostrarTodasAcademias() {
+        boolean temAcademia = false;
+        for (Academia academia : academias) {
+            if (academia != null) {
+                System.out.println(academia);
+                temAcademia = true;
+            }
+        }
+        if (!temAcademia) {
+            System.out.println("NAO EXISTEM ACADEMIAS CADASTRADA.");
+        }
     }
 
-    public void alterarNomeAcademia(String novoNome) {
-        this.academia.setNome(novoNome);
-        this.academia.setDataModificacao(LocalDateTime.now());
+    public Academia buscaPorNome(String nome) {
+        for (Academia academia : academias) {
+            if (academia != null && academia.getNome().equals(nome)) {
+                return academia;
+            }
+        }
+        return null;
+    }
+
+    public boolean remover(String nome) {
+        for (int i = 0; i < academias.length; i++) {
+            if (academias[i] != null && academias[i].getNome().equals(nome)) {
+                academias[i] = null;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int proximaPosicaoLivre() {
+        for (int i = 0; i < academias.length; i++) {
+            if (academias[i] == null) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
