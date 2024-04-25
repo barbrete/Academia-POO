@@ -15,7 +15,7 @@ import java.util.Objects;
      static long serial;
      private long id;
      private String nome;
-     private char sexo;
+     private String sexo;
      private int nascimento;
      private String login;
      private String senha;
@@ -40,11 +40,11 @@ import java.util.Objects;
          this.nome = nome;
      }
  
-     public char getSexo() {
+     public String getSexo() {
          return sexo;
      }
  
-     public void setSexo(char sexo) {
+     public void setSexo(String sexo) {
          this.sexo = sexo;
      }
  

@@ -53,6 +53,17 @@ public class GUI {
         return Integer.parseInt(scanner.nextLine());
     }
 
+    //24-04 COMEÇANDO POR AQUI 
+    public int menuCrudPessoa(){
+        System.out.println("\n=============== CRUD PESSOA ================");
+        System.out.println("1 - CRIAR PESSOA");
+        System.out.println("2 - MOSTRAR PESSOA");
+        System.out.println("3 - ATUALIZAR PESSOA");
+        System.out.println("4 - EXCLUIR PESSOA");
+        System.out.println("5 - VOLTAR AO MENU ANTERIOR");
+        return Integer.parseInt(scanner.nextLine());
+    }
+
     public int receberOpcaoMenuCruds() {
         System.out.print("\nESCOLHA UMA OPCAO: ");
         return Integer.parseInt(scanner.nextLine());

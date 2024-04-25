@@ -77,12 +77,19 @@ public class menuGeral {
         Pessoa p = new Pessoa();
         System.out.println("NOME: ");
         p.setNome(scanner.nextLine());
+        System.out.println("SEXO [M/F]: ");
+        p.setSexo(scanner.nextLine());
+        System.out.println("DATA DE NASCIMENTO: ");
+        p.setNascimento(scanner.nextInt());
+        //System.out.println("TIPO DE USUARIO: ");  -- CRIAR TIPO USUARIO - PROFESSOR, ALUNO E ADMIN
+        //p.setTipoUsuario(scanner.nextLine());
         System.out.println("LOGIN: ");
         p.setLogin(scanner.nextLine());
         System.out.println("SENHA: ");
         p.setSenha(scanner.nextLine());
+        p.setDataCriacao(LocalDateTime.now());
+        p.setDataModificacao(LocalDateTime.now());
         return p;
-
     }
 
     private Academia cadastraAcademia() {
@@ -103,7 +110,6 @@ public class menuGeral {
 
     public void receberOpcaoMenu(int opc) {
         int resp;
-        String nome, endereco;
 
         while (opc != 3) {
 
@@ -153,21 +159,88 @@ public class menuGeral {
                             }
                             break;
                         case 5:
-                            gui.exibirMenuCruds();
+                            return;
 
                         default:
                             gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
                     }
                     break;
                 case 2:
-                    //opc = gui.menuCrudPessoa();
-                    break;
+                    opc = gui.menuCrudPessoa();
+                    
+                    switch (opc){
+                        case 1:
+                            Pessoa p = cadastraPessoa();
+
+                            if (pessoaDAO.adiciona(p)) {
+                                gui.exibirMensagem("USUARIO ADICIONADO COM SUCESSO!");
+                            } else {
+                                System.out.println("NAO FOI POSSIVEL ADICIONAR USUARIO.");
+                            }
+                        break;
+                        
+                        case 2:
+                            pessoaDAO.mostrarTodos();;
+                        break;
+
+                        case 3:
+                            System.out.println("DIGITE O NOME DO USUARIO QUE DESEJA ALTERAR...: ");
+                            String nomePessoa = scanner.nextLine();
+                            Pessoa pessoaParaAlterar = pessoaDAO.buscaPorNome(nomePessoa);
+                            if (pessoaParaAlterar != null) {
+                                gui.exibirMensagem("DIGITE O NOVO NOME DE USUÁRIO...: ");
+                                String novoNomeUsuario = scanner.nextLine();
+                                pessoaParaAlterar.setNome(novoNomeUsuario);
+                                gui.exibirMensagem("DIGITE O NOVO SEXO DE USUÁRIO [M/F]...: ");
+                                String novoSexoUsuario = scanner.nextLine();
+                                pessoaParaAlterar.setSexo(novoSexoUsuario);
+                                gui.exibirMensagem("DIGITE A NOVA DATA DE NASCIMENTO...: ");
+                                int novaDataNascimento = scanner.nextInt();
+                                pessoaParaAlterar.setNascimento(novaDataNascimento);
+                                //gui.exibirMensagem("DIGITE O NOVO TIPO DE USUÁRIO...: ");
+                                //String novoTipoUsuario = scanner.nextLine();
+                                //pessoaParaAlterar.setTipoUsuario(novoTipoUsuario);
+                                gui.exibirMensagem("DIGITE O NOVO LOGIN DE USUARIO...: ");
+                                String novoLoginUsuario = scanner.nextLine();
+                                pessoaParaAlterar.setLogin(novoLoginUsuario);
+                                gui.exibirMensagem("DIGITE A NOVA SENHA DO USUARIO...: ");
+                                String novaSenhaUsuario = scanner.nextLine();
+                                pessoaParaAlterar.setSenha(novaSenhaUsuario);
+
+                                pessoaParaAlterar.setDataModificacao(LocalDateTime.now());
+                                gui.exibirMensagem("USUARIO ALTERADO COM SUCESSO!");
+                            } else {
+                                System.out.println("USUARIO NAO EXISTE NO BANCO DE DADOS.");
+                            }
+                        break;
+
+                        case 4:
+                            System.out.println("DIGITE O NOME DO USUARIO QUE DESEJA EXCLUIR...: ");
+                            String nomeUsuarioExcluir = scanner.nextLine();
+                            Pessoa pessoaParaExcluir = pessoaDAO.buscaPorNome(nomeUsuarioExcluir);
+                            if (pessoaParaExcluir != null) {
+                                pessoaDAO.remover(nomeUsuarioExcluir);
+                                gui.exibirMensagem("USUARIO EXCLUIDO COM SUCESSO!");
+                            } else {
+                                System.out.println("USUARIO NAO EXISTE NO BANCO DE DADOS.");
+                            }
+                        break;
+
+                        case 5:
+                            return;
+
+                        default:
+                            gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                        break;
+                    }
+
                 case 3:
                     iniciar();
                     break;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPÇÃO VÁLIDA.");
+                    gui.exibirMensagem("ESCOLHA UMA OPÇÃO VALIDA.");
                     break;
+                
             }
         }
     }

@@ -92,7 +92,7 @@ public class PessoaDAO {
 
     }
 
-    Pessoa buscaPorNome(String nome) {
+    public Pessoa buscaPorNome(String nome) {
         for (Pessoa p : pessoas) {
             if (p != null && p.getNome().equals(nome)) {
                 return p;
