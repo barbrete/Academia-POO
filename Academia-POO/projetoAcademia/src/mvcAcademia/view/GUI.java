@@ -28,12 +28,13 @@ public class GUI {
         return Integer.parseInt(scanner.nextLine());
     }
 
-   public int exibirMenuCruds() {
+    public int exibirMenuCruds() {
         System.out.println("\n=============== MENU GERAL ================");
         System.out.println("1 - CRUD ACADEMIA");
         System.out.println("2 - CRUD PESSOA");
         System.out.println("3 - CRUD EXERCICIO");
-        System.out.println("4 - VOLTAR AO MENU ANTERIOR");
+        System.out.println("4 - CRUD DIVISAO DE TREINO");
+        System.out.println("5 - VOLTAR AO MENU ANTERIOR");
         System.out.println("OPCAO...:  ");
 
         return Integer.parseInt(scanner.nextLine());
@@ -73,6 +74,18 @@ public class GUI {
         System.out.println("3 - ATUALIZAR EXERCICIO");
         System.out.println("4 - EXCLUIR EXERCICIO");
         System.out.println("5 - VOLTAR AO MENU ANTERIOR");
+        return Integer.parseInt(scanner.nextLine());
+    }
+
+    public int menuCrudDivisaoTreino() {
+        System.out.println("\n=============== CRUD DIVISAO DE TREINO ================");
+        System.out.println("1 - CRIAR NOVA DIVISAO DE TREINO");
+        System.out.println("2 - LISTAR TODAS AS DIVISOES DE TREINO");
+        System.out.println("3 - ALTERAR UMA DIVISAO DE TREINO EXISTENTE");
+        System.out.println("4 - EXCLUIR UMA DIVISAO DE TREINO");
+        System.out.println("5 - VOLTAR AO MENU ANTERIOR");
+
+        System.out.print("OPCAO: ");
         return Integer.parseInt(scanner.nextLine());
     }
 
