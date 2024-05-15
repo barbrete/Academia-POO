@@ -4,6 +4,12 @@
  */
 package mvcAcademia.model;
 
+/**
+ *
+ * @author barbrete e kitotsui
+ */
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
  /**
@@ -16,10 +22,10 @@ import java.util.Objects;
      private long id;
      private String nome;
      private String sexo;
-     private int nascimento;
+     private LocalDate nascimento;
      private String login;
      private String senha;
-     private int tipoUsuario;
+     private String tipoUsuario;
      private LocalDateTime dataCriacao;
      private LocalDateTime dataModificacao;
      
@@ -48,13 +54,13 @@ import java.util.Objects;
          this.sexo = sexo;
      }
  
-     public int getNascimento() {
-         return nascimento;
-     }
+     public LocalDate getNascimento() {
+        return nascimento;
+    }
  
-     public void setNascimento(int nascimento) {
-         this.nascimento = nascimento;
-     }
+       public void setNascimento(LocalDate nascimento) {
+        this.nascimento = nascimento;
+    }
  
      public String getLogin() {
          return login;
@@ -72,11 +78,11 @@ import java.util.Objects;
          this.senha = senha;
      }
  
-     public int getTipoUsuario() {
+     public String getTipoUsuario() {
          return tipoUsuario;
      }
  
-     public void setTipoUsuario(int tipoUsuario) {
+     public void setTipoUsuario(String tipoUsuario) {
          this.tipoUsuario = tipoUsuario;
      }
  
@@ -95,11 +101,13 @@ import java.util.Objects;
      public void setDataModificacao(LocalDateTime dataModificacao) {
          this.dataModificacao = dataModificacao;
      }
+
+    @Override
+    public String toString() {
+        return "Pessoa{" + "id=" + id + ", nome=" + nome + ", sexo=" + sexo + ", nascimento=" + nascimento + ", login=" + login + ", senha=" + senha + ", tipoUsuario=" + tipoUsuario + ", dataCriacao=" + dataCriacao + ", dataModificacao=" + dataModificacao + '}';
+    }
      
-     @Override
-     public String toString() {
-         return "\nNOME:  " + this.nome + " COM ID: " + this.id;
-     }
+     
  
      @Override
      public int hashCode() {
