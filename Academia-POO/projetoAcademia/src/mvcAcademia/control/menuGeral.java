@@ -15,6 +15,8 @@ import java.util.Scanner;
 
 import mvcAcademia.model.Academia;
 import mvcAcademia.model.AcademiaDAO;
+import mvcAcademia.model.DivisaoTreino;
+import mvcAcademia.model.DivisaoTreinoDAO;
 import mvcAcademia.model.Exercicio;
 import mvcAcademia.model.ExercicioDAO;
 import mvcAcademia.model.Pessoa;
@@ -28,6 +30,7 @@ public class menuGeral {
     private PessoaDAO pessoaDAO = new PessoaDAO();
     private AcademiaDAO academiaDAO = new AcademiaDAO();
     private ExercicioDAO exercicioDAO = new ExercicioDAO();
+    private DivisaoTreinoDAO divisaoTreinoDao = new DivisaoTreinoDAO();
     private Scanner scanner = new Scanner(System.in);
     private boolean sair = false;
 
@@ -150,7 +153,6 @@ public class menuGeral {
     }
 
     private void exibirMenuAdministrador() {
-        // Implementação do menu para Administrador (acesso a todas as CRUDs)
         exibirMenuCRUD();
     }
 
@@ -221,8 +223,8 @@ public class menuGeral {
 
         return p;
     }
-    
-     private Exercicio cadastraExercicio() {
+
+    private Exercicio cadastraExercicio() {
         Exercicio ex = new Exercicio();
         System.out.println("NOME: ");
         ex.setNome(scanner.nextLine());
@@ -233,24 +235,43 @@ public class menuGeral {
         return ex;
     }
 
-  private void exibirMenuCRUD() {
+    private DivisaoTreino cadastraDivisaoTreino() {
+        DivisaoTreino novaDivisao = new DivisaoTreino();
+        gui.exibirMensagem("CADASTRO DE NOVA DIVISÃO DE TREINO:");
+
+        System.out.println("NOME DA DIVISÃO: ");
+        novaDivisao.setNome(scanner.nextLine());
+
+        System.out.println("DESCRIÇÃO DA DIVISÃO: ");
+        novaDivisao.setDescricao(scanner.nextLine());
+
+        novaDivisao.setDataCriacao(LocalDateTime.now());
+        novaDivisao.setDataModificacao(LocalDateTime.now());
+
+        return novaDivisao;
+    }
+
+    private void exibirMenuCRUD() {
         int resp;
 
         while (true) {
             resp = gui.exibirMenuCruds();
 
             switch (resp) {
-                case 1: 
+                case 1:
                     gerenciarAcademias();
                     break;
-                case 2: 
+                case 2:
                     gerenciarPessoas();
                     break;
-                case 3: 
+                case 3:
                     gerenciarExercicios();
                     break;
-                case 4: 
-                    return; 
+                case 4:
+                    gerenciarDivisaoTreino();
+                    break;
+                case 5:
+                    return;
                 default:
                     gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
                     break;
@@ -397,7 +418,63 @@ public class menuGeral {
             }
         }
     }
-    
+
+    private void gerenciarDivisaoTreino() {
+        int resp;
+
+        while (true) {
+            resp = gui.menuCrudDivisaoTreino();
+
+            switch (resp) {
+                case 1:
+                    DivisaoTreino div = this.cadastraDivisaoTreino();
+                    if (divisaoTreinoDao.adiciona(div)) {
+                        System.out.println("DIVISAO DE TREINO CRIADA COM SUCESSO!");
+                    } else {
+                        System.out.println("DIVISAO DE TREINO NAO CRIADA.");
+                    }
+                    break;
+                case 2:
+                    divisaoTreinoDao.mostrarTodasDivisoes();
+                    break;
+                case 3:
+                    System.out.println("DIGITE O NOME DA DIVISAO DE TREINO QUE DESEJA ALTERAR...: ");
+                    String nomeDiv = scanner.nextLine();
+                    DivisaoTreino divParaAlterar = divisaoTreinoDao.buscaPorNome(nomeDiv);
+                    if (divParaAlterar != null) {
+                        System.out.println("DIGITE O NOVO NOME DA DIVISAO DE TREINO...: ");
+                        String novoNomeDivisao = scanner.nextLine();
+                        divParaAlterar.setNome(novoNomeDivisao);
+                        System.out.println("DIGITE A NOVA DESCRICAO DA DIVISAO DE TREINO...: ");
+                        String novaDescricaoDivisao = scanner.nextLine();
+                        divParaAlterar.setDescricao(novaDescricaoDivisao);
+                        divParaAlterar.setDataModificacao(LocalDateTime.now());
+                        System.out.println("DIVISAO DE TREINO ALTERADA COM SUCESSO!");
+
+                    } else {
+                        System.out.println("DIVISAO DE TREINO NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 4:
+                    System.out.println("DIGITE O NOME DA DIVISAO DE TREINO QUE DESEJA EXCLUIR...: ");
+                    String nomeDivExcluir = scanner.nextLine();
+                    DivisaoTreino divParaExcluir = divisaoTreinoDao.buscaPorNome(nomeDivExcluir);
+                    if (divParaExcluir != null) {
+                            divisaoTreinoDao.remover(nomeDivExcluir);
+                            System.out.println("DIVISAO DE TREINO EXCLUIDA COM SUCESSO!");
+                    } else {
+                        System.out.println("DIVISAO DE TREINO NÃO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
+                    break;
+            }
+        }
+    }
+
     private void gerenciarExercicios() {
         int resp;
 
@@ -444,8 +521,8 @@ public class menuGeral {
                         System.out.println("EXERCICIO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
                     break;
-                case 5: 
-                    return; 
+                case 5:
+                    return;
                 default:
                     gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
                     break;
