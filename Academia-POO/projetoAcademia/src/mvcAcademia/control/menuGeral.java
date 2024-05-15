@@ -8,15 +8,11 @@ package mvcAcademia.control;
  *
  * @author barbrete e kitotsui
  */
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 import mvcAcademia.model.Academia;
 import mvcAcademia.model.AcademiaDAO;
-import mvcAcademia.model.DivisaoTreino;
-import mvcAcademia.model.DivisaoTreinoDAO;
 import mvcAcademia.model.Exercicio;
 import mvcAcademia.model.ExercicioDAO;
 import mvcAcademia.model.Pessoa;
@@ -30,7 +26,6 @@ public class menuGeral {
     private PessoaDAO pessoaDAO = new PessoaDAO();
     private AcademiaDAO academiaDAO = new AcademiaDAO();
     private ExercicioDAO exercicioDAO = new ExercicioDAO();
-    private DivisaoTreinoDAO divisaoTreinoDao = new DivisaoTreinoDAO();
     private Scanner scanner = new Scanner(System.in);
     private boolean sair = false;
 
@@ -41,10 +36,10 @@ public class menuGeral {
             opcaoUsuario = gui.menuBemVindo();
 
             switch (opcaoUsuario) {
-                case 1:
+                case 1: 
                     fazerLogin();
                     break;
-                case 2:
+                case 2: 
                     Pessoa pu = this.cadastrarLogin();
                     if (pessoaDAO.adiciona(pu)) {
 
@@ -53,7 +48,7 @@ public class menuGeral {
                         System.out.println("USUARIO NAO ADICIONADO.");
                     }
                     break;
-                case 3:
+                case 3: 
                     gui.exibirMensagem("FINALIZANDO O PROGRAMA... OBRIGADO POR UTILIZAR.");
                     sair = true;
                     break;
@@ -73,87 +68,11 @@ public class menuGeral {
 
         if (pessoaLogada != null) {
             gui.exibirMensagem("USUARIO LOGADO COM SUCESSO!");
-
-            switch (pessoaLogada.getTipoUsuario()) {
-                case "Administrador":
-                    exibirMenuAdministrador();
-                    break;
-                case "Professor":
-                    exibirMenuProfessor();
-                    break;
-                case "Aluno":
-                    exibirMenuAluno();
-                    break;
-                default:
-                    gui.exibirMensagem("USUARIO NAO RECONHECIDO.");
-                    break;
-            }
+            exibirMenuCRUD();
+            
         } else {
             gui.exibirMensagem("LOGIN INVALIDO, TENTE NOVAMENTE.");
         }
-    }
-
-    private void exibirMenuAluno() {
-        int opcaoUsuario;
-
-        while (true) {
-            opcaoUsuario = gui.menuAluno();
-
-            switch (opcaoUsuario) {
-                case 1:
-                    // Visualizar Ficha de Treino
-                    // (implementação será adicionada)
-                    break;
-                case 2:
-                    // Imprimir Ficha de Treino
-                    // (implementação será adicionada)
-                    break;
-                case 3:
-                    // Visualizar Avaliações Físicas
-                    // (implementação será adicionada)
-                    break;
-                case 4:
-                    return; // Voltar ao menu anterior
-                default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
-                    break;
-            }
-        }
-    }
-
-    private void exibirMenuProfessor() {
-        int opcaoUsuario;
-
-        while (true) {
-            opcaoUsuario = gui.menuProfessor();
-
-            switch (opcaoUsuario) {
-                case 1:
-                    // CRUD Treino (implementação será adicionada)
-                    break;
-                case 2:
-                    // Visualizar Ficha de Treino (para Alunos)
-                    // (implementação será adicionada)
-                    break;
-                case 3:
-                    // Imprimir Ficha de Treino (para Alunos)
-                    // (implementação será adicionada)
-                    break;
-                case 4:
-                    // Visualizar Avaliações Físicas (para Alunos)
-                    // (implementação será adicionada)
-                    break;
-                case 5:
-                    return; // Voltar ao menu anterior
-                default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
-                    break;
-            }
-        }
-    }
-
-    private void exibirMenuAdministrador() {
-        exibirMenuCRUD();
     }
 
     private Academia cadastraAcademia() {
@@ -169,59 +88,39 @@ public class menuGeral {
 
     private Pessoa cadastrarLogin() {
         Pessoa pu = new Pessoa();
-        gui.exibirMensagem("CADASTRO DE LOGIN:");
+        gui.exibirMensagem("===========CADASTRO DE LOGIN===========");
         System.out.println("NOME: ");
         pu.setNome(scanner.nextLine());
         System.out.println("LOGIN: ");
         pu.setLogin(scanner.nextLine());
         System.out.println("SENHA: ");
         pu.setSenha(scanner.nextLine());
-        pu.setTipoUsuario("Aluno");
         return pu;
 
     }
 
     private Pessoa cadastraPessoa() {
         Pessoa p = new Pessoa();
-        int opcaoTipoUsuario;
-
         gui.exibirMensagem("CADASTRO DE PESSOA:");
         gui.exibirMensagem("NOME:");
         p.setNome(scanner.nextLine());
         gui.exibirMensagem("SEXO [M/F]:");
         p.setSexo(scanner.nextLine());
-
-        gui.exibirMensagem("DATA DE NASCIMENTO (dd/MM/yyyy):");
-        String dataNascimentoStr = scanner.nextLine();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
-        p.setNascimento(dataNascimento);
-
-        // Obtenha a opção de tipo de usuário do menu
-        opcaoTipoUsuario = gui.menuTipoUsuario();
-
-        switch (opcaoTipoUsuario) {
-            case 1:
-                p.setTipoUsuario("Administrador");
-                break;
-            case 2:
-                p.setTipoUsuario("Professor");
-                break;
-            case 3:
-                p.setTipoUsuario("Aluno");
-                break;
-            default:
-                p.setTipoUsuario("Aluno");
-                break;
-        }
-        System.out.println("LOGIN: ");
+        gui.exibirMensagem("DATA DE NASCIMENTO:");
+        p.setNascimento(scanner.nextInt());
+        gui.exibirMensagem("LOGIN :");
         p.setLogin(scanner.nextLine());
-        System.out.println("SENHA: ");
+        scanner.nextLine();
+        gui.exibirMensagem("SENHA :");
         p.setSenha(scanner.nextLine());
-        p.setDataCriacao(UtilPessoa.getDiaAtual());
-        p.setDataModificacao(UtilPessoa.getDiaAtual());
-
+        // Adicione validação e conversão para data de nascimento
+        // p.setNascimento(scanner.nextLine());
+        System.out.printf("TIPO DE USUÁRIO %n1 - ADMIN %n2 - PROFESSOR%n3 - CLIENTE%n");
+        p.setTipoUsuario(scanner.nextInt());
+        p.setDataCriacao(LocalDateTime.now());
+        p.setDataModificacao(LocalDateTime.now());
         return p;
+
     }
 
     private Exercicio cadastraExercicio() {
@@ -235,22 +134,6 @@ public class menuGeral {
         return ex;
     }
 
-    private DivisaoTreino cadastraDivisaoTreino() {
-        DivisaoTreino novaDivisao = new DivisaoTreino();
-        gui.exibirMensagem("CADASTRO DE NOVA DIVISÃO DE TREINO:");
-
-        System.out.println("NOME DA DIVISÃO: ");
-        novaDivisao.setNome(scanner.nextLine());
-
-        System.out.println("DESCRIÇÃO DA DIVISÃO: ");
-        novaDivisao.setDescricao(scanner.nextLine());
-
-        novaDivisao.setDataCriacao(LocalDateTime.now());
-        novaDivisao.setDataModificacao(LocalDateTime.now());
-
-        return novaDivisao;
-    }
-
     private void exibirMenuCRUD() {
         int resp;
 
@@ -258,20 +141,17 @@ public class menuGeral {
             resp = gui.exibirMenuCruds();
 
             switch (resp) {
-                case 1:
+                case 1: 
                     gerenciarAcademias();
                     break;
-                case 2:
+                case 2: 
                     gerenciarPessoas();
                     break;
-                case 3:
+                case 3: 
                     gerenciarExercicios();
                     break;
-                case 4:
-                    gerenciarDivisaoTreino();
-                    break;
-                case 5:
-                    return;
+                case 4: 
+                    return; 
                 default:
                     gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
                     break;
@@ -326,8 +206,8 @@ public class menuGeral {
                         System.out.println("ACADEMIA NAO EXISTENTE NO BANCO DE DADOS.");
                     }
                     break;
-                case 5:
-                    return;
+                case 5: 
+                    return; 
                 default:
                     gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
                     break;
@@ -337,7 +217,6 @@ public class menuGeral {
 
     private void gerenciarPessoas() {
         int resp;
-        int opcaoTipoUsuario;
 
         while (true) {
             resp = gui.menuCrudPessoa();
@@ -360,32 +239,18 @@ public class menuGeral {
                     String nomePessoa = scanner.nextLine();
                     Pessoa pessoaParaAlterar = pessoaDAO.buscaPorNome(nomePessoa);
                     if (pessoaParaAlterar != null) {
-                        gui.exibirMensagem("DIGITE O NOVO NOME DE USUARIO...: ");
+                        gui.exibirMensagem("DIGITE O NOVO NOME DE USUÁRIO...: ");
                         String novoNomeUsuario = scanner.nextLine();
                         pessoaParaAlterar.setNome(novoNomeUsuario);
-                        gui.exibirMensagem("DIGITE O NOVO SEXO DE USUARIO [M/F]...: ");
+                        gui.exibirMensagem("DIGITE O NOVO SEXO DE USUÁRIO [M/F]...: ");
                         String novoSexoUsuario = scanner.nextLine();
                         pessoaParaAlterar.setSexo(novoSexoUsuario);
-                        gui.exibirMensagem("DIGITE A NOVA DATA DE NASCIMENTO (dd/MM/yyyy): ");
-                        String dataNascimentoStr = scanner.nextLine();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                        LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
-                        pessoaParaAlterar.setNascimento(dataNascimento);
-                        opcaoTipoUsuario = gui.menuTipoUsuario();
-                        switch (opcaoTipoUsuario) {
-                            case 1:
-                                pessoaParaAlterar.setTipoUsuario("Administrador");
-                                break;
-                            case 2:
-                                pessoaParaAlterar.setTipoUsuario("Professor");
-                                break;
-                            case 3:
-                                pessoaParaAlterar.setTipoUsuario("Aluno");
-                                break;
-                            default:
-                                pessoaParaAlterar.setTipoUsuario("Aluno");
-                                break;
-                        }
+                        gui.exibirMensagem("DIGITE A NOVA DATA DE NASCIMENTO...: ");
+                        int novaDataNascimento = scanner.nextInt();
+                        pessoaParaAlterar.setNascimento(novaDataNascimento);
+                        //gui.exibirMensagem("DIGITE O NOVO TIPO DE USUÁRIO...: ");
+                        //String novoTipoUsuario = scanner.nextLine();
+                        //pessoaParaAlterar.setTipoUsuario(novoTipoUsuario);
                         gui.exibirMensagem("DIGITE O NOVO LOGIN DE USUARIO...: ");
                         String novoLoginUsuario = scanner.nextLine();
                         pessoaParaAlterar.setLogin(novoLoginUsuario);
@@ -410,66 +275,10 @@ public class menuGeral {
                         System.out.println("USUARIO NAO EXISTE NO BANCO DE DADOS.");
                     }
                     break;
-                case 5:
+                case 5: 
                     return;
                 default:
                     gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
-                    break;
-            }
-        }
-    }
-
-    private void gerenciarDivisaoTreino() {
-        int resp;
-
-        while (true) {
-            resp = gui.menuCrudDivisaoTreino();
-
-            switch (resp) {
-                case 1:
-                    DivisaoTreino div = this.cadastraDivisaoTreino();
-                    if (divisaoTreinoDao.adiciona(div)) {
-                        System.out.println("DIVISAO DE TREINO CRIADA COM SUCESSO!");
-                    } else {
-                        System.out.println("DIVISAO DE TREINO NAO CRIADA.");
-                    }
-                    break;
-                case 2:
-                    divisaoTreinoDao.mostrarTodasDivisoes();
-                    break;
-                case 3:
-                    System.out.println("DIGITE O NOME DA DIVISAO DE TREINO QUE DESEJA ALTERAR...: ");
-                    String nomeDiv = scanner.nextLine();
-                    DivisaoTreino divParaAlterar = divisaoTreinoDao.buscaPorNome(nomeDiv);
-                    if (divParaAlterar != null) {
-                        System.out.println("DIGITE O NOVO NOME DA DIVISAO DE TREINO...: ");
-                        String novoNomeDivisao = scanner.nextLine();
-                        divParaAlterar.setNome(novoNomeDivisao);
-                        System.out.println("DIGITE A NOVA DESCRICAO DA DIVISAO DE TREINO...: ");
-                        String novaDescricaoDivisao = scanner.nextLine();
-                        divParaAlterar.setDescricao(novaDescricaoDivisao);
-                        divParaAlterar.setDataModificacao(LocalDateTime.now());
-                        System.out.println("DIVISAO DE TREINO ALTERADA COM SUCESSO!");
-
-                    } else {
-                        System.out.println("DIVISAO DE TREINO NAO EXISTENTE NO BANCO DE DADOS.");
-                    }
-                    break;
-                case 4:
-                    System.out.println("DIGITE O NOME DA DIVISAO DE TREINO QUE DESEJA EXCLUIR...: ");
-                    String nomeDivExcluir = scanner.nextLine();
-                    DivisaoTreino divParaExcluir = divisaoTreinoDao.buscaPorNome(nomeDivExcluir);
-                    if (divParaExcluir != null) {
-                            divisaoTreinoDao.remover(nomeDivExcluir);
-                            System.out.println("DIVISAO DE TREINO EXCLUIDA COM SUCESSO!");
-                    } else {
-                        System.out.println("DIVISAO DE TREINO NÃO EXISTENTE NO BANCO DE DADOS.");
-                    }
-                    break;
-                case 5:
-                    return;
-                default:
-                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -521,8 +330,8 @@ public class menuGeral {
                         System.out.println("EXERCICIO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
                     break;
-                case 5:
-                    return;
+                case 5: 
+                    return; 
                 default:
                     gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
                     break;
