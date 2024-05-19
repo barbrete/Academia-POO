@@ -18,7 +18,7 @@ import java.util.Objects;
   */
  
  public class Pessoa {
-     static long serial;
+     private static long serial = 1;
      private long id;
      private String nome;
      private String sexo;
@@ -28,12 +28,11 @@ import java.util.Objects;
      private String tipoUsuario;
      private LocalDateTime dataCriacao;
      private LocalDateTime dataModificacao;
-     
-     public Pessoa()
-     {
-         id = Pessoa.serial++;
-     }
- 
+
+    public Pessoa() {
+        id = Pessoa.serial++;
+    }
+    
      public long getId() {
          return id;
      }
@@ -104,10 +103,19 @@ import java.util.Objects;
 
     @Override
     public String toString() {
-        return "Pessoa{" + "id=" + id + ", nome=" + nome + ", sexo=" + sexo + ", nascimento=" + nascimento + ", login=" + login + ", senha=" + senha + ", tipoUsuario=" + tipoUsuario + ", dataCriacao=" + dataCriacao + ", dataModificacao=" + dataModificacao + '}';
+        return "==================INFORMACOES DA PESSOA================= " 
+                + "\nID: " + id 
+                + "\nNOME: " + nome 
+                + "\nSEXO: " + sexo 
+                + "\nNASCIMENTO: " + nascimento 
+                + "\nLOGIN: " + login 
+                + "\nSENHA: " + senha 
+                + "\nTIPO DE USUARI: " + tipoUsuario 
+                + "\nDATA DE CRIACAO: " + dataCriacao 
+                + "\nDATA DE MODIFICACAO: " + dataModificacao;
     }
      
-     
+ 
  
      @Override
      public int hashCode() {

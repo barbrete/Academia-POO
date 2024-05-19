@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package mvcAcademia.model;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -10,33 +11,68 @@ import java.time.LocalDateTime;
  *
  * @author barbrete e kitotsui
  */
+
 public class PessoaDAO {
     
     Pessoa[] pessoas = new Pessoa[5];
 
+    
     public PessoaDAO() {
+        LocalDate dataNascimento1 = LocalDate.of(1996, 9, 11);
         Pessoa p1 = new Pessoa();
         p1.setNome("Rogerio");
         p1.setLogin("Rojas");
         p1.setSenha("123");
-        p1.setTipoUsuario(0);
+        p1.setTipoUsuario("Administrador");
+        p1.setSexo("M");
+        p1.setNascimento(dataNascimento1);
+        p1.setDataCriacao(UtilPessoa.getDiaAtual());
+        p1.setDataModificacao(UtilPessoa.getDiaAtual());
         
-        this.adiciona(p1);
+        adiciona(p1);
 
         Pessoa p2 = new Pessoa();
+        LocalDate dataNascimento2 = LocalDate.of(2000, 5, 13);
         p2.setNome("Barbara");
-        p2.setLogin("babara");
-        p2.setSenha("654");
-        p2.setTipoUsuario(1);
+        p2.setLogin("babs");
+        p2.setSenha("123");
+        p2.setSexo("F");
+        p2.setNascimento(dataNascimento2);
+        p2.setTipoUsuario("Professor");
+        p2.setDataCriacao(UtilPessoa.getDiaAtual());
+        p2.setDataModificacao(UtilPessoa.getDiaAtual());
         adiciona(p2);
 
         Pessoa p3 = new Pessoa();
-        p3.setNome("eduardo");
+        LocalDate dataNascimento3 = LocalDate.of(1986, 8, 13);
+        p3.setNome("Eduardo");
         p3.setLogin("dudu");
-        p3.setSenha("corsa");
-        p3.setTipoUsuario(2);
+        p3.setSenha("123");
+        p3.setSexo("M");
+        p3.setNascimento(dataNascimento3);
+        p3.setTipoUsuario("Aluno");
+        p3.setDataCriacao(UtilPessoa.getDiaAtual());
+        p3.setDataModificacao(UtilPessoa.getDiaAtual());
         adiciona(p3);
         
+    }
+    
+    public Pessoa buscaPessoaPorId(long id) {
+        for (Pessoa p : pessoas) {
+            if (p != null && p.getId() == id) {
+                return p;
+            }
+        }
+        return null;
+    }
+      
+   public void mostraPessoa(long id) {//mostra pessoa especifica
+       Pessoa p = buscaPessoaPorId(id);
+        if (p != null) {
+            System.out.println(p);
+        } else {
+            System.out.println("PESSOA NAO ENCONTRADA.");
+        }
     }
     
     public Pessoa buscaPessoaLogin(String login, String senha) {

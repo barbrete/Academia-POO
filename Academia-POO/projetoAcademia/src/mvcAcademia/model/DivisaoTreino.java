@@ -3,16 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package mvcAcademia.model;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-
 /**
- *
- * @author barbrete e kitotsui
- */
+  *
+  * @author barbrete e kitotsui
+  */
+public class DivisaoTreino {
 
-public class Exercicio{
     private static long serial = 1;
     private long id;
     private String nome;
@@ -20,9 +20,8 @@ public class Exercicio{
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
 
-
-    public Exercicio (){
-        id = Exercicio.serial++;
+    public DivisaoTreino() {
+        id = DivisaoTreino.serial++;
     }
 
     public long getId() {
@@ -60,41 +59,44 @@ public class Exercicio{
     public void setDataModificacao(LocalDateTime dataModificacao) {
         this.dataModificacao = dataModificacao;
     }
+    
+    public void atualizarDataModificacao() {
+        this.dataModificacao = LocalDateTime.now();
+    }
 
     @Override
-     public String toString() {
-         return "==================INFORMACOES DO EXERCICIO================= " 
-                 + "\nID: " + id 
-                 + "\nNOME: " + nome 
-                 + "\nDESCRICAO: " + descricao 
-                 + "\nDATA DE CRIACAO: " + dataCriacao 
-                 + "\nDATA DE MODIFICACAO: " + dataModificacao;
-     }
+    public String toString() {
+        
+        return  "\n(ID: - " + id + ")" 
+                + " NOME: " + nome 
+                + " DESCRICAO: " + descricao;
+                
+    }
 
-      @Override
-     public int hashCode() {
-         int hash = 7;
-         hash = 31 * hash + Objects.hashCode(this.nome);
-         hash = 31 * hash + Objects.hashCode(this.descricao);
-         return hash;
-     }
-    
-      @Override
-     public boolean equals(Object obj) {
-         if (this == obj) {
-             return true;
-         }
-         if (obj == null) {
-             return false;
-         }
-         if (getClass() != obj.getClass()) {
-             return false;
-         }
-         final Exercicio other = (Exercicio) obj;
-         if (!Objects.equals(this.nome, other.nome)) {
-             return false;
-         }
-         return Objects.equals(this.descricao, other.descricao);
-     }  
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (int) (this.id ^ (this.id >>> 32));
+        hash = 53 * hash + Objects.hashCode(this.nome);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DivisaoTreino other = (DivisaoTreino) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return Objects.equals(this.nome, other.nome);
+    }
 
 }

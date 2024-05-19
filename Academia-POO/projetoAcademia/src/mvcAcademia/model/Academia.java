@@ -13,7 +13,7 @@ import java.util.Objects;
   */
  public class Academia {
  
-     private static long serial;
+     private static long serial = 1;
      private long id;
      private String nome;
      private String endereco;
