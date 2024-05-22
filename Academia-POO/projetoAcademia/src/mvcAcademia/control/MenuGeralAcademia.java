@@ -11,10 +11,13 @@ package mvcAcademia.control;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Scanner;
 
 import mvcAcademia.model.Academia;
 import mvcAcademia.model.AcademiaDAO;
+import mvcAcademia.model.AlunoPagamentoMensalidade;
+import mvcAcademia.model.AlunoPagamentoMensalidadeDAO;
 import mvcAcademia.model.AvaliacaoFisica;
 import mvcAcademia.model.AvaliacaoFisicaDAO;
 import mvcAcademia.model.DivisaoTreino;
@@ -27,10 +30,17 @@ import mvcAcademia.model.ExercicioAplicacaoDAO;
 import mvcAcademia.model.ExercicioDAO;
 import mvcAcademia.model.MensalidadeVigente;
 import mvcAcademia.model.MensalidadeVigenteDAO;
+import mvcAcademia.model.MovimentacaoFinanceira;
+import mvcAcademia.model.MovimentacaoFinanceiraDAO;
+import mvcAcademia.model.PagamentoRecorrente;
+import mvcAcademia.model.PagamentoRecorrenteDAO;
 import mvcAcademia.model.Treino;
 import mvcAcademia.model.TreinoDAO;
 import mvcAcademia.model.Pessoa;
 import mvcAcademia.model.PessoaDAO;
+import mvcAcademia.model.RelatorioMovimentacaoFinanceira;
+import mvcAcademia.model.TreinoAplicacao;
+import mvcAcademia.model.TreinoAplicacaoDAO;
 import mvcAcademia.model.UtilPessoa;
 import mvcAcademia.view.AcademiaController;
 
@@ -43,18 +53,24 @@ public class MenuGeralAcademia {
     private DivisaoTreinoDAO divisaoTreinoDAO = new DivisaoTreinoDAO();
     private DivisaoTreinoMusculoDAO divisaoTreinoMusculoDAO = new DivisaoTreinoMusculoDAO();
     private TreinoDAO treinoDAO = new TreinoDAO();
+    private TreinoAplicacaoDAO treinoAplicacaoDAO = new TreinoAplicacaoDAO();
     private ExercicioAplicacaoDAO eaDAO = new ExercicioAplicacaoDAO();
     private AvaliacaoFisicaDAO avFisDAO = new AvaliacaoFisicaDAO();
     private MensalidadeVigenteDAO mvDAO = new MensalidadeVigenteDAO();
+    private PagamentoRecorrenteDAO pagamentoRecorrenteDAO = new PagamentoRecorrenteDAO();
+    private AlunoPagamentoMensalidadeDAO apmDAO = new AlunoPagamentoMensalidadeDAO();
+    private MovimentacaoFinanceiraDAO movimentacaoFinanceiraDAO = new MovimentacaoFinanceiraDAO();
+    RelatorioMovimentacaoFinanceira relatorio = new RelatorioMovimentacaoFinanceira(movimentacaoFinanceiraDAO);
 
     private Scanner scanner = new Scanner(System.in);
     private boolean sair = false;
-    
+    private long pessoaLogadaId;
+
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
-    
+
     public void iniciar() {
         int opcaoUsuario;
 
@@ -85,6 +101,20 @@ public class MenuGeralAcademia {
         }
     }
 
+    private boolean mensalidadeEstaEmDia(Pessoa aluno) {
+        AlunoPagamentoMensalidade apm = apmDAO.buscarUltimoPagamentoPorAluno(aluno.getId());
+        if (apm == null) {
+            return false;
+        }
+        LocalDate dataVencimento = apm.getDataVencimento();
+        LocalDate dataPagamento = apm.getDataPagamento();
+        if (dataPagamento != null) {
+            return !dataPagamento.isAfter(dataVencimento.plusDays(2));
+        } else {
+            return LocalDate.now().isBefore(dataVencimento.plusDays(2));
+        }
+    }
+
     private void fazerLogin() {
         gui.exibirMensagem("LOGIN:");
         String login = scanner.nextLine();
@@ -94,6 +124,7 @@ public class MenuGeralAcademia {
 
         if (pessoaLogada != null) {
             gui.exibirMensagem("USUARIO LOGADO COM SUCESSO!");
+            pessoaLogadaId = pessoaLogada.getId();
 
             switch (pessoaLogada.getTipoUsuario()) {
                 case "Administrador":
@@ -122,16 +153,24 @@ public class MenuGeralAcademia {
 
             switch (opcaoUsuario) {
                 case 1:
-                    // Visualizar Ficha de Treino
-                    // (implementação será adicionada)
+                    TreinoAplicacao fichaTreino = treinoAplicacaoDAO.buscarPorPessoaId(pessoaLogadaId);
+                    if (fichaTreino != null) {
+                        System.out.println(fichaTreino);
+                    } else {
+                        System.out.println("NENHUMA FICHA DE TREINO ASSOCIADA A ESSA PESSOA.");
+                    }
                     break;
                 case 2:
-                    // Imprimir Ficha de Treino
-                    // (implementação será adicionada)
+                    // IMPRIMIR FICHA DE TREINO?  
+                    System.out.println("FICHA DE TREINO SENDO IMPRESSA............");
                     break;
                 case 3:
-                    // Visualizar Avaliações Físicas
-                    // (implementação será adicionada)
+                    AvaliacaoFisica avaliacaoFisica = avFisDAO.buscaAvaliacaoPorPessoaId(pessoaLogadaId);
+                    if (avaliacaoFisica != null) {
+                        System.out.println(avaliacaoFisica);
+                    } else {
+                        System.out.println("NENHUMA AVALIACAO FISICA ASSOCIADA A ESSA PESSOA.");
+                    }
                     break;
                 case 4:
                     return;
@@ -150,19 +189,16 @@ public class MenuGeralAcademia {
 
             switch (opcaoUsuario) {
                 case 1:
-                    // CRUD Treino (implementação será adicionada)
+                    gerenciarPessoas();
                     break;
                 case 2:
-                    // Visualizar Ficha de Treino (para Alunos)
-                    // (implementação será adicionada)
+                    gerenciaDivisaoTreino();
                     break;
                 case 3:
-                    // Imprimir Ficha de Treino (para Alunos)
-                    // (implementação será adicionada)
+                    gerenciaTreinoAplicacao();
                     break;
                 case 4:
-                    // Visualizar Avaliações Físicas (para Alunos)
-                    // (implementação será adicionada)
+                    gerenciaAvaliacaoFisica();
                     break;
                 case 5:
                     return;
@@ -311,7 +347,7 @@ public class MenuGeralAcademia {
 
         return novoTreino;
     }
-    
+
     private MensalidadeVigente cadastraMensalidadeVigente() {
         MensalidadeVigente novaMensalidade = new MensalidadeVigente();
         gui.exibirMensagem("CADASTRO DE MENSALIDADE VIGENTE\n");
@@ -334,6 +370,128 @@ public class MenuGeralAcademia {
         return novaMensalidade;
     }
 
+    private AlunoPagamentoMensalidade cadastraAlunoPagamentoMensalidade() {
+        AlunoPagamentoMensalidade novoAPM = new AlunoPagamentoMensalidade();
+        System.out.println("CADASTRO DE NOVO PAGAMENTO DE MENSALIDADE DO ALUNO:\n");
+        System.out.println("DIGITE ID DO ALUNO: ");
+        long idPessoa = Long.parseLong(scanner.nextLine());
+        Pessoa p = pessoaDAO.buscaPessoaPorId(idPessoa);
+        System.out.println("ESCOLHA O ID DA MENSALIDADE VIGENTE ASSOCIADA A ESSA PESSOA: ");
+        MensalidadeVigente mv = mvDAO.mostraMensalidadeVigente(idPessoa);
+        long idMensalidadeVigente = Long.parseLong(scanner.nextLine());
+
+        LocalDateTime dataCriacao = pessoaDAO.getDataCriacaoPorId(idPessoa);
+        LocalDate dataCriacaoLocalDate = dataCriacao.toLocalDate();
+        UtilPessoa.incrementaMes(dataCriacaoLocalDate, 1);
+        novoAPM.setDataVencimento(dataCriacaoLocalDate);
+
+        System.out.println("VALOR PAGO: ");
+        novoAPM.setValorPago(scanner.nextDouble());
+        scanner.nextLine();
+        System.out.println("MODALIDADE: \n1 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
+        novoAPM.setModalidade(scanner.nextInt());
+        scanner.nextLine();
+
+        System.out.println("DIGITE A DATA DE PAGAMENTO: (dd/MM/yyyy)");//fazer metodo para verificar se a data de pagamento esta sendo paga depois da data de criacao da conta da pessoa
+        String dataPagamentoStr = scanner.nextLine();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dataPagamento = LocalDate.parse(dataPagamentoStr, formatter);
+        novoAPM.setDataPagamento(dataPagamento);
+
+        novoAPM.setDataCriacao(UtilPessoa.getDiaAtual());
+        novoAPM.setDataModificacao(UtilPessoa.getDiaAtual());
+
+        return novoAPM;
+    }
+
+    private TreinoAplicacao cadastrarTreinoAplicacao() {
+        TreinoAplicacao treinoAplicacao = new TreinoAplicacao();
+        System.out.println("CADASTRO DE NOVO TREINO APLICACAO:\n");
+
+        System.out.println("NOME DO TREINO APLICACAO: ");
+        treinoAplicacao.setNome(scanner.nextLine());
+
+        System.out.println("DESCRICAO DO TREINO APLICACAO: ");
+        treinoAplicacao.setDescricao(scanner.nextLine());
+
+        return treinoAplicacao;
+    }
+
+    private AvaliacaoFisica cadastraAvaliacaoFisica() {
+        AvaliacaoFisica af = new AvaliacaoFisica();
+        System.out.println("AVALIACAO FISICA");
+        System.out.println("A AVALIACAO FISICA CUSTA R$20,00, VOCE ESTA CIENTE (S/N)?");
+        String resp = scanner.nextLine();
+
+        if ("S".equalsIgnoreCase(resp)) {
+            System.out.println("DIGITE SEU ID: ");
+            long idPessoa = Long.parseLong(scanner.nextLine());
+            Pessoa p = pessoaDAO.buscaPessoaPorId(idPessoa);
+            Treino t = treinoDAO.buscaTreinoPorId(idPessoa);
+
+            if (p != null) {
+                af.setPessoa(p);
+                System.out.println("DIGITE SEU PESO: ");
+                double peso = scanner.nextDouble();
+                System.out.println("DIGITE SUA ALTURA: ");
+                double altura = scanner.nextDouble();
+                double imc = avFisDAO.calculaIMC(peso, altura);
+                scanner.nextLine();
+                avFisDAO.interpretaIMC(imc);
+                System.out.println("QUAL O SEU INDICE DE SATISFACAO COM O RESULTADO? ");
+                af.setIndiceSatisfacao(scanner.nextInt());
+                scanner.nextLine();
+                af.setPeso(peso);
+                af.setAltura(altura);
+                af.setImc(imc);
+                af.setDataCriacao(new Date());
+                af.setDataModificacao(new Date());
+                System.out.println("OBRIGADO POR REALIZAR A AVALIACAO FISICA! SERA ADICIONADO O VALOR DE R$20,00 NA SUA MENSALIDADE!");
+            } else {
+                System.out.println("PESSOA NAO ENCONTRADA");
+            }
+        } else {
+            System.out.println("AVALIACAO FISICA NAO FOI CRIADA.");
+        }
+        return af;
+    }
+
+    private PagamentoRecorrente cadastraPagamentoRecorrente() {
+        PagamentoRecorrente pagamentoRecorrente = new PagamentoRecorrente();
+        System.out.println("CADASTRO DE PAGAMENTO RECORRENTE");
+
+        System.out.println("DIGITE O ID DA PESSOA: ");
+        long idPessoa = Long.parseLong(scanner.nextLine());
+        Pessoa pessoa = pessoaDAO.buscaPessoaPorId(idPessoa);
+        if (pessoa != null) {
+            pagamentoRecorrente.setPessoa(pessoa);
+        } else {
+            System.out.println("PESSOA NÃO ENCONTRADA.");
+            return null;
+        }
+
+        return pagamentoRecorrente;
+    }
+
+    private MovimentacaoFinanceira cadastraMovimentacaoFinanceira() {
+        MovimentacaoFinanceira movimentacao = new MovimentacaoFinanceira();
+        System.out.println("CADASTRO DE MOVIMENTACAO FINANCEIRA");
+        System.out.println("DIGITE O VALOR: ");
+        double valor = Double.parseDouble(scanner.nextLine());
+        System.out.println("SELECIONE O TIPO DE MOVIMENTACAO (ENTRADA ou SAIDA): ");
+        String tipo = scanner.nextLine().toUpperCase();
+        System.out.println("DIGITE A DESCRICAO: ");
+        String descricao = scanner.nextLine();
+
+        movimentacao.setValor(valor);
+        movimentacao.setTipo(tipo);
+        movimentacao.setDescricao(descricao);
+        movimentacao.setDataCriacao(LocalDateTime.now());
+        movimentacao.setDataModificacao(LocalDateTime.now());
+
+        return movimentacao;
+    }
+
     private void exibirMenuCRUD() {
         int resp;
 
@@ -352,6 +510,7 @@ public class MenuGeralAcademia {
                     break;
                 case 4:
                     genreciaExercicioAplicacao();
+                    break;
                 case 5:
                     gerenciaDivisaoTreino();
                     break;
@@ -362,26 +521,25 @@ public class MenuGeralAcademia {
                     gerenciaTreino();
                     break;
                 case 8:
-                    gerenciaAvaliacaoFisica();
+                    gerenciaTreinoAplicacao();
                     break;
                 case 9:
-                    gerenciaMensalidadeVigente();
+                    gerenciaAvaliacaoFisica();
+
                     break;
-                    case 10:
-                    //gerenciaPagamentoMensalidade();
-                    System.out.println("CRUD EM ESTADO DE DESENVOLVIMENTO");
+                case 10:
+                    gerenciaMensalidadeVigente();
+
                     break;
                 case 11:
-                    //gerenciaPagamentoRecorrente();
-                    System.out.println("CRUD EM ESTADO DE DESENVOLVIMENTO");
+                    gerenciaAlunoPagamentoMensalidade();
+
                     break;
                 case 12:
-                    //gerenciaEntradaAluno();
-                    System.out.println("CRUD EM ESTADO DE DESENVOLVIMENTO");
+                    gerenciaPagamentoRecorrente();
                     break;
                 case 13:
-                    //gerenciaMovimentacaoFinaceira();
-                    System.out.println("CRUD EM ESTADO DE DESENVOLVIMENTO");                    
+                    gerenciaMovimentacaoFinanceira();
                     break;
                 case 14:
                     //gerenciaRelatorioAlunoAdimplentes();
@@ -389,12 +547,8 @@ public class MenuGeralAcademia {
                     break;
                 case 15:
                     //gerenciaRelatorio();
-                    System.out.println("CRUD EM ESTADO DE DESENVOLVIMENTO");
                     break;
                 case 16:
-                    //gerenciaFichaDeTreino Crud treino aplicacao?
-                    System.out.println("CRUD EM ESTADO DE DESENVOLVIMENTO");
-                case 17:
                     return;
                 default:
                     gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
@@ -734,6 +888,149 @@ public class MenuGeralAcademia {
         }
     }
 
+    private void gerenciaTreinoAplicacao() {
+        int resp;
+
+        while (true) {
+            resp = gui.menuCrudTreinoAplicacao();
+
+            switch (resp) {
+                case 1:
+                    TreinoAplicacao treinoAplicacao = this.cadastrarTreinoAplicacao();
+                    if (treinoAplicacaoDAO.adiciona(treinoAplicacao)) {
+                        System.out.println("TREINO APLICACAO CRIADO COM SUCESSO!");
+                    } else {
+                        System.out.println("FALHA AO CRIAR TREINO APLICACAO.");
+                    }
+                    break;
+                case 2:
+                    treinoAplicacaoDAO.mostrarTodosTreinosAplicacoes();
+                    break;
+                case 3:
+                    System.out.println("DIGITE O ID DO TREINO APLICACAO QUE DESEJA ALTERAR...: ");
+                    long idAplicacao = Long.parseLong(scanner.nextLine());
+                    TreinoAplicacao aplicacaoParaAlterar = treinoAplicacaoDAO.buscarPorId(idAplicacao);
+                    if (aplicacaoParaAlterar != null) {
+                        System.out.println("DIGITE O NOVO NOME DO TREINO APLICACAO...: ");
+                        String novoNomeAplicacao = scanner.nextLine();
+                        aplicacaoParaAlterar.setNome(novoNomeAplicacao);
+                        System.out.println("DIGITE A NOVA DESCRICAO DO TREINO APLICACAO...: ");
+                        String novaDescricaoAplicacao = scanner.nextLine();
+                        aplicacaoParaAlterar.setDescricao(novaDescricaoAplicacao);
+                        System.out.println("TREINO APLICACAO ALTERADO COM SUCESSO!");
+
+                    } else {
+                        System.out.println("TREINO APLICACAO NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 4:
+                    System.out.println("DIGITE O ID DO TREINO APLICACAO QUE DESEJA EXCLUIR...: ");
+                    long idAplicacaoExcluir = Long.parseLong(scanner.nextLine());
+                    if (treinoAplicacaoDAO.remover(idAplicacaoExcluir)) {
+                        System.out.println("TREINO APLICACAO EXCLUIDO COM SUCESSO!");
+                    } else {
+                        System.out.println("TREINO APLICACAO NÃO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 5:
+                    treinoAplicacaoDAO.mostrarTodosTreinosAplicacoes();
+                    System.out.println("\nQUAL TREINO APLICACAO DESEJA GERENCIAR? DIGITE O ID:\n");
+                    long idTreinoAplicacaoAssociar = Long.parseLong(scanner.nextLine());
+                    TreinoAplicacao treinoAplicacaoAssociar = treinoAplicacaoDAO.buscarPorId(idTreinoAplicacaoAssociar);
+
+                    if (treinoAplicacaoAssociar != null) {
+                        System.out.println("ACADEMIAS EXISTENTES:\n");
+                        academiaDAO.mostrarTodasAcademias();
+                        System.out.println("QUAL ACADEMIA DESEJA ASSOCIAR? DIGITE O ID:\n");
+                        long idAcademia = Long.parseLong(scanner.nextLine());
+                        Academia academia = academiaDAO.buscaPorId(idAcademia);
+                        if (academia != null) {
+                            treinoAplicacaoAssociar.setAcademia(academia);
+                        } else {
+                            System.out.println("ACADEMIA NÃO ENCONTRADA.");
+                            break;
+                        }
+
+                        // Associar Pessoa
+                        System.out.println("PESSOAS EXISTENTES:\n");
+                        pessoaDAO.mostrarTodos();
+                        System.out.println("QUAL PESSOA DESEJA ASSOCIAR? DIGITE O ID:\n");
+                        long idPessoa = Long.parseLong(scanner.nextLine());
+                        Pessoa pessoa = pessoaDAO.buscaPessoaPorId(idPessoa);
+                        if (pessoa != null) {
+                            treinoAplicacaoAssociar.setPessoa(pessoa);
+                        } else {
+                            System.out.println("PESSOA NÃO ENCONTRADA.");
+                            break;
+                        }
+
+                        System.out.println("TREINOS EXISTENTES:\n");
+                        treinoDAO.mostrarTodosTreinos();
+                        System.out.println("QUAL TREINO DESEJA ASSOCIAR? DIGITE O ID:\n");
+                        long idTreino = Long.parseLong(scanner.nextLine());
+                        Treino treino = treinoDAO.buscaTreinoPorId(idTreino);
+                        if (treino != null) {
+                            treinoAplicacaoAssociar.setTreino(treino);
+                        } else {
+                            System.out.println("TREINO NÃO ENCONTRADO.");
+                            break;
+                        }
+
+                        System.out.println("EXERCICIOS EXISTENTES:\n");
+                        exercicioDAO.mostrarTodosExercicios();
+                        System.out.println("QUAL EXERCICIO DESEJA ASSOCIAR? DIGITE O ID:\n");
+                        long idExercicio = Long.parseLong(scanner.nextLine());
+                        Exercicio exercicio = exercicioDAO.buscaPorId(idExercicio);
+                        if (exercicio != null) {
+                            treinoAplicacaoAssociar.setExercicio(exercicio);
+                        } else {
+                            System.out.println("EXERCICIO NÃO ENCONTRADO.");
+                            break;
+                        }
+
+                        System.out.println("DIVISOES DE TREINO EXISTENTES:\n");
+                        divisaoTreinoDAO.mostrarTodasDivisoesTreino();
+                        System.out.println("QUAL DIVISAO DE TREINO DESEJA ASSOCIAR? DIGITE O ID:\n");
+                        long idDivisaoTreino = Long.parseLong(scanner.nextLine());
+                        DivisaoTreino divisaoTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
+                        if (divisaoTreino != null) {
+                            treinoAplicacaoAssociar.setDivTreino(divisaoTreino);
+                        } else {
+                            System.out.println("DIVISAO DE TREINO NÃO ENCONTRADA.");
+                            break;
+                        }
+
+                        System.out.println("DIVISOES DE TREINO MUSCULO EXISTENTES:\n");
+                        divisaoTreinoMusculoDAO.mostrarTodasDivisoesMusculo();
+                        System.out.println("QUAL DIVISAO DE TREINO MUSCULO DESEJA ASSOCIAR? DIGITE O ID:\n");
+                        long idDivisaoTreinoMusculo = Long.parseLong(scanner.nextLine());
+                        DivisaoTreinoMusculo divisaoTreinoMusculo = divisaoTreinoMusculoDAO.buscaPorId(idDivisaoTreinoMusculo);
+
+                        if (academia != null && pessoa != null && treino != null && exercicio != null && divisaoTreino != null && divisaoTreinoMusculo != null) {
+                            treinoAplicacaoAssociar.setAcademia(academia);
+                            treinoAplicacaoAssociar.setPessoa(pessoa);
+                            treinoAplicacaoAssociar.setTreino(treino);
+                            treinoAplicacaoAssociar.setExercicio(exercicio);
+                            treinoAplicacaoAssociar.setDivTreino(divisaoTreino);
+                            treinoAplicacaoAssociar.setDivTreinoMusc(divisaoTreinoMusculo);
+                            System.out.println("ASSOCIACOES REALIZADAS COM SUCESSO!");
+                        } else {
+                            System.out.println("FALHA AO REALIZAR ASSOCIACOES. CERTIFIQUE-SE DE QUE TODOS OS DADOS EXISTEM.");
+                        }
+                    } else {
+                        System.out.println("TREINO APLICACAO NÃO ENCONTRADO.");
+                    }
+
+                    break;
+                case 6:
+                    return;
+                default:
+                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    break;
+            }
+        }
+    }
+
     private void gerenciaTreino() {
         int resp;
 
@@ -844,50 +1141,104 @@ public class MenuGeralAcademia {
             }
         }
     }
-    
+
     private void gerenciaAvaliacaoFisica() {
-        AvaliacaoFisica af = new AvaliacaoFisica();
-        System.out.println("AVALIACAO FISICA");
-        System.out.println("A AVALIACAO FISICA CUSTA R$20,00, VOCE ESTA CIENTE (S/N)?");
-        String resp = scanner.nextLine();
-        
-        if ("S".equals(resp)) {
-            System.out.println("DIGITE SEU ID: ");
-            long idPessoa = Long.parseLong(scanner.nextLine());
-            Pessoa p = pessoaDAO.buscaPessoaPorId(idPessoa);
-            Treino t = treinoDAO.buscaTreinoPorId(idPessoa);
-            
-            if (p != null) {
-                pessoaDAO.mostraPessoa(idPessoa);
-                scanner.nextLine();
-                treinoDAO.mostraTreino(idPessoa);
-                scanner.nextLine();
-                System.out.println("DIGITE SEU PESO: ");
-                double peso = scanner.nextDouble();
-                System.out.println("DIGITE SUA ALTURA: ");
-                double altura = scanner.nextDouble();
-                double imc = avFisDAO.calculaIMC(peso, altura);
-                scanner.nextLine();
-                avFisDAO.interpretaIMC(imc);
-                scanner.nextLine();
-                System.out.println("QUAL O SEU INDICE DE SATISFACAO COM O RESULTADO? ");
-                af.setIndiceSatisfacao(scanner.nextInt());
-                scanner.nextLine();
-                
-                //CHAMAR METODO PARA PAGAR O DINHEIRO DA AVALIACAO
-                System.out.println("OBRIGADO POR COMPRAR A AVALICAO FISICA! RETIRADO O VALOR DE R$20,00 DA SUA CONTA");
-                scanner.nextLine();
-                
-            } 
-            else {
-                System.out.println("PESSOA NAO ENCONTRADA");
+        int resp;
+
+        while (true) {
+            resp = gui.menuCrudAvaliacaoFisica();
+
+            switch (resp) {
+                case 1:
+                    System.out.println("A AVALIACAO FISICA CUSTA R$20,00, VOCE ESTA CIENTE (S/N)?");
+                    String respCriacao = scanner.nextLine();
+
+                    if ("S".equalsIgnoreCase(respCriacao)) {
+
+                        AvaliacaoFisica novaAvaliacao = this.cadastraAvaliacaoFisica();
+                        if (avFisDAO.adiciona(novaAvaliacao)) {
+                            System.out.println("AVALIACAO FISICA CRIADA COM SUCESSO!");
+                        } else {
+                            System.out.println("ERRO AO CRIAR A AVALIACAO FISICA.");
+                        }
+                    } else {
+                        System.out.println("AVALIACAO FISICA NAO FOI CRIADA.");
+                    }
+                    break;
+                case 2:
+                    // Mostrar Todas as Avaliações Físicas
+                    avFisDAO.mostrarAvaliacaoFisica();
+                    break;
+                case 3:
+                    // Alterar Avaliação Física
+                    System.out.println("DIGITE O ID DA AVALIACAO FISICA QUE DESEJA ALTERAR: ");
+                    long idAvaliacao = Long.parseLong(scanner.nextLine());
+                    AvaliacaoFisica avaliacaoParaAlterar = avFisDAO.buscaAvaliacaoID(idAvaliacao);
+                    if (avaliacaoParaAlterar != null) {
+                        System.out.println("DIGITE O NOVO PESO: ");
+                        double novoPeso = scanner.nextDouble();
+                        System.out.println("DIGITE A NOVA ALTURA: ");
+                        double novaAltura = scanner.nextDouble();
+                        double novoImc = avFisDAO.calculaIMC(novoPeso, novaAltura);
+                        scanner.nextLine();
+                        avFisDAO.interpretaIMC(novoImc);
+                        System.out.println("QUAL O NOVO INDICE DE SATISFACAO? ");
+                        int novoIndiceSatisfacao = scanner.nextInt();
+                        scanner.nextLine();
+                        avaliacaoParaAlterar.setPeso(novoPeso);
+                        avaliacaoParaAlterar.setAltura(novaAltura);
+                        avaliacaoParaAlterar.setImc(novoImc);
+                        avaliacaoParaAlterar.setIndiceSatisfacao(novoIndiceSatisfacao);
+                        avaliacaoParaAlterar.setDataModificacao(new Date());
+                        System.out.println("AVALIACAO FISICA ALTERADA COM SUCESSO!");
+                    } else {
+                        System.out.println("AVALIACAO FISICA NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 4:
+                    // Excluir Avaliação Física
+                    System.out.println("DIGITE O ID DA AVALIACAO FISICA QUE DESEJA EXCLUIR: ");
+                    long idAvaliacaoExcluir = Long.parseLong(scanner.nextLine());
+                    AvaliacaoFisica avaliacaoParaExcluir = avFisDAO.buscaAvaliacaoID(idAvaliacaoExcluir);
+                    if (avaliacaoParaExcluir != null) {
+                        avFisDAO.remover(avaliacaoParaExcluir.getId());
+                        System.out.println("AVALIACAO FISICA EXCLUIDA COM SUCESSO!");
+                    } else {
+                        System.out.println("AVALIACAO FISICA NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("DIGITE O ID DA PESSOA PARA ASSOCIAR A AVALIACAO FISICA: ");
+                    long idPessoa = Long.parseLong(scanner.nextLine());
+                    Pessoa pessoaParaAssociar = pessoaDAO.buscaPessoaPorId(idPessoa);
+
+                    if (pessoaParaAssociar != null) {
+                        System.out.println("AVALIACOES FISICAS EXISTENTES:\n");
+                        avFisDAO.mostrarAvaliacaoFisica();
+                        System.out.println("\nQUAL AVALIACAO FISICA DESEJA ASSOCIAR? DIGITE O ID:\n");
+                        long idAvaliacaoAssociar = Long.parseLong(scanner.nextLine());
+                        AvaliacaoFisica avaliacaoAssociar = avFisDAO.buscaAvaliacaoID(idAvaliacaoAssociar);
+
+                        if (avaliacaoAssociar != null) {
+                            avaliacaoAssociar.setPessoa(pessoaParaAssociar);
+                            System.out.println("AVALIACAO FISICA ASSOCIADA COM SUCESSO!");
+                        } else {
+                            System.out.println("AVALIACAO FISICA NAO ENCONTRADA.");
+                        }
+                    } else {
+                        System.out.println("PESSOA NAO ENCONTRADA.");
+                    }
+                    break;
+                case 6:
+                    return;
+                default:
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
+                    break;
             }
         }
-        else
-            return;
-}
+    }
 
-    private void gerenciaMensalidadeVigente(){
+    private void gerenciaMensalidadeVigente() {
         int resp;
 
         while (true) {
@@ -896,7 +1247,7 @@ public class MenuGeralAcademia {
             switch (resp) {
                 case 1:
                     MensalidadeVigente mv = this.cadastraMensalidadeVigente();
-                    
+
                     if (mvDAO.adiciona(mv)) {
                         System.out.println("MENSALIDADE VIGENTE CRIADA COM SUCESSO!");
                     } else {
@@ -951,7 +1302,228 @@ public class MenuGeralAcademia {
         }
     }
 
-    
+    private void gerenciaPagamentoRecorrente() {
+        int resp;
+
+        while (true) {
+            resp = gui.menuCrudPagamentoRecorrente();
+
+            switch (resp) {
+                case 1:
+                    PagamentoRecorrente novoPagamento = this.cadastraPagamentoRecorrente();
+                    if (pagamentoRecorrenteDAO.adiciona(novoPagamento)) {
+                        System.out.println("PAGAMENTO RECORRENTE CRIADO COM SUCESSO!");
+                    } else {
+                        System.out.println("ERRO AO CRIAR O PAGAMENTO RECORRENTE.");
+                    }
+                    break;
+                case 2:
+                    PagamentoRecorrente[] pagamentos = pagamentoRecorrenteDAO.mostrarTodosPagamentos();
+                    if (pagamentos.length > 0) {
+                        System.out.println("PAGAMENTOS RECORRENTES:");
+                        for (PagamentoRecorrente pagamento : pagamentos) {
+                            System.out.println(pagamento);
+                        }
+                    } else {
+                        System.out.println("NÃO HÁ PAGAMENTOS RECORRENTES REGISTRADOS.");
+                    }
+                    break;
+                case 3:
+                    System.out.println("DIGITE O ID DO PAGAMENTO RECORRENTE QUE DESEJA ALTERAR: ");
+                    int idPagamento = Integer.parseInt(scanner.nextLine());
+                    PagamentoRecorrente pagamentoParaAlterar = pagamentoRecorrenteDAO.buscaPagamentoPorId(idPagamento);
+                    if (pagamentoParaAlterar != null) {
+                        System.out.println("IMPLEMENTAR LÓGICA PARA ALTERAR O PAGAMENTO RECORRENTE.");
+                    } else {
+                        System.out.println("PAGAMENTO RECORRENTE NÃO ENCONTRADO.");
+                    }
+                    break;
+                case 4:
+                    System.out.println("DIGITE O ID DO PAGAMENTO RECORRENTE QUE DESEJA EXCLUIR: ");
+                    int idPagamentoExcluir = Integer.parseInt(scanner.nextLine());
+                    if (pagamentoRecorrenteDAO.remover(idPagamentoExcluir)) {
+                        System.out.println("PAGAMENTO RECORRENTE EXCLUÍDO COM SUCESSO!");
+                    } else {
+                        System.out.println("PAGAMENTO RECORRENTE NÃO ENCONTRADO.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("DIGITE O ID DA PESSOA PARA ASSOCIAR AO PAGAMENTO RECORRENTE: ");
+                    long idPessoa = Long.parseLong(scanner.nextLine());
+                    Pessoa pessoaParaAssociar = pessoaDAO.buscaPessoaPorId(idPessoa);
+
+                    if (pessoaParaAssociar != null) {
+                        System.out.println("PAGAMENTOS RECORRENTES EXISTENTES:\n");
+                        pagamentoRecorrenteDAO.mostrarTodosPagamentos();
+                        System.out.println("\nQUAL PAGAMENTO RECORRENTE DESEJA ASSOCIAR? DIGITE O ID:\n");
+                        long idPagamentoAssociar = Long.parseLong(scanner.nextLine());
+                        PagamentoRecorrente pagamentoAssociar = pagamentoRecorrenteDAO.buscaPagamentoPorId(idPagamentoAssociar);
+
+                        if (pagamentoAssociar != null) {
+                            pagamentoAssociar.setPessoa(pessoaParaAssociar);
+                            System.out.println("PAGAMENTO RECORRENTE ASSOCIADO COM SUCESSO!");
+                        } else {
+                            System.out.println("PAGAMENTO RECORRENTE NAO ENCONTRADO.");
+                        }
+                    } else {
+                        System.out.println("PESSOA NAO ENCONTRADA.");
+                    }
+                    break;
+                case 6:
+                    return;
+                default:
+                    System.out.println("ESCOLHA UMA OPÇÃO VÁLIDA.");
+                    break;
+            }
+        }
+    }
+
+    private void gerenciaMovimentacaoFinanceira() {
+        int opcao;
+
+        while (true) {
+            opcao = gui.menuCrudMovimentacaoFinanceira();
+
+            switch (opcao) {
+                case 1:
+                    MovimentacaoFinanceira novaMovimentacao = this.cadastraMovimentacaoFinanceira();
+                    if (movimentacaoFinanceiraDAO.adiciona(novaMovimentacao)) {
+                        System.out.println("Movimentação financeira cadastrada com sucesso!");
+                    } else {
+                        System.out.println("Erro ao cadastrar movimentação financeira.");
+                    }
+                    break;
+                case 2:
+                    movimentacaoFinanceiraDAO.mostrarTodas();
+                    break;
+                case 3:
+                    System.out.println("Digite o ID da movimentação financeira que deseja alterar: ");
+                    long idMovimentacao = Long.parseLong(scanner.nextLine());
+                    MovimentacaoFinanceira movimentacaoParaAlterar = movimentacaoFinanceiraDAO.buscarMovimentacaoPorId(idMovimentacao);
+                    if (movimentacaoParaAlterar != null) {
+                        System.out.println("Digite o novo valor: ");
+                        double novoValor = Double.parseDouble(scanner.nextLine());
+                        System.out.println("Digite a nova descrição: ");
+                        String novaDescricao = scanner.nextLine();
+                        movimentacaoParaAlterar.setValor(novoValor);
+                        movimentacaoParaAlterar.setDescricao(novaDescricao);
+                        movimentacaoParaAlterar.setDataModificacao(LocalDateTime.now());
+                        System.out.println("Movimentação financeira alterada com sucesso!");
+                    } else {
+                        System.out.println("Movimentação financeira não encontrada.");
+                    }
+                    break;
+                case 4:
+                    System.out.println("Digite o ID da movimentação financeira que deseja excluir: ");
+                    long idMovimentacaoExcluir = Long.parseLong(scanner.nextLine());
+                    MovimentacaoFinanceira movimentacaoParaExcluir = movimentacaoFinanceiraDAO.buscarMovimentacaoPorId(idMovimentacaoExcluir);
+                    if (movimentacaoParaExcluir != null) {
+                        movimentacaoFinanceiraDAO.remover(idMovimentacaoExcluir);
+                        System.out.println("Movimentação financeira excluída com sucesso!");
+                    } else {
+                        System.out.println("Movimentação financeira não encontrada.");
+                    }
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("Escolha uma opção válida.");
+                    break;
+            }
+        }
+    }
+
+    private void gerenciaAlunoPagamentoMensalidade() {
+        int resp;
+
+        while (true) {
+            resp = gui.menuCrudAlunoPagamentoMensalidade();
+
+            switch (resp) {
+                case 1:
+                    AlunoPagamentoMensalidade apm = this.cadastraAlunoPagamentoMensalidade();
+                    if (apmDAO.adiciona(apm)) {
+                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO CRIADO COM SUCESSO!");
+                    } else {
+                        System.out.println("FALHA AO CRIAR PAGAMENTO DA MENSALIDADE DO ALUNO.");
+                    }
+                    break;
+                case 2:
+                    apmDAO.mostrarTodos();
+                    break;
+                case 3:
+                    System.out.println("DIGITE O ID DO PAGAMENTO DA MENSALIDADE DO ALUNO QUE DESEJA ALTERAR...: ");
+                    long id = scanner.nextLong();
+                    AlunoPagamentoMensalidade apmParaAlterar = apmDAO.buscaAlunoPagamentoMensalidadePorId(id);
+                    if (apmParaAlterar != null) {
+                        gui.exibirMensagem("DIGITE O NOVO VALOR QUE IRA PAGAR...: ");
+                        double novoValorAPM = scanner.nextDouble();
+                        apmParaAlterar.setValorPago(novoValorAPM);
+                        scanner.nextLine();
+
+                        System.out.println("MODALIDADE: \n0 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
+                        int novaModalidade = scanner.nextInt();
+                        apmParaAlterar.setModalidade(novaModalidade);
+
+                        gui.exibirMensagem("DIGITE A NOVA DATA DE PAGAMENTO (dd/MM/yyyy)...: ");
+                        String novaDataPagamentoStr = scanner.nextLine();
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                        LocalDate dataPagamento = LocalDate.parse(novaDataPagamentoStr, formatter);
+                        apmParaAlterar.setDataPagamento(dataPagamento);
+
+                        apmParaAlterar.setDataCriacao(UtilPessoa.getDiaAtual());
+                        apmParaAlterar.setDataModificacao(UtilPessoa.getDiaAtual());
+
+                        gui.exibirMensagem("PAGAMENTO DA MENSALIDADE DO ALUNO ALTERADA COM SUCESSO!");
+                    } else {
+                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 4:
+                    System.out.println("DIGITE O ID DO PAGAMENTO DA MENSALIDADE DO ALUNO QUE DESEJA EXCLUIR...: ");
+                    long ide = scanner.nextLong();
+                    AlunoPagamentoMensalidade apmParaExcluir = apmDAO.buscaAlunoPagamentoMensalidadePorId(ide);
+                    if (apmParaExcluir != null) {
+                        mvDAO.remover(ide);
+                        gui.exibirMensagem("MENSALIDADE VIGENTE EXCLUIDO COM SUCESSO!");
+                    } else {
+                        System.out.println("MENSALIDADE VIGENTE NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 5:
+                    return;
+                default:
+                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    break;
+            }
+        }
+    }
+
+    private void gerenciaRelatorio() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("DIGITE O MES (1 A 12): ");
+        int MES = 0;
+        if (scanner.hasNextInt()) {
+            MES = scanner.nextInt();
+        } else {
+            System.out.println("ENTRADA INVALIDA PARA O MES.");
+            return;
+        }
+
+        System.out.println("DIGITE O ANO: ");
+        int ANO = 0;
+        if (scanner.hasNextInt()) {
+            ANO = scanner.nextInt();
+        } else {
+            System.out.println("ENTRADA INVALIDA PARA O ANO.");
+            return;
+        }
+        relatorio.exibirRelatorio(MES, ANO);
+        
+        scanner.close();
+    }
+
     public static void main(String[] args) {
         MenuGeralAcademia menu = new MenuGeralAcademia();
         menu.iniciar();
