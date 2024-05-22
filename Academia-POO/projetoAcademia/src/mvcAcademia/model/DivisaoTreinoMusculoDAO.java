@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class DivisaoTreinoMusculoDAO {
 
     private DivisaoTreinoMusculo[] vetorDivisoesMusculo = new DivisaoTreinoMusculo[10];
-    private DivisaoTreinoDAO divisaoTreinoDAO;
+
 
     public DivisaoTreinoMusculoDAO() {
         DivisaoTreinoMusculo divA = new DivisaoTreinoMusculo();

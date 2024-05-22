@@ -28,11 +28,12 @@ import java.util.Objects;
      private String tipoUsuario;
      private LocalDateTime dataCriacao;
      private LocalDateTime dataModificacao;
-
-    public Pessoa() {
-        id = Pessoa.serial++;
-    }
-    
+     
+     public Pessoa()
+     {
+         id = Pessoa.serial++;
+     }
+ 
      public long getId() {
          return id;
      }

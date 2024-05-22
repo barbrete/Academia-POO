@@ -92,19 +92,19 @@ public class AvaliacaoFisica {
         this.dataModificacao = dataModificacao;
     }
 
-    @Override
-    public String toString() {
-        return "AvaliacaoFisica{" + 
-                "id=" + id + 
-                ", pessoa=" + pessoa + 
-                ", ultimoTreino=" + ultimoTreino +
-                ", peso=" + peso + 
-                ", altura=" + altura + 
-                ", imc=" + imc + 
-                ", indiceSatisfacao=" + indiceSatisfacao + 
-                ", dataCriacao=" + dataCriacao + 
-                ", dataModificacao=" + dataModificacao + '}';
-    }
+   @Override
+public String toString() {
+    return "\n==================INFORMACOES DA AVALIACAO FISICA================== " 
+            + "\nID: " + id 
+            + "\nULTIMO TREINO: " + ultimoTreino
+            + "\nPESO: " + peso + " kg"
+            + "\nALTURA: " + altura + " m"
+            + "\nIMC: " + imc 
+            + "\nINDICE DE SATISFACAO: " + indiceSatisfacao 
+            + "\nDATA DE CRIACAO: " + dataCriacao 
+            + "\nDATA DE MODIFICACAO: " + dataModificacao;
+}
+
 
     @Override
     public int hashCode() {

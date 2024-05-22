@@ -67,7 +67,7 @@ import java.util.Objects;
  
      @Override
      public String toString() {
-         return "==================INFORMACOES DA ACADEMIA================= " 
+         return "\n==================INFORMACOES DA ACADEMIA================= " 
                  + "\nID: " + id 
                  + "\nNOME: " + nome 
                  + "\nENDERECO: " + endereco 

@@ -18,9 +18,9 @@ public class Treino {
     private long id;
     private String objetivo;
     private String nome;
+    private DivisaoTreino divTreino;
     private LocalDate dataInicio;
     private LocalDate dataTermino;
-    private DivisaoTreino divisaoTreino;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
 
@@ -40,6 +40,15 @@ public class Treino {
         this.objetivo = objetivo;
     }
 
+    public DivisaoTreino getDivTreino() {
+        return divTreino;
+    }
+
+    public void setDivTreino(DivisaoTreino divTreino) {
+        this.divTreino = divTreino;
+    }
+    
+    
     public String getNome() {
         return nome;
     }
@@ -64,14 +73,6 @@ public class Treino {
         this.dataTermino = dataTermino;
     }
 
-    public DivisaoTreino getDivisaoTreino() {
-        return divisaoTreino;
-    }
-
-    public void setDivisaoTreino(DivisaoTreino divisaoTreino) {
-        this.divisaoTreino = divisaoTreino;
-    }
-
     public LocalDateTime getDataCriacao() {
         return dataCriacao;
     }
@@ -92,12 +93,13 @@ public class Treino {
 
     @Override
     public String toString() {
-        return "==================INFORMACOES DO TREINO================== " 
+        return "\n==================INFORMACOES DO TREINO================== " 
                 + "\nID: " + id 
+                +"\nNOME: " + nome
                 + "\nOBJETIVO: " + objetivo 
                 + "\nDATA INICIO: " + dataInicio 
                 + "\nDATA TERMINO: " + dataTermino 
-                + "\nDIVISAO DE TREINO: " + (divisaoTreino != null ? divisaoTreino.getNome() : "N/A") 
+                + "\nDIVISAO DE TREINO: " + divTreino
                 + "\nDATA DE CRIACAO: " + dataCriacao 
                 + "\nDATA DE MODIFICACAO: " + dataModificacao;
     }
@@ -128,7 +130,5 @@ public class Treino {
         return Objects.equals(this.objetivo, other.objetivo);
     }
 
-    public void se(LocalDateTime now) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    
 }

@@ -18,6 +18,8 @@ public class UtilPessoa {
     private static Pessoa pessoaLogado = null;
     
     private static LocalDateTime diaAtual = LocalDateTime.now();
+    private static LocalDate diaAtualL = LocalDate.now();
+
     public static Pessoa getPessoaLogado() {
         return pessoaLogado;
     }
@@ -30,6 +32,10 @@ public class UtilPessoa {
         return diaAtual;
     }
     
+    public static LocalDate getDiaAtualL() {
+        return diaAtualL;
+    }
+ 
     public static int getDiaDoMes() {
         return diaAtual.getDayOfMonth();
     }
@@ -42,5 +48,8 @@ public class UtilPessoa {
         diaAtual.plusMonths(numeroMeses);
     }
     
+    public static LocalDate incrementaMes(LocalDate dataCriacao, int numeroMeses) {
+        return dataCriacao.plusMonths(numeroMeses);
+    }
     
 }

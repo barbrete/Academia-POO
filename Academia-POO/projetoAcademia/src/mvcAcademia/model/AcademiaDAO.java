@@ -69,6 +69,15 @@ public class AcademiaDAO {
         }
         return null;
     }
+    
+     public Academia buscaPorId(long id) {
+        for (Academia academia : academias) {
+            if (academia != null && academia.getId() == id) {
+                return academia;
+            }
+        }
+        return null;
+    }
 
     public boolean remover(String nome) {
         for (int i = 0; i < academias.length; i++) {

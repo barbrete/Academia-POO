@@ -14,15 +14,14 @@ import java.time.LocalDateTime;
 public class TreinoDAO {
 
     private Treino[] treinos = new Treino[10];
-    private DivisaoTreinoDAO divisaoTreinoDAO;
     
     public TreinoDAO(){
         LocalDate dtInicioT1 = LocalDate.of(2024, 05, 05);
         LocalDate dtTerminoT1 = LocalDate.of(2024, 06, 05);
         Treino t1 = new Treino();
-        t1.setNome("Transformação Fit");
+        t1.setNome("Transformacao Fit");
         t1.setObjetivo("Emagrecimento");
-        //t1.setDivisaoTreino(divisaoTreinoDAO);
+        //t1.setDivTreino(divisaoTreinoDAO);
         t1.setDataInicio(dtInicioT1);
         t1.setDataTermino(dtTerminoT1);
         t1.setDataCriacao(LocalDateTime.now());
@@ -88,7 +87,7 @@ public class TreinoDAO {
         return null;
     }
     
-    public void mostraTreino(long id) {//mostra treino especifico
+    public void mostraTreino(long id) {
        Treino t = buscaTreinoPorId(id);
         if (t != null) {
             System.out.println(t);
@@ -124,6 +123,15 @@ public class TreinoDAO {
       public Treino buscaPorNome(String nome) {
         for (Treino treino : treinos) {
             if (treino != null && treino.getNome().equals(nome)) {
+                return treino;
+            }
+        }
+        return null;
+    }
+      
+        public Treino buscaPorId(long id) {
+        for (Treino treino : treinos) {
+            if (treino != null && treino.getId() == id) {
                 return treino;
             }
         }

@@ -1,23 +1,26 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package mvcAcademia.model;
 
 import java.time.LocalDateTime;
 
 /**
  *
- * @author barbrete e kitotsui
+ * @author Rogério
  */
-public class DivisaoTreinoMusculo {
+public class MovimentacaoFinanceira {
 
     private static long serial = 1;
     private long id;
-    private String nome;
+    private double valor;
+    private String tipo;
     private String descricao;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
-    private DivisaoTreino divisaoTreino;  
-    
 
-    public DivisaoTreinoMusculo() {
+    public MovimentacaoFinanceira() {
         this.id = serial++;
     }
 
@@ -25,12 +28,20 @@ public class DivisaoTreinoMusculo {
         return id;
     }
 
-    public String getNome() {
-        return nome;
+    public double getValor() {
+        return valor;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setValor(double valor) {
+        this.valor = valor;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public String getDescricao() {
@@ -57,19 +68,14 @@ public class DivisaoTreinoMusculo {
         this.dataModificacao = dataModificacao;
     }
 
-      public DivisaoTreino getDivisaoTreino() {  
-        return divisaoTreino;
-    }
-
-    public void setDivisaoTreino(DivisaoTreino divisaoTreino) {  
-        this.divisaoTreino = divisaoTreino;
-    }
-
     @Override
     public String toString() {
-        return  "\n" + divisaoTreino 
-                + " ID: " + id
-                + " NOME: " + nome
-                + " DESCRICAO: " + descricao;
+        return "\n==================INFORMACOES DA PESSOA=================\n " 
+                +"ID: " + id + "\n"
+                + "Valor: " + valor + "\n"
+                + "Tipo: " + tipo + "\n"
+                + "Descricao: " + descricao + "\n"
+                + "Data de Criacao: " + dataCriacao + "\n"
+                + "Data de Modificacao: " + dataModificacao;
     }
 }

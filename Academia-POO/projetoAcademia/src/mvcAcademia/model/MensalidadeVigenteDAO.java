@@ -66,6 +66,16 @@ public class MensalidadeVigenteDAO {
             System.out.println("MENSALIDADE NAO ENCONTRADA.");
         }
     }
+   
+    public MensalidadeVigente mostraMensalidadeVigente(long id) {
+       MensalidadeVigente mv = buscaMensalidadePorId(id);
+        if (mv != null) {
+            return mv;
+        } else {
+            return null;
+        }
+    }
+    
     
     public boolean adiciona(MensalidadeVigente mv) {
         int proximaPosicaoLivre = proximaPosicaoLivre();

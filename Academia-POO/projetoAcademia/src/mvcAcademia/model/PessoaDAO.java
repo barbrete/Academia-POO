@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 public class PessoaDAO {
     
     Pessoa[] pessoas = new Pessoa[5];
-
     
     public PessoaDAO() {
         LocalDate dataNascimento1 = LocalDate.of(1996, 9, 11);
@@ -57,22 +56,31 @@ public class PessoaDAO {
         
     }
     
-    public Pessoa buscaPessoaPorId(long id) {
-        for (Pessoa p : pessoas) {
-            if (p != null && p.getId() == id) {
-                return p;
-            }
-        }
-        return null;
-    }
-      
-   public void mostraPessoa(long id) {//mostra pessoa especifica
-       Pessoa p = buscaPessoaPorId(id);
+    public void mostraPessoa(long id) { //mostra pessoa especifica
+        Pessoa p = buscaPessoaPorId(id);
         if (p != null) {
             System.out.println(p);
         } else {
-            System.out.println("PESSOA NAO ENCONTRADA.");
+            System.out.println("PESSOA NAO ENCONTRADA");
         }
+    }
+    
+    public LocalDateTime getDataCriacaoPorId(long id) {
+        for (Pessoa pessoa : pessoas) {
+            if (pessoa != null && pessoa.getId() == id) {
+                return pessoa.getDataCriacao();
+            }
+        }
+        return null; 
+    }
+    
+    public Pessoa buscaPessoaPorId(long id) {
+        for (Pessoa pessoa : pessoas) {
+            if (pessoa != null && pessoa.getId() == id) {
+                return pessoa;
+            }
+        }
+        return null;
     }
     
     public Pessoa buscaPessoaLogin(String login, String senha) {

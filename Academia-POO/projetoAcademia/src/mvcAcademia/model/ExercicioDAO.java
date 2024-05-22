@@ -154,6 +154,15 @@ public class ExercicioDAO {
         }
         return null;
     }
+    
+    public Exercicio buscaPorId(long id) {
+        for (Exercicio exercicio : vetorEx) {
+            if (exercicio != null && exercicio.getId() == id) {
+                return exercicio;
+            }
+        }
+        return null;
+    }
 
     public boolean remover(String nome) {
         for (int i = 0; i < vetorEx.length; i++) {
@@ -164,6 +173,8 @@ public class ExercicioDAO {
         }
         return false;
     }
+    
+    
 
     private int proximaPosicaoLivre() {
         for (int i = 0; i < vetorEx.length; i++) {
