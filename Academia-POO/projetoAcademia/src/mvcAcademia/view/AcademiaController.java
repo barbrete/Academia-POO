@@ -249,8 +249,6 @@ public class AcademiaController {
         return Integer.parseInt(scanner.nextLine());
     }
 
-    public void exibirMensagem(String mensagem) {
-        System.out.println(mensagem);
-    }
+   
 
 }

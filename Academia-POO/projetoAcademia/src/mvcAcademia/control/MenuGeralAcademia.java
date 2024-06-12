@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 import mvcAcademia.model.Academia;
@@ -85,17 +86,17 @@ public class MenuGeralAcademia {
                     Pessoa pu = this.cadastrarLogin();
                     if (pessoaDAO.adiciona(pu)) {
 
-                        gui.exibirMensagem("USUARIO ADICIONADO COM SUCESSO");
+                        System.out.println("USUARIO ADICIONADO COM SUCESSO");
                     } else {
                         System.out.println("USUARIO NAO ADICIONADO.");
                     }
                     break;
                 case 3:
-                    gui.exibirMensagem("FINALIZANDO O PROGRAMA... OBRIGADO POR UTILIZAR.");
+                    System.out.println("FINALIZANDO O PROGRAMA... OBRIGADO POR UTILIZAR.");
                     sair = true;
                     break;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -116,14 +117,14 @@ public class MenuGeralAcademia {
     }
 
     private void fazerLogin() {
-        gui.exibirMensagem("LOGIN:");
+        System.out.println("LOGIN:");
         String login = scanner.nextLine();
-        gui.exibirMensagem("SENHA:");
+        System.out.println("SENHA:");
         String senha = scanner.nextLine();
         Pessoa pessoaLogada = pessoaDAO.buscaPessoaLogin(login, senha);
 
         if (pessoaLogada != null) {
-            gui.exibirMensagem("USUARIO LOGADO COM SUCESSO!");
+            System.out.println("USUARIO LOGADO COM SUCESSO!");
             pessoaLogadaId = pessoaLogada.getId();
 
             switch (pessoaLogada.getTipoUsuario()) {
@@ -137,11 +138,11 @@ public class MenuGeralAcademia {
                     exibirMenuAluno();
                     break;
                 default:
-                    gui.exibirMensagem("USUARIO NAO RECONHECIDO.");
+                    System.out.println("USUARIO NAO RECONHECIDO.");
                     break;
             }
         } else {
-            gui.exibirMensagem("LOGIN INVALIDO, TENTE NOVAMENTE.");
+            System.out.println("LOGIN INVALIDO, TENTE NOVAMENTE.");
         }
     }
 
@@ -175,7 +176,7 @@ public class MenuGeralAcademia {
                 case 4:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -203,7 +204,7 @@ public class MenuGeralAcademia {
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -221,6 +222,7 @@ public class MenuGeralAcademia {
         acad.setEndereco(scanner.nextLine());
         acad.setDataCriacao(LocalDateTime.now());
         acad.setDataModificacao(LocalDateTime.now());
+
         return acad;
     }
 
@@ -250,7 +252,7 @@ public class MenuGeralAcademia {
 
     private Pessoa cadastrarLogin() {
         Pessoa pu = new Pessoa();
-        gui.exibirMensagem("CADASTRO DE LOGIN:");
+        System.out.println("CADASTRO DE LOGIN:");
         System.out.println("NOME: ");
         pu.setNome(scanner.nextLine());
         System.out.println("LOGIN: ");
@@ -266,13 +268,13 @@ public class MenuGeralAcademia {
         Pessoa p = new Pessoa();
         int opcaoTipoUsuario;
 
-        gui.exibirMensagem("CADASTRO DE PESSOA:");
-        gui.exibirMensagem("NOME:");
+        System.out.println("CADASTRO DE PESSOA:");
+        System.out.println("NOME:");
         p.setNome(scanner.nextLine());
-        gui.exibirMensagem("SEXO [M/F]:");
+        System.out.println("SEXO [M/F]:");
         p.setSexo(scanner.nextLine());
 
-        gui.exibirMensagem("DATA DE NASCIMENTO (dd/MM/yyyy):");
+        System.out.println("DATA DE NASCIMENTO (dd/MM/yyyy):");
         String dataNascimentoStr = scanner.nextLine();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
@@ -334,7 +336,7 @@ public class MenuGeralAcademia {
 
     private Treino cadastraTreino() {
         Treino novoTreino = new Treino();
-        gui.exibirMensagem("CADASTRO DE TREINO\n");
+        System.out.println("CADASTRO DE TREINO\n");
 
         System.out.println("NOME DO TREINO: ");
         novoTreino.setNome(scanner.nextLine());
@@ -350,16 +352,16 @@ public class MenuGeralAcademia {
 
     private MensalidadeVigente cadastraMensalidadeVigente() {
         MensalidadeVigente novaMensalidade = new MensalidadeVigente();
-        gui.exibirMensagem("CADASTRO DE MENSALIDADE VIGENTE\n");
+        System.out.println("CADASTRO DE MENSALIDADE VIGENTE\n");
         System.out.println("DIGITE VALOR DA MENSALIDADE DA ACADEMIA");
         novaMensalidade.setValor(scanner.nextInt());
         scanner.nextLine();
-        gui.exibirMensagem("DATA DE INICIO (dd/MM/yyyy):");
+        System.out.println("DATA DE INICIO (dd/MM/yyyy):");
         String dataInicioStr = scanner.nextLine();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate dataInicio = LocalDate.parse(dataInicioStr, formatter);
         novaMensalidade.setDataInicio(dataInicio);
-        gui.exibirMensagem("DATA DE TERMINO (dd/MM/yyyy):");
+        System.out.println("DATA DE TERMINO (dd/MM/yyyy):");
         String dataTerminoStr = scanner.nextLine();
         DateTimeFormatter formattert = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate dataTermino = LocalDate.parse(dataTerminoStr, formattert);
@@ -551,7 +553,7 @@ public class MenuGeralAcademia {
                 case 16:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -566,20 +568,20 @@ public class MenuGeralAcademia {
             switch (resp) {
                 case 1:
                     Academia acad = this.cadastraAcademia();
-                    if (academiaDAO.adiciona(acad)) {
-                        System.out.println("ACADEMIA CRIADA COM SUCESSO!");
-                    } else {
-                        System.out.println("ACADEMIA NAO CRIADA.");
-                    }
+                    academiaDAO.adiciona(acad);
+                    System.out.println("ACADEMIA CRIADA COM SUCESSO!");
+
                     break;
                 case 2:
+                    //academiaDAO.mostrarTodasAcademias();
+                    List <Academia> academias = academiaDAO.lista(null);
                     academiaDAO.mostrarTodasAcademias();
                     break;
                 case 3:
                     System.out.println("DIGITE O NOME DA ACADEMIA QUE DESEJA ALTERAR...: ");
                     String nomeAcademia = scanner.nextLine();
-                    Academia academiaParaAlterar = academiaDAO.buscaPorNome(nomeAcademia);
-                    if (academiaParaAlterar != null) {
+                    //Academia academiaParaAlterar = academiaDAO.buscaPorNome(nomeAcademia);
+                    /* if (academiaParaAlterar != null) {
                         gui.exibirMensagem("DIGITE O NOVO NOME DA ACADEMIA...: ");
                         String novoNomeAcademia = scanner.nextLine();
                         academiaParaAlterar.setNome(novoNomeAcademia);
@@ -590,23 +592,23 @@ public class MenuGeralAcademia {
                         gui.exibirMensagem("ACADEMIA ALTERADA COM SUCESSO!");
                     } else {
                         System.out.println("ACADEMIA NAO EXISTENTE NO BANCO DE DADOS.");
-                    }
+                    }*/
                     break;
                 case 4:
                     System.out.println("DIGITE O NOME DA ACADEMIA QUE DESEJA EXCLUIR...: ");
                     String nomeAcademiaExcluir = scanner.nextLine();
-                    Academia academiaParaExcluir = academiaDAO.buscaPorNome(nomeAcademiaExcluir);
+                    /*Academia academiaParaExcluir = academiaDAO.buscaPorNome(nomeAcademiaExcluir);
                     if (academiaParaExcluir != null) {
                         academiaDAO.remover(nomeAcademiaExcluir);
                         gui.exibirMensagem("ACADEMIA EXCLUIDA COM SUCESSO!");
                     } else {
                         System.out.println("ACADEMIA NAO EXISTENTE NO BANCO DE DADOS.");
-                    }
+                    }*/
                     break;
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -635,14 +637,14 @@ public class MenuGeralAcademia {
                     String nomeEx = scanner.nextLine();
                     Exercicio exParaAlterar = exercicioDAO.buscaPorNome(nomeEx);
                     if (exParaAlterar != null) {
-                        gui.exibirMensagem("DIGITE O NOVO NOME DO EXERCICIO...: ");
+                        System.out.println("DIGITE O NOVO NOME DO EXERCICIO...: ");
                         String novoNomeExercicio = scanner.nextLine();
                         exParaAlterar.setNome(novoNomeExercicio);
-                        gui.exibirMensagem("DIGITE A NOVA DESCRICAO DO EXERCICIO...: ");
+                        System.out.println("DIGITE A NOVA DESCRICAO DO EXERCICIO...: ");
                         String novaDescricaoExercicio = scanner.nextLine();
                         exParaAlterar.setDescricao(novaDescricaoExercicio);
                         exParaAlterar.setDataModificacao(LocalDateTime.now());
-                        gui.exibirMensagem("EXERCICIO ALTERADA COM SUCESSO!");
+                        System.out.println("EXERCICIO ALTERADA COM SUCESSO!");
                     } else {
                         System.out.println("EXERCICIO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -653,7 +655,7 @@ public class MenuGeralAcademia {
                     Exercicio exParaExcluir = exercicioDAO.buscaPorNome(nomeExExcluir);
                     if (exParaExcluir != null) {
                         exercicioDAO.remover(nomeExExcluir);
-                        gui.exibirMensagem("EXERCICIO EXCLUIDO COM SUCESSO!");
+                        System.out.println("EXERCICIO EXCLUIDO COM SUCESSO!");
                     } else {
                         System.out.println("EXERCICIO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -661,7 +663,7 @@ public class MenuGeralAcademia {
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -679,7 +681,7 @@ public class MenuGeralAcademia {
                     Pessoa p = cadastraPessoa();
 
                     if (pessoaDAO.adiciona(p)) {
-                        gui.exibirMensagem("USUARIO ADICIONADO COM SUCESSO!");
+                        System.out.println("USUARIO ADICIONADO COM SUCESSO!");
                     } else {
                         System.out.println("NAO FOI POSSIVEL ADICIONAR USUARIO.");
                     }
@@ -692,13 +694,13 @@ public class MenuGeralAcademia {
                     String nomePessoa = scanner.nextLine();
                     Pessoa pessoaParaAlterar = pessoaDAO.buscaPorNome(nomePessoa);
                     if (pessoaParaAlterar != null) {
-                        gui.exibirMensagem("DIGITE O NOVO NOME DE USUARIO...: ");
+                        System.out.println("DIGITE O NOVO NOME DE USUARIO...: ");
                         String novoNomeUsuario = scanner.nextLine();
                         pessoaParaAlterar.setNome(novoNomeUsuario);
-                        gui.exibirMensagem("DIGITE O NOVO SEXO DE USUARIO [M/F]...: ");
+                        System.out.println("DIGITE O NOVO SEXO DE USUARIO [M/F]...: ");
                         String novoSexoUsuario = scanner.nextLine();
                         pessoaParaAlterar.setSexo(novoSexoUsuario);
-                        gui.exibirMensagem("DIGITE A NOVA DATA DE NASCIMENTO (dd/MM/yyyy): ");
+                        System.out.println("DIGITE A NOVA DATA DE NASCIMENTO (dd/MM/yyyy): ");
                         String dataNascimentoStr = scanner.nextLine();
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                         LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
@@ -718,15 +720,15 @@ public class MenuGeralAcademia {
                                 pessoaParaAlterar.setTipoUsuario("Aluno");
                                 break;
                         }
-                        gui.exibirMensagem("DIGITE O NOVO LOGIN DE USUARIO...: ");
+                        System.out.println("DIGITE O NOVO LOGIN DE USUARIO...: ");
                         String novoLoginUsuario = scanner.nextLine();
                         pessoaParaAlterar.setLogin(novoLoginUsuario);
-                        gui.exibirMensagem("DIGITE A NOVA SENHA DO USUARIO...: ");
+                        System.out.println("DIGITE A NOVA SENHA DO USUARIO...: ");
                         String novaSenhaUsuario = scanner.nextLine();
                         pessoaParaAlterar.setSenha(novaSenhaUsuario);
 
                         pessoaParaAlterar.setDataModificacao(LocalDateTime.now());
-                        gui.exibirMensagem("USUARIO ALTERADO COM SUCESSO!");
+                        System.out.println("USUARIO ALTERADO COM SUCESSO!");
                     } else {
                         System.out.println("USUARIO NAO EXISTE NO BANCO DE DADOS.");
                     }
@@ -737,7 +739,7 @@ public class MenuGeralAcademia {
                     Pessoa pessoaParaExcluir = pessoaDAO.buscaPorNome(nomeUsuarioExcluir);
                     if (pessoaParaExcluir != null) {
                         pessoaDAO.remover(nomeUsuarioExcluir);
-                        gui.exibirMensagem("USUARIO EXCLUIDO COM SUCESSO!");
+                        System.out.println("USUARIO EXCLUIDO COM SUCESSO!");
                     } else {
                         System.out.println("USUARIO NAO EXISTE NO BANCO DE DADOS.");
                     }
@@ -745,7 +747,7 @@ public class MenuGeralAcademia {
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -774,14 +776,14 @@ public class MenuGeralAcademia {
                     String nomeDivisaoTreino = scanner.nextLine();
                     DivisaoTreino divisaoParaAlterar = divisaoTreinoDAO.buscaPorNome(nomeDivisaoTreino);
                     if (divisaoParaAlterar != null) {
-                        gui.exibirMensagem("DIGITE O NOVO NOME DA DIVISAO DE TREINO...: ");
+                        System.out.println("DIGITE O NOVO NOME DA DIVISAO DE TREINO...: ");
                         String novoNomeDivisaoTreino = scanner.nextLine();
                         divisaoParaAlterar.setNome(novoNomeDivisaoTreino);
-                        gui.exibirMensagem("DIGITE A NOVA DESCRICAO DA DIVISAO DE TREINO...: ");
+                        System.out.println("DIGITE A NOVA DESCRICAO DA DIVISAO DE TREINO...: ");
                         String novaDescricaoDivisaoTreino = scanner.nextLine();
                         divisaoParaAlterar.setDescricao(novaDescricaoDivisaoTreino);
                         divisaoParaAlterar.setDataModificacao(LocalDateTime.now());
-                        gui.exibirMensagem("DIVISAO DE TREINO ALTERADA COM SUCESSO!");
+                        System.out.println("DIVISAO DE TREINO ALTERADA COM SUCESSO!");
                     } else {
                         System.out.println("DIVISAO DE TREINO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -792,7 +794,7 @@ public class MenuGeralAcademia {
                     DivisaoTreino divisaoParaExcluir = divisaoTreinoDAO.buscaPorNome(nomeDivisaoTreinoExcluir);
                     if (divisaoParaExcluir != null) {
                         divisaoTreinoDAO.remover(nomeDivisaoTreinoExcluir);
-                        gui.exibirMensagem("DIVISAO DE TREINO EXCLUIDA COM SUCESSO!");
+                        System.out.println("DIVISAO DE TREINO EXCLUIDA COM SUCESSO!");
                     } else {
                         System.out.println("DIVISAO DE TREINO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -800,7 +802,7 @@ public class MenuGeralAcademia {
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -882,7 +884,7 @@ public class MenuGeralAcademia {
                 case 6:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -932,7 +934,7 @@ public class MenuGeralAcademia {
                         System.out.println("TREINO APLICACAO NÃO EXISTENTE NO BANCO DE DADOS.");
                     }
                     break;
-                case 5:
+                /*case 5:
                     treinoAplicacaoDAO.mostrarTodosTreinosAplicacoes();
                     System.out.println("\nQUAL TREINO APLICACAO DESEJA GERENCIAR? DIGITE O ID:\n");
                     long idTreinoAplicacaoAssociar = Long.parseLong(scanner.nextLine());
@@ -1019,13 +1021,13 @@ public class MenuGeralAcademia {
                         }
                     } else {
                         System.out.println("TREINO APLICACAO NÃO ENCONTRADO.");
-                    }
+                    }*/
 
-                    break;
+                //break;
                 case 6:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -1054,14 +1056,14 @@ public class MenuGeralAcademia {
                     String nomeTreino = scanner.nextLine();
                     Treino treinoParaAlterar = treinoDAO.buscaPorNome(nomeTreino);
                     if (treinoParaAlterar != null) {
-                        gui.exibirMensagem("DIGITE O NOVO NOME DO TREINO: ");
+                        System.out.println("DIGITE O NOVO NOME DO TREINO: ");
                         String novoNomeTreino = scanner.nextLine();
                         treinoParaAlterar.setNome(novoNomeTreino);
-                        gui.exibirMensagem("DIGITE A NOVA DESCRICAO DO TREINO: ");
+                        System.out.println("DIGITE A NOVA DESCRICAO DO TREINO: ");
                         String novaDescricaoTreino = scanner.nextLine();
                         treinoParaAlterar.setObjetivo(novaDescricaoTreino);
                         treinoParaAlterar.setDataModificacao(LocalDateTime.now());
-                        gui.exibirMensagem("TREINO ALTERADO COM SUCESSO!");
+                        System.out.println("TREINO ALTERADO COM SUCESSO!");
                     } else {
                         System.out.println("TREINO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -1080,7 +1082,7 @@ public class MenuGeralAcademia {
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -1109,14 +1111,14 @@ public class MenuGeralAcademia {
                     String descAplicacao = scanner.nextLine();
                     ExercicioAplicacao descAplicacaoAlterada = eaDAO.buscaPorDescricao(descAplicacao);
                     if (descAplicacaoAlterada != null) {
-                        gui.exibirMensagem("DIGITE A NOVA DESCRICAO DA APLICACAO...: ");
+                        System.out.println("DIGITE A NOVA DESCRICAO DA APLICACAO...: ");
                         String novoNomeAplicacao = scanner.nextLine();
                         descAplicacaoAlterada.setDescricao(novoNomeAplicacao);
-                        gui.exibirMensagem("DIGITE A NOVA DESCRICAO DA APLICACAO...: ");
+                        System.out.println("DIGITE A NOVA DESCRICAO DA APLICACAO...: ");
                         String novaDescricaoExercicio = scanner.nextLine();
                         descAplicacaoAlterada.setDescricao(novaDescricaoExercicio);
                         descAplicacaoAlterada.setDataModificacao(LocalDateTime.now());
-                        gui.exibirMensagem("APLICACAO ALTERADA COM SUCESSO!");
+                        System.out.println("APLICACAO ALTERADA COM SUCESSO!");
                     } else {
                         System.out.println("APLICACAO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -1128,7 +1130,7 @@ public class MenuGeralAcademia {
                     ExercicioAplicacao apParaExcluir = eaDAO.buscaPorDescricao(descAplicacaoExcluir);
                     if (apParaExcluir != null) {
                         eaDAO.remover(descAplicacaoExcluir);
-                        gui.exibirMensagem("APLICACAO EXCLUIDA COM SUCESSO!");
+                        System.out.println("APLICACAO EXCLUIDA COM SUCESSO!");
                     } else {
                         System.out.println("APLICACAO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -1136,7 +1138,7 @@ public class MenuGeralAcademia {
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -1262,22 +1264,22 @@ public class MenuGeralAcademia {
                     long id = scanner.nextLong();
                     MensalidadeVigente mvParaAlterar = mvDAO.buscaMensalidadePorId(id);
                     if (mvParaAlterar != null) {
-                        gui.exibirMensagem("DIGITE O NOVO VALOR DA MENSALIDADE...: ");
+                        System.out.println("DIGITE O NOVO VALOR DA MENSALIDADE...: ");
                         double novoValorMensalidade = scanner.nextDouble();
                         mvParaAlterar.setValor(novoValorMensalidade);
                         scanner.nextLine();
-                        gui.exibirMensagem("DIGITE A NOVA DATA DE INICIO DA MENSALIDADE (dd/MM/yyyy)...: ");
+                        System.out.println("DIGITE A NOVA DATA DE INICIO DA MENSALIDADE (dd/MM/yyyy)...: ");
                         String novaDataInicioStr = scanner.nextLine();
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                         LocalDate dataInicio = LocalDate.parse(novaDataInicioStr, formatter);
                         mvParaAlterar.setDataInicio(dataInicio);
-                        gui.exibirMensagem("DIGITE A NOVA DATA DE DATA DE TERMINO DA MENSALIDADE(dd/MM/yyyy)...: ");
+                        System.out.println("DIGITE A NOVA DATA DE DATA DE TERMINO DA MENSALIDADE(dd/MM/yyyy)...: ");
                         String novaDataTerminoStr = scanner.nextLine();
                         formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                         LocalDate dataTermino = LocalDate.parse(novaDataTerminoStr, formatter);
                         mvParaAlterar.setDataTermino(dataTermino);
                         scanner.nextLine();
-                        gui.exibirMensagem("MENSALIDADE ALTERADA COM SUCESSO!");
+                        System.out.println("MENSALIDADE ALTERADA COM SUCESSO!");
                     } else {
                         System.out.println("MENSALIDADE NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -1288,7 +1290,7 @@ public class MenuGeralAcademia {
                     MensalidadeVigente mvParaExcluir = mvDAO.buscaMensalidadePorId(ide);
                     if (mvParaExcluir != null) {
                         mvDAO.remover(ide);
-                        gui.exibirMensagem("MENSALIDADE VIGENTE EXCLUIDO COM SUCESSO!");
+                        System.out.println("MENSALIDADE VIGENTE EXCLUIDO COM SUCESSO!");
                     } else {
                         System.out.println("MENSALIDADE VIGENTE NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -1296,7 +1298,7 @@ public class MenuGeralAcademia {
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -1456,7 +1458,7 @@ public class MenuGeralAcademia {
                     long id = scanner.nextLong();
                     AlunoPagamentoMensalidade apmParaAlterar = apmDAO.buscaAlunoPagamentoMensalidadePorId(id);
                     if (apmParaAlterar != null) {
-                        gui.exibirMensagem("DIGITE O NOVO VALOR QUE IRA PAGAR...: ");
+                        System.out.println("DIGITE O NOVO VALOR QUE IRA PAGAR...: ");
                         double novoValorAPM = scanner.nextDouble();
                         apmParaAlterar.setValorPago(novoValorAPM);
                         scanner.nextLine();
@@ -1465,7 +1467,7 @@ public class MenuGeralAcademia {
                         int novaModalidade = scanner.nextInt();
                         apmParaAlterar.setModalidade(novaModalidade);
 
-                        gui.exibirMensagem("DIGITE A NOVA DATA DE PAGAMENTO (dd/MM/yyyy)...: ");
+                        System.out.println("DIGITE A NOVA DATA DE PAGAMENTO (dd/MM/yyyy)...: ");
                         String novaDataPagamentoStr = scanner.nextLine();
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                         LocalDate dataPagamento = LocalDate.parse(novaDataPagamentoStr, formatter);
@@ -1474,7 +1476,7 @@ public class MenuGeralAcademia {
                         apmParaAlterar.setDataCriacao(UtilPessoa.getDiaAtual());
                         apmParaAlterar.setDataModificacao(UtilPessoa.getDiaAtual());
 
-                        gui.exibirMensagem("PAGAMENTO DA MENSALIDADE DO ALUNO ALTERADA COM SUCESSO!");
+                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO ALTERADA COM SUCESSO!");
                     } else {
                         System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -1485,7 +1487,7 @@ public class MenuGeralAcademia {
                     AlunoPagamentoMensalidade apmParaExcluir = apmDAO.buscaAlunoPagamentoMensalidadePorId(ide);
                     if (apmParaExcluir != null) {
                         mvDAO.remover(ide);
-                        gui.exibirMensagem("MENSALIDADE VIGENTE EXCLUIDO COM SUCESSO!");
+                        System.out.println("MENSALIDADE VIGENTE EXCLUIDO COM SUCESSO!");
                     } else {
                         System.out.println("MENSALIDADE VIGENTE NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -1493,7 +1495,7 @@ public class MenuGeralAcademia {
                 case 5:
                     return;
                 default:
-                    gui.exibirMensagem("ESCOLHA UMA OPCAO VALIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
@@ -1520,7 +1522,7 @@ public class MenuGeralAcademia {
             return;
         }
         relatorio.exibirRelatorio(MES, ANO);
-        
+
         scanner.close();
     }
 

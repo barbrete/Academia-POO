@@ -13,17 +13,13 @@ import java.util.Objects;
   */
  public class Academia {
  
-     private static long serial = 1;
      private long id;
      private String nome;
      private String endereco;
      private LocalDateTime dataCriacao;
      private LocalDateTime dataModificacao;
  
-     public Academia()
-     {
-         id = Academia.serial++;
-     }
+  
      public long getId()
      {
          return id;

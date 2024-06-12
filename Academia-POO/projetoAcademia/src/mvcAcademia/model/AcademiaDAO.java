@@ -4,97 +4,72 @@
  */
 package mvcAcademia.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author barbrete e kitotsui
  */
-
 public class AcademiaDAO {
 
-    private Academia[] academias = new Academia[5];
+    public Academia adiciona(Academia academia) {
+        String sql = "insert into academia" + "(nome, endereco, datacriacao, datamodificacao)"
+                + "values (?, ?, ?, ?)";
 
-    public AcademiaDAO() {
-        Academia academia1 = new Academia();
-        academia1.setNome("BRASIL FITNESS");
-        academia1.setEndereco("RUA BRASILIA");
-        academia1.setDataCriacao(LocalDateTime.now());
-        academia1.setDataModificacao(LocalDateTime.now());
-        adiciona(academia1);
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-        Academia academia2 = new Academia();
-        academia2.setNome("GYM MASTER");
-        academia2.setEndereco("RUA FERNANDO COSTA");
-        academia2.setDataCriacao(LocalDateTime.now());
-        academia2.setDataModificacao(LocalDateTime.now());
-        adiciona(academia2);
+            stmt.setString(1, academia.getNome());
+            stmt.setString(2, academia.getEndereco());
+            stmt.setDate(3, java.sql.Date.valueOf(academia.getDataCriacao().toLocalDate()));
+            stmt.setDate(4, java.sql.Date.valueOf(academia.getDataModificacao().toLocalDate()));
 
-        Academia academia3 = new Academia();
-        academia3.setNome("ACADEMIA EQUILIBRIO");
-        academia3.setEndereco("AVENIDA MARANHAO");
-        academia3.setDataCriacao(LocalDateTime.now());
-        academia3.setDataModificacao(LocalDateTime.now());
-        adiciona(academia3);
-    }
+            stmt.execute();
 
-    public boolean adiciona(Academia academia) {
-        int proximaPosicaoLivre = proximaPosicaoLivre();
-        if (proximaPosicaoLivre != -1) {
-            academias[proximaPosicaoLivre] = academia;
-            return true;
-        } else {
-            return false;
+            System.out.println("Elemento inserido com sucesso!");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+        return academia;
     }
 
-    public void mostrarTodasAcademias() {
-        boolean temAcademia = false;
-        for (Academia academia : academias) {
-            if (academia != null) {
-                System.out.println(academia);
-                temAcademia = true;
+    public List<Academia> lista(Academia academia) {
+        String sql = "select *from academia";
+        List<Academia> academias = new ArrayList<>();
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                long id = rs.getLong("idacademia");
+                String nome = rs.getString("nome");
+                String endereco = rs.getString("endereco");
+                //String dataCriacao = rs.getString("datacriacao");
+                //String dataModificacao = rs.getString("datamodificacao");
+
+                Academia acad = new Academia();
+                acad.setNome(nome);
+                acad.setEndereco(endereco);
+                //acad.setDataCriacao(dataCriacao);
+                //acad.setDataModificacao(dataModificacao);
+
+                academias.add(academia);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        if (!temAcademia) {
-            System.out.println("NAO EXISTEM ACADEMIAS CADASTRADA.");
-        }
+        return academias;
     }
 
-    public Academia buscaPorNome(String nome) {
-        for (Academia academia : academias) {
-            if (academia != null && academia.getNome().equals(nome)) {
-                return academia;
-            }
-        }
-        return null;
+   public void mostrarTodasAcademias() {
+    List <Academia> academias = lista(null);
+    for (Academia academia : academias) {
+        System.out.println(academia);
     }
-    
-     public Academia buscaPorId(long id) {
-        for (Academia academia : academias) {
-            if (academia != null && academia.getId() == id) {
-                return academia;
-            }
-        }
-        return null;
-    }
+  }
 
-    public boolean remover(String nome) {
-        for (int i = 0; i < academias.length; i++) {
-            if (academias[i] != null && academias[i].getNome().equals(nome)) {
-                academias[i] = null;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private int proximaPosicaoLivre() {
-        for (int i = 0; i < academias.length; i++) {
-            if (academias[i] == null) {
-                return i;
-            }
-        }
-        return -1;
-    }
 }
