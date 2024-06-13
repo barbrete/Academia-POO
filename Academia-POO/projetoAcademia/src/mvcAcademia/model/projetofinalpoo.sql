@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `projetofinalpoo` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `projetofinalpoo`;
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: projetofinalpoo
@@ -24,12 +26,12 @@ DROP TABLE IF EXISTS `academia`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `academia` (
   `idacademia` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(45) NOT NULL,
-  `endereco` varchar(45) NOT NULL,
-  `datacriacao` varchar(45) DEFAULT NULL,
-  `datamodificacao` varchar(45) DEFAULT NULL,
+  `nome` varchar(45) DEFAULT NULL,
+  `endereco` varchar(45) DEFAULT NULL,
+  `datacriacao` timestamp NULL DEFAULT NULL,
+  `datamodificacao` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`idacademia`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,7 +40,7 @@ CREATE TABLE `academia` (
 
 LOCK TABLES `academia` WRITE;
 /*!40000 ALTER TABLE `academia` DISABLE KEYS */;
-INSERT INTO `academia` VALUES (1,'Brasil Fitness','Rua Brasilia','2024-06-12','2024-06-12'),(2,'Gym Master','Avenida Fernando Costa','2024-06-12','2024-06-12'),(3,'Academia Equilibrio','Avenida Maranhão','2024-06-12','2024-06-12'),(4,'maria do bairro','rua macapa','2024-06-12','2024-06-12');
+INSERT INTO `academia` VALUES (1,'maria','macapa','1997-09-11 10:23:50','1997-08-12 10:30:33'),(2,'saruê','android','1997-09-11 10:23:50','1997-08-12 10:30:33'),(3,'xibiu','santa marta','2024-06-13 02:30:06','2024-06-13 02:30:06');
 /*!40000 ALTER TABLE `academia` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -51,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-12  2:26:26
+-- Dump completed on 2024-06-12 23:35:30

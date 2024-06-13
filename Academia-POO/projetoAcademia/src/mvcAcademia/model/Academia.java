@@ -18,12 +18,15 @@ import java.util.Objects;
      private String endereco;
      private LocalDateTime dataCriacao;
      private LocalDateTime dataModificacao;
- 
-  
+     
      public long getId()
      {
          return id;
      }
+
+    public void setId(long id) {
+        this.id = id;
+    }
  
      public String getNome() {
          return nome;

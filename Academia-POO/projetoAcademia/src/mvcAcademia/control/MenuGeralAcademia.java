@@ -214,6 +214,12 @@ public class MenuGeralAcademia {
         exibirMenuCRUD();
     }
 
+    private void mostrarTodasAcademias(List<Academia> academias) {
+        for (Academia academia : academias) {
+            System.out.println(academia);
+        }
+    }
+
     private Academia cadastraAcademia() {
         Academia acad = new Academia();
         System.out.println("NOME: ");
@@ -573,9 +579,8 @@ public class MenuGeralAcademia {
 
                     break;
                 case 2:
-                    //academiaDAO.mostrarTodasAcademias();
-                    List <Academia> academias = academiaDAO.lista(null);
-                    academiaDAO.mostrarTodasAcademias();
+                    List<Academia> academias = academiaDAO.lista(null);
+                    this.mostrarTodasAcademias(academias);
                     break;
                 case 3:
                     System.out.println("DIGITE O NOME DA ACADEMIA QUE DESEJA ALTERAR...: ");
