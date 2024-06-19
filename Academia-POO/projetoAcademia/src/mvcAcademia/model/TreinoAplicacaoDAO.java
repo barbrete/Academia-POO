@@ -15,32 +15,7 @@ public class TreinoAplicacaoDAO {
     private TreinoAplicacao[] vetorTreinoAplicacoes = new TreinoAplicacao[10];
     PessoaDAO pessoaDAO = new PessoaDAO();
 
-    public TreinoAplicacaoDAO() {
-        TreinoAplicacao treino1 = new TreinoAplicacao();
-        treino1.setNome("Ficha generica 1");
-        treino1.setDescricao("Ficha generica para voce");
-        treino1.setDataCriacao(LocalDateTime.now().minusDays(10));
-        treino1.setDataModificacao(LocalDateTime.now().minusDays(5));
-        treino1.setPessoa(pessoaDAO.buscaPessoaPorId(1));
-
-        TreinoAplicacao treino2 = new TreinoAplicacao();
-        treino2.setNome("Ficha generica 2");
-        treino2.setDescricao("Ficha generica para voce");
-        treino2.setDataCriacao(LocalDateTime.now().minusDays(8));
-        treino2.setDataModificacao(LocalDateTime.now().minusDays(3));
-        treino2.setPessoa(pessoaDAO.buscaPessoaPorId(2));
-
-        TreinoAplicacao treino3 = new TreinoAplicacao();
-        treino3.setNome("Ficha generica 3");
-        treino3.setDescricao("Ficha generica para voce");
-        treino3.setDataCriacao(LocalDateTime.now().minusDays(15));
-        treino3.setDataModificacao(LocalDateTime.now().minusDays(7));
-        treino2.setPessoa(pessoaDAO.buscaPessoaPorId(2));
-
-        vetorTreinoAplicacoes[0] = treino1;
-        vetorTreinoAplicacoes[1] = treino2;
-        vetorTreinoAplicacoes[2] = treino3;
-    }
+    
 
     public boolean adiciona(TreinoAplicacao treinoAplicacao) {
         int proximaPosicaoLivre = proximaPosicaoLivre();

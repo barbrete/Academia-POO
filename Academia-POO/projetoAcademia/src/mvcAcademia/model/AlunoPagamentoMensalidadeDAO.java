@@ -18,39 +18,7 @@ public class AlunoPagamentoMensalidadeDAO {
     PessoaDAO pessoaDAO = new PessoaDAO();
     MensalidadeVigenteDAO mvDAO = new MensalidadeVigenteDAO();
 
-    public AlunoPagamentoMensalidadeDAO() {
-        AlunoPagamentoMensalidade apm1 = new AlunoPagamentoMensalidade();
-        apm1.setValorPago(100.00);
-        apm1.setModalidade(1);
-        apm1.setDataCriacao(LocalDateTime.now());
-        apm1.setDataModificacao(LocalDateTime.now());
-        apm1.setAluno(pessoaDAO.buscaPessoaPorId(1));
-        apm1.setMvAlunoPagamento(mvDAO.buscaMensalidadePorId(1));
-        apm1.setDataVencimento(LocalDate.now().plusMonths(1));
-        Pessoa aluno1 = pessoaDAO.buscaPessoaPorId(1);
-
-        AlunoPagamentoMensalidade apm2 = new AlunoPagamentoMensalidade();
-        apm2.setValorPago(120.00);
-        apm2.setModalidade(3);
-        apm2.setDataCriacao(LocalDateTime.now());
-        apm2.setDataModificacao(LocalDateTime.now());
-        apm2.setAluno(pessoaDAO.buscaPessoaPorId(2));
-        apm2.setMvAlunoPagamento(mvDAO.buscaMensalidadePorId(2));
-        apm2.setDataVencimento(LocalDate.now().plusMonths(1));
-
-        AlunoPagamentoMensalidade apm3 = new AlunoPagamentoMensalidade();
-        apm3.setValorPago(100.00);
-        apm3.setModalidade(4);
-        apm3.setDataCriacao(LocalDateTime.now());
-        apm3.setDataModificacao(LocalDateTime.now());
-        apm3.setAluno(pessoaDAO.buscaPessoaPorId(0));
-        apm3.setMvAlunoPagamento(mvDAO.buscaMensalidadePorId(0));
-        apm3.setDataVencimento(LocalDate.now().plusMonths(1));
-
-        vAlunoPagMensalidade[0] = apm1;
-        vAlunoPagMensalidade[1] = apm2;
-        vAlunoPagMensalidade[2] = apm3;
-    }
+    
 
     public AlunoPagamentoMensalidade buscarUltimoPagamentoPorAluno(long alunoId) {
         AlunoPagamentoMensalidade ultimoPagamento = null;

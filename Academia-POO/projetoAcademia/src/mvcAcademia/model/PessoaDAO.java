@@ -3,170 +3,201 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package mvcAcademia.model;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author barbrete e kitotsui
  */
-
 public class PessoaDAO {
-    
-    Pessoa[] pessoas = new Pessoa[5];
-    
-    public PessoaDAO() {
-        LocalDate dataNascimento1 = LocalDate.of(1996, 9, 11);
-        Pessoa p1 = new Pessoa();
-        p1.setNome("Rogerio");
-        p1.setLogin("Rojas");
-        p1.setSenha("123");
-        p1.setTipoUsuario("Administrador");
-        p1.setSexo("M");
-        p1.setNascimento(dataNascimento1);
-        p1.setDataCriacao(UtilPessoa.getDiaAtual());
-        p1.setDataModificacao(UtilPessoa.getDiaAtual());
-        
-        adiciona(p1);
 
-        Pessoa p2 = new Pessoa();
-        LocalDate dataNascimento2 = LocalDate.of(2000, 5, 13);
-        p2.setNome("Barbara");
-        p2.setLogin("babs");
-        p2.setSenha("123");
-        p2.setSexo("F");
-        p2.setNascimento(dataNascimento2);
-        p2.setTipoUsuario("Professor");
-        p2.setDataCriacao(UtilPessoa.getDiaAtual());
-        p2.setDataModificacao(UtilPessoa.getDiaAtual());
-        adiciona(p2);
+    public boolean adiciona(Pessoa pessoa) {
+        String sql = "INSERT INTO pessoa (nome, sexo, datanascimento, login, senha, tipousuario, datacriacao, datamodificacao) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        Pessoa p3 = new Pessoa();
-        LocalDate dataNascimento3 = LocalDate.of(1986, 8, 13);
-        p3.setNome("Eduardo");
-        p3.setLogin("dudu");
-        p3.setSenha("123");
-        p3.setSexo("M");
-        p3.setNascimento(dataNascimento3);
-        p3.setTipoUsuario("Aluno");
-        p3.setDataCriacao(UtilPessoa.getDiaAtual());
-        p3.setDataModificacao(UtilPessoa.getDiaAtual());
-        adiciona(p3);
-        
-    }
-    
-    public void mostraPessoa(long id) { //mostra pessoa especifica
-        Pessoa p = buscaPessoaPorId(id);
-        if (p != null) {
-            System.out.println(p);
-        } else {
-            System.out.println("PESSOA NAO ENCONTRADA");
-        }
-    }
-    
-    public LocalDateTime getDataCriacaoPorId(long id) {
-        for (Pessoa pessoa : pessoas) {
-            if (pessoa != null && pessoa.getId() == id) {
-                return pessoa.getDataCriacao();
-            }
-        }
-        return null; 
-    }
-    
-    public Pessoa buscaPessoaPorId(long id) {
-        for (Pessoa pessoa : pessoas) {
-            if (pessoa != null && pessoa.getId() == id) {
-                return pessoa;
-            }
-        }
-        return null;
-    }
-    
-    public Pessoa buscaPessoaLogin(String login, String senha) {
-         for (Pessoa p : pessoas) {
-            if (p!= null && p.getLogin().equals(login) &&
-                    p.getSenha().equals(senha)) {
-                return p;
-            }
-        }
-        return null;
-    }
-    
-    public boolean adiciona(Pessoa p) {
-        int proximaPosicaoLivre = this.proximaPosicaoLivre();
-        if (proximaPosicaoLivre != -1) {
-            pessoas[proximaPosicaoLivre] = p;
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, pessoa.getNome());
+            stmt.setString(2, pessoa.getSexo());
+            stmt.setObject(3, pessoa.getNascimento());
+            stmt.setString(4, pessoa.getLogin());
+            stmt.setString(5, pessoa.getSenha());
+            stmt.setString(6, pessoa.getTipoUsuario());
+            stmt.setTimestamp(7, java.sql.Timestamp.valueOf(pessoa.getDataCriacao()));
+            stmt.setTimestamp(8, java.sql.Timestamp.valueOf(pessoa.getDataModificacao()));
+
+            stmt.execute();
+
             return true;
-        } else {
-            return false;
-        }
 
-    }
-
-    public boolean ehVazio() {
-        for (Pessoa p : pessoas) {
-            if (p != null) {
-                return false;
-            }
-        }
-        return true;
-
-    }
-
-    public void mostrarTodos() {
-        boolean temPessoa = false;
-        for (Pessoa p : pessoas) {
-            if (p != null) {
-                System.out.println(p);
-                temPessoa = true;
-            }
-        }
-        if (!temPessoa) {
-            System.out.println("não existe usuario cadastrado");
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ADICIONAR PESSOA: " + e.getMessage());
         }
     }
 
-    public boolean alterarNome(String nome, String novoNome) {
-        for (Pessoa p : pessoas) {
-            if (p != null && p.getNome().equals(nome)) {
-                p.setNome(novoNome);
-                return true;
-            }
-        }
-        return false;
+    public Pessoa buscaPorId(long id) {
+        String sql = "SELECT * FROM pessoa WHERE idpessoa = ?";
 
-    }
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-    public Pessoa buscaPorNome(String nome) {
-        for (Pessoa p : pessoas) {
-            if (p != null && p.getNome().equals(nome)) {
-                return p;
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String nome = rs.getString("nome");
+                    String sexo = rs.getString("sexo");
+                    LocalDate nascimento = rs.getObject("datanascimento", LocalDate.class);
+                    String login = rs.getString("login");
+                    String senha = rs.getString("senha");
+                    String tipoUsuario = rs.getString("tipousuario");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                    Pessoa pessoa = new Pessoa();
+                    pessoa.setId(id);
+                    pessoa.setNome(nome);
+                    pessoa.setSexo(sexo);
+                    pessoa.setNascimento(nascimento);
+                    pessoa.setLogin(login);
+                    pessoa.setSenha(senha);
+                    pessoa.setTipoUsuario(tipoUsuario);
+                    pessoa.setDataCriacao(dataCriacao);
+                    pessoa.setDataModificacao(dataModificacao);
+
+                    return pessoa;
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO BUSCAR PESSOA POR ID: " + e.getMessage());
         }
         return null;
-
     }
 
-    public boolean remover(String nome) {
-        for (int i = 0; i < pessoas.length; i++) {
-            if (pessoas[i] != null && pessoas[i].getNome().equals(nome)) {
-                pessoas[i] = null;
+    public Pessoa buscaPorLogin(String login, String senha) {
+        String sql = "SELECT * FROM pessoa WHERE login = ? AND senha = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, login);
+            stmt.setString(2, senha);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Long id = rs.getLong("idpessoa");
+                    String nome = rs.getString("nome");
+                    String sexo = rs.getString("sexo");
+                    LocalDate nascimento = rs.getObject("datanascimento", LocalDate.class);
+                    String tipoUsuario = rs.getString("tipousuario");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                    Pessoa pessoa = new Pessoa();
+                    pessoa.setId(id);
+                    pessoa.setNome(nome);
+                    pessoa.setSexo(sexo);
+                    pessoa.setNascimento(nascimento);
+                    pessoa.setLogin(login);
+                    pessoa.setSenha(senha);
+                    pessoa.setTipoUsuario(tipoUsuario);
+                    pessoa.setDataCriacao(dataCriacao);
+                    pessoa.setDataModificacao(dataModificacao);
+
+                    return pessoa;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO BUSCAR PESSOA POR LOGIN: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public Pessoa alterar(Pessoa pessoa) {
+    String sql = "update pessoa set nome = ?, sexo = ?, datanascimento = ?, tipousuario = ?, login = ?, senha = ?, datamodificacao = ? where idpessoa = ?";
+
+    try (Connection connection = new ConexaoAcademia().getConnection(); 
+         PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+        stmt.setString(1, pessoa.getNome());
+        stmt.setString(2, pessoa.getSexo());
+        stmt.setDate(3, java.sql.Date.valueOf(pessoa.getNascimento()));
+        stmt.setString(4, pessoa.getTipoUsuario());
+        stmt.setString(5, pessoa.getLogin());
+        stmt.setString(6, pessoa.getSenha());
+        stmt.setTimestamp(7, java.sql.Timestamp.valueOf(pessoa.getDataModificacao()));
+        stmt.setLong(8, pessoa.getId());
+
+        stmt.execute();
+
+    } catch (SQLException e) {
+        throw new RuntimeException("ERRO AO ALTERAR PESSOA: " + e.getMessage());
+    }
+    return pessoa;
+}
+
+
+    public boolean remover(long id) {
+        String sql = "DELETE FROM pessoa WHERE idpessoa = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            int rowsDeleted = stmt.executeUpdate();
+
+            if (rowsDeleted > 0) {
                 return true;
             }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO REMOVER PESSOA: " + e.getMessage());
         }
         return false;
-
     }
 
-    private int proximaPosicaoLivre() {
-        for (int i = 0; i < pessoas.length; i++) {
-            if (pessoas[i] == null) {
-                return i;
+    public List<Pessoa> lista() {
+        String sql = "SELECT * FROM pessoa";
+        List<Pessoa> pessoas = new ArrayList<>(); // Move a declaração para fora do bloco try
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Long id = rs.getLong("idpessoa");
+                String nome = rs.getString("nome");
+                String sexo = rs.getString("sexo");
+                LocalDate nascimento = rs.getObject("datanascimento", LocalDate.class);
+                String login = rs.getString("login");
+                String senha = rs.getString("senha");
+                String tipoUsuario = rs.getString("tipousuario");
+                LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                Pessoa p = new Pessoa();
+                p.setId(id);
+                p.setNome(nome);
+                p.setSexo(sexo);
+                p.setNascimento(nascimento);
+                p.setLogin(login);
+                p.setSenha(senha);
+                p.setTipoUsuario(tipoUsuario);
+                p.setDataCriacao(dataCriacao);
+                p.setDataModificacao(dataModificacao);
+
+                pessoas.add(p);
             }
 
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO MOSTRAR TODAS AS PESSOAS: " + e.getMessage());
         }
-        return -1;
-    
+        return pessoas; 
     }
+
 }

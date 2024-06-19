@@ -16,41 +16,7 @@ public class PagamentoRecorrenteDAO {
     private PagamentoRecorrente[] pagamentos = new PagamentoRecorrente[5];
     PessoaDAO pessoaDAO = new PessoaDAO();
 
-    public PagamentoRecorrenteDAO() {
-        PagamentoRecorrente pagamento1 = new PagamentoRecorrente();
-        pagamento1.setPessoa(pessoaDAO.buscaPessoaPorId(1));
-        pagamento1.setData(LocalDateTime.of(2024, 5, 15, 0, 0));
-        pagamento1.setCartaoCredito("1234 5678 9012 3456");
-        pagamento1.setValor(150.00);
-        pagamento1.setDataInicio(LocalDateTime.of(2024, 5, 1, 0, 0));
-        pagamento1.setNumMesesAutorizados(6);
-        pagamento1.setDataCriacao(LocalDateTime.now());
-        pagamento1.setDataModificacao(LocalDateTime.now());
-        adiciona(pagamento1);
-
-        PagamentoRecorrente pagamento2 = new PagamentoRecorrente();
-        pagamento1.setPessoa(pessoaDAO.buscaPessoaPorId(2));
-        pagamento2.setData(LocalDateTime.of(2024, 6, 10, 0, 0));
-        pagamento2.setCartaoCredito("9876 5432 1098 7654");
-        pagamento2.setValor(120.00); 
-        pagamento2.setDataInicio(LocalDateTime.of(2024, 6, 1, 0, 0));
-        pagamento2.setNumMesesAutorizados(3);
-        pagamento2.setDataCriacao(LocalDateTime.now());
-        pagamento2.setDataModificacao(LocalDateTime.now());
-        adiciona(pagamento2);
-
-        PagamentoRecorrente pagamento3 = new PagamentoRecorrente();
-        pagamento1.setPessoa(pessoaDAO.buscaPessoaPorId(3));;
-        pagamento3.setData(LocalDateTime.of(2024, 7, 5, 0, 0));
-        pagamento3.setCartaoCredito("2468 1357 8024 6790");
-        pagamento3.setValor(200.00);
-        pagamento3.setDataInicio(LocalDateTime.of(2024, 7, 1, 0, 0));
-        pagamento3.setNumMesesAutorizados(12);
-        pagamento3.setDataCriacao(LocalDateTime.now());
-        pagamento3.setDataModificacao(LocalDateTime.now());
-        adiciona(pagamento3);
-
-    }
+    
 
     public PagamentoRecorrente buscaPagamentoPorId(long id) {
         for (PagamentoRecorrente pagamento : pagamentos) {
