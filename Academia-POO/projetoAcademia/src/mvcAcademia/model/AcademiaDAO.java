@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class AcademiaDAO {
 
-    public Academia adiciona(Academia academia) {
+    public boolean adiciona(Academia academia) {
         String sql = "insert into academia" + "(nome, endereco, datacriacao, datamodificacao)"
                 + "values (?, ?, ?, ?)";
 
@@ -31,12 +31,14 @@ public class AcademiaDAO {
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(academia.getDataModificacao()));
 
             stmt.execute();
+            
+            return true;
 
         } catch (SQLException e) {
             throw new RuntimeException("ERRO AO ADICIONAR ACADEMIA: " + e.getMessage());
         }
-        return academia;
     }
+    
 
     public List<Academia> lista(Academia academia) {
         String sql = "select * from academia";

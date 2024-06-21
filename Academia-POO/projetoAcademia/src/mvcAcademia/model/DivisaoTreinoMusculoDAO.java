@@ -1,10 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mvcAcademia.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -12,103 +14,136 @@ import java.time.LocalDateTime;
  */
 public class DivisaoTreinoMusculoDAO {
 
-    private DivisaoTreinoMusculo[] vetorDivisoesMusculo = new DivisaoTreinoMusculo[10];
+    public boolean adiciona(DivisaoTreinoMusculo divisaoMusculo) {
+        String sql = "INSERT INTO divisaotreinomusculo (nome, descricao, datacriacao, datamodificacao, iddivisaotreino) "
+                + "VALUES (?, ?, ?, ?, ?)";
 
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-    public DivisaoTreinoMusculoDAO() {
-        DivisaoTreinoMusculo divA = new DivisaoTreinoMusculo();
-        divA.setNome("A");
-        divA.setDescricao("PEITO, OMBRO, TRICEPS");
-        divA.setDataCriacao(LocalDateTime.now());
-        divA.setDataModificacao(LocalDateTime.now());
-        adiciona(divA);
+            stmt.setString(1, divisaoMusculo.getNome());
+            stmt.setString(2, divisaoMusculo.getDescricao());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(divisaoMusculo.getDataCriacao()));
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(divisaoMusculo.getDataModificacao()));
+            stmt.setLong(5, divisaoMusculo.getDivisaoTreino().getId());
 
-        DivisaoTreinoMusculo divB = new DivisaoTreinoMusculo();
-        divB.setNome("B");
-        divB.setDescricao("COSTAS, BICEPS, ABDOMEN");
-        divB.setDataCriacao(LocalDateTime.now());
-        divB.setDataModificacao(LocalDateTime.now());
-        adiciona(divB);
+            int rowsInserted = stmt.executeUpdate();
 
-        DivisaoTreinoMusculo divC = new DivisaoTreinoMusculo();
-        divC.setNome("C");
-        divC.setDescricao("PERNAS, PANTURRILHAS, ABDOMEN");
-        divC.setDataCriacao(LocalDateTime.now());
-        divC.setDataModificacao(LocalDateTime.now());
-        adiciona(divC);
+            return rowsInserted > 0;
 
-        DivisaoTreinoMusculo divD = new DivisaoTreinoMusculo();
-        divD.setNome("D");
-        divD.setDescricao("PEITO, OMBRO, TRICEPS");
-        divD.setDataCriacao(LocalDateTime.now());
-        divD.setDataModificacao(LocalDateTime.now());
-        adiciona(divD);
-
-        DivisaoTreinoMusculo divE = new DivisaoTreinoMusculo();
-        divE.setNome("E");
-        divE.setDescricao("COSTAS, BICEPS, ABDOMEN");
-        divE.setDataCriacao(LocalDateTime.now());
-        divE.setDataModificacao(LocalDateTime.now());
-        adiciona(divE);
-    }
-
-    public boolean adiciona(DivisaoTreinoMusculo divisao) {
-        int proximaPosicaoLivre = proximaPosicaoLivre();
-        if (proximaPosicaoLivre != -1) {
-            vetorDivisoesMusculo[proximaPosicaoLivre] = divisao;
-            return true;
-        } else {
-            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ADICIONAR DIVISÃO DE TREINO MUSCULO: " + e.getMessage());
         }
     }
 
-    public void mostrarTodasDivisoesMusculo() {
-        boolean temDivisao = false;
-        for (DivisaoTreinoMusculo divisao : vetorDivisoesMusculo) {
-            if (divisao != null) {
-                System.out.println(divisao);
-                temDivisao = true;
+    public DivisaoTreinoMusculo buscaPorId(long id) {
+        String sql = "SELECT * FROM divisaotreinomusculo WHERE iddivisaotreinomusculo = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String nome = rs.getString("nome");
+                    String descricao = rs.getString("descricao");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+                    long idDivisaoTreino = rs.getLong("iddivisaotreino");
+
+                    DivisaoTreinoDAO divisaoTreinoDAO = new DivisaoTreinoDAO();
+                    DivisaoTreino divisaoTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
+
+                    DivisaoTreinoMusculo divisaoMusculo = new DivisaoTreinoMusculo();
+                    divisaoMusculo.setId(id);
+                    divisaoMusculo.setNome(nome);
+                    divisaoMusculo.setDescricao(descricao);
+                    divisaoMusculo.setDataCriacao(dataCriacao);
+                    divisaoMusculo.setDataModificacao(dataModificacao);
+                    divisaoMusculo.setDivisaoTreino(divisaoTreino);
+
+                    return divisaoMusculo;
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO BUSCAR DIVISÃO DE TREINO MUSCULO POR ID: " + e.getMessage());
         }
-        if (!temDivisao) {
-            System.out.println("NENHUMA DIVISAO DE TREINO MUSCULAR CADASTRADA.");
-        }
-    }
 
-    public DivisaoTreinoMusculo buscarPorNome(String nome) {
-        for (DivisaoTreinoMusculo divisao : vetorDivisoesMusculo) {
-            if (divisao != null && divisao.getNome().equals(nome)) {
-                return divisao;
-            }
-        }
         return null;
+    }
+
+    public DivisaoTreinoMusculo alterar(DivisaoTreinoMusculo divisaoMusculo) {
+        String sql = "UPDATE divisaotreinomusculo SET nome = ?, descricao = ?, datamodificacao = ?, iddivisaotreino = ? WHERE iddivisaotreinomusculo = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, divisaoMusculo.getNome());
+            stmt.setString(2, divisaoMusculo.getDescricao());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(divisaoMusculo.getDataModificacao()));
+            stmt.setLong(4, divisaoMusculo.getDivisaoTreino().getId());
+            stmt.setLong(5, divisaoMusculo.getId());
+
+            int rowsUpdated = stmt.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                return divisaoMusculo;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ALTERAR DIVISÃO DE TREINO MUSCULO: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public boolean remover(long id) {
+        String sql = "DELETE FROM divisaotreinomusculo WHERE iddivisaotreinomusculo = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            int rowsDeleted = stmt.executeUpdate();
+
+            return rowsDeleted > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO REMOVER DIVISÃO DE TREINO MUSCULO: " + e.getMessage());
+        }
+    }
+
+    public List<DivisaoTreinoMusculo> lista() {
+        String sql = "SELECT * FROM divisaotreinomusculo";
+        List<DivisaoTreinoMusculo> divisoesMusculo = new ArrayList<>();
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                long id = rs.getLong("iddivisaotreinomusculo");
+                String nome = rs.getString("nome");
+                String descricao = rs.getString("descricao");
+                LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+                long idDivisaoTreino = rs.getLong("iddivisaotreino");
+
+                DivisaoTreinoDAO divisaoTreinoDAO = new DivisaoTreinoDAO();
+                DivisaoTreino divisaoTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
+
+                DivisaoTreinoMusculo divisaoMusculo = new DivisaoTreinoMusculo();
+                divisaoMusculo.setId(id);
+                divisaoMusculo.setNome(nome);
+                divisaoMusculo.setDescricao(descricao);
+                divisaoMusculo.setDataCriacao(dataCriacao);
+                divisaoMusculo.setDataModificacao(dataModificacao);
+                divisaoMusculo.setDivisaoTreino(divisaoTreino);
+
+                divisoesMusculo.add(divisaoMusculo);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO LISTAR DIVISÕES DE TREINO MUSCULO: " + e.getMessage());
+        }
+
+        return divisoesMusculo;
     }
     
-     public DivisaoTreinoMusculo buscaPorId(long id) {
-        for (DivisaoTreinoMusculo divisao : vetorDivisoesMusculo) {
-            if (divisao != null && divisao.getId() == id) {
-                return divisao;
-            }
-        }
-        return null;
-    }
-
-    public boolean remover(String nome) {
-        for (int i = 0; i < vetorDivisoesMusculo.length; i++) {
-            if (vetorDivisoesMusculo[i] != null && vetorDivisoesMusculo[i].getNome().equals(nome)) {
-                vetorDivisoesMusculo[i] = null;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private int proximaPosicaoLivre() {
-        for (int i = 0; i < vetorDivisoesMusculo.length; i++) {
-            if (vetorDivisoesMusculo[i] == null) {
-                return i;
-            }
-        }
-        return -1;
-    }
 }

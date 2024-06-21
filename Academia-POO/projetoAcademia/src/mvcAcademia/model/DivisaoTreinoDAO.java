@@ -1,101 +1,136 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mvcAcademia.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
- * @author barbrete e kitotsui
+ * @autor barbrete e kitotsui
  */
 public class DivisaoTreinoDAO {
 
-    private DivisaoTreino[] divisoesTreino = new DivisaoTreino[10];
+    public boolean adiciona(DivisaoTreino divisao) {
+        String sql = "INSERT INTO divisaotreino (nome, descricao, datacriacao, datamodificacao) "
+                + "VALUES (?, ?, ?, ?)";
 
-    public DivisaoTreinoDAO() {
-        DivisaoTreino divABC = new DivisaoTreino();
-        divABC.setNome("ABC");
-        divABC.setDescricao("ABC descansa 1x ABC descansa 2x");
-        divABC.setDataCriacao(LocalDateTime.now());
-        divABC.setDataModificacao(LocalDateTime.now());
-        adiciona(divABC);
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-        DivisaoTreino divBCD = new DivisaoTreino();
-        divBCD.setNome("BCD");
-        divBCD.setDescricao("BCD descansa 1x BCD sem descanso");
-        divBCD.setDataCriacao(LocalDateTime.now());
-        divBCD.setDataModificacao(LocalDateTime.now());
-        adiciona(divBCD);
+            stmt.setString(1, divisao.getNome());
+            stmt.setString(2, divisao.getDescricao());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(divisao.getDataCriacao()));
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(divisao.getDataModificacao()));
 
-        DivisaoTreino divCDE = new DivisaoTreino();
-        divCDE.setNome("CDE");
-        divCDE.setDescricao("CDE descansa 1x CDE descansa 1x CDE descansa 1x");
-        divCDE.setDataCriacao(LocalDateTime.now());
-        divCDE.setDataModificacao(LocalDateTime.now());
-        adiciona(divCDE);
-    }
+            int rowsInserted = stmt.executeUpdate();
 
-    public boolean adiciona(DivisaoTreino divisaoTreino) {
-        int proximaPosicaoLivre = proximaPosicaoLivre();
-        if (proximaPosicaoLivre != -1) {
-            divisoesTreino[proximaPosicaoLivre] = divisaoTreino;
-            return true;
-        } else {
-            return false;
+            return rowsInserted > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ADICIONAR DIVISÃO DE TREINO: " + e.getMessage());
         }
     }
-    
-    public void mostrarTodasDivisoesTreino() {
-        boolean temDivisaoTreino = false;
-        for (DivisaoTreino divisaoTreino : divisoesTreino) {
-            if (divisaoTreino != null) {
-                System.out.println(divisaoTreino);
-                temDivisaoTreino = true;
+
+    public DivisaoTreino buscaPorId(long id) {
+        String sql = "SELECT * FROM divisaotreino WHERE iddivisaotreino = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String nome = rs.getString("nome");
+                    String descricao = rs.getString("descricao");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                    DivisaoTreino divisao = new DivisaoTreino();
+                    divisao.setId(id);
+                    divisao.setNome(nome);
+                    divisao.setDescricao(descricao);
+                    divisao.setDataCriacao(dataCriacao);
+                    divisao.setDataModificacao(dataModificacao);
+
+                    return divisao;
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO BUSCAR DIVISÃO DE TREINO POR ID: " + e.getMessage());
         }
-        if (!temDivisaoTreino) {
-            System.out.println("NAO EXISTEM DIVISOES DE TREINO CADASTRADAS.");
-        }
-    }
 
-    public DivisaoTreino buscaPorNome(String nome) {
-        for (DivisaoTreino divisaoTreino : divisoesTreino) {
-            if (divisaoTreino != null && divisaoTreino.getNome().equals(nome)) {
-                return divisaoTreino;
-            }
-        }
-        return null;
-    }
-    
-      public DivisaoTreino buscaPorId(long id) {
-        for (DivisaoTreino divisaoT : divisoesTreino) {
-            if (divisaoT != null && divisaoT.getId() == id) {
-                return divisaoT;
-            }
-        }
         return null;
     }
 
-    public boolean remover(String nome) {
-        for (int i = 0; i < divisoesTreino.length; i++) {
-            if (divisoesTreino[i] != null && divisoesTreino[i].getNome().equals(nome)) {
-                divisoesTreino[i] = null;
-                return true;
+    public DivisaoTreino alterar(DivisaoTreino divisao) {
+        String sql = "UPDATE divisaotreino SET nome = ?, descricao = ?, datamodificacao = ? WHERE iddivisaotreino = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, divisao.getNome());
+            stmt.setString(2, divisao.getDescricao());
+            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(divisao.getDataModificacao()));
+            stmt.setLong(4, divisao.getId());
+
+            int rowsUpdated = stmt.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                return divisao;
             }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ALTERAR DIVISÃO DE TREINO: " + e.getMessage());
         }
-        return false;
+
+        return null;
     }
 
-    private int proximaPosicaoLivre() {
-        for (int i = 0; i < divisoesTreino.length; i++) {
-            if (divisoesTreino[i] == null) {
-                return i;
-            }
+    public boolean remover(long id) {
+        String sql = "DELETE FROM divisaotreino WHERE iddivisaotreino = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            int rowsDeleted = stmt.executeUpdate();
+
+            return rowsDeleted > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO REMOVER DIVISÃO DE TREINO: " + e.getMessage());
         }
-        return -1;
     }
-    
-   
+
+    public List<DivisaoTreino> lista() {
+        String sql = "SELECT * FROM divisaotreino";
+        List<DivisaoTreino> divisoes = new ArrayList<>();
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                long id = rs.getLong("iddivisaotreino");
+                String nome = rs.getString("nome");
+                String descricao = rs.getString("descricao");
+                LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                DivisaoTreino divisao = new DivisaoTreino();
+                divisao.setId(id);
+                divisao.setNome(nome);
+                divisao.setDescricao(descricao);
+                divisao.setDataCriacao(dataCriacao);
+                divisao.setDataModificacao(dataModificacao);
+
+                divisoes.add(divisao);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO LISTAR DIVISÕES DE TREINO: " + e.getMessage());
+        }
+
+        return divisoes;
+    }
 }

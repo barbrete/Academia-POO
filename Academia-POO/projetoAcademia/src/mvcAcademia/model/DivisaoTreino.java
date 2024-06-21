@@ -24,6 +24,10 @@ public class DivisaoTreino {
         id = DivisaoTreino.serial++;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+    
     public long getId() {
         return id;
     }
@@ -66,12 +70,15 @@ public class DivisaoTreino {
 
     @Override
     public String toString() {
-        
-        return  "\n(ID: - " + id + ")" 
-                + " NOME: " + nome 
-                + " DESCRICAO: " + descricao;
-                
+        return "\n==================INFORMACOES DE DIVISAO DE TREINO ================= " 
+                 + "\nID: " + id 
+                 + "\nNOME: " + nome 
+                 + "\nDESCRICAO: " + descricao 
+                 + "\nDATA DE CRIACAO: " + dataCriacao 
+                 + "\nDATA DE MODIFICACAO: " + dataModificacao;
     }
+
+    
 
     @Override
     public int hashCode() {

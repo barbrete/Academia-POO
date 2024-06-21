@@ -21,6 +21,10 @@ public class DivisaoTreinoMusculo {
         this.id = serial++;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+    
     public long getId() {
         return id;
     }
@@ -67,9 +71,10 @@ public class DivisaoTreinoMusculo {
 
     @Override
     public String toString() {
-        return  "\n" + divisaoTreino 
-                + " ID: " + id
-                + " NOME: " + nome
-                + " DESCRICAO: " + descricao;
+        return   "\n" + divisaoTreino 
+                + "\n================== DIVISAO DE TREINO MUSCULO ASSOCIADA: ================= "
+                + " \nID: " + id
+                + " \nNOME: " + nome
+                + " \nDESCRICAO: " + descricao;
     }
 }
