@@ -165,7 +165,7 @@ public class PessoaDAO {
 
     public List<Pessoa> lista() {
         String sql = "SELECT * FROM pessoa";
-        List<Pessoa> pessoas = new ArrayList<>(); // Move a declaração para fora do bloco try
+        List<Pessoa> pessoas = new ArrayList<>(); 
 
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 

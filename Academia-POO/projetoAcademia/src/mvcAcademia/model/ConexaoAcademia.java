@@ -21,7 +21,7 @@ public class ConexaoAcademia {
             properties.setProperty("serverTimezone", "America/Sao_Paulo");
             properties.setProperty("allowPublicKeyRetrieval", "true");
             
-            String url = "jdbc:mysql://localhost/projetofinalpoo";
+            String url = "jdbc:mysql://localhost/projetopoofinal";
             return DriverManager.getConnection(url, properties);
             
             

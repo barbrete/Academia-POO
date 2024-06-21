@@ -226,6 +226,12 @@ public class MenuGeralAcademia {
         }
     }
 
+    private void mostrarTodosExercicios(List<Exercicio> exercicios) {
+        for (Exercicio exercicio : exercicios) {
+            System.out.println(exercicio);
+        }
+    }
+
     private Academia cadastraAcademia() {
         Academia acad = new Academia();
         System.out.println("NOME: ");
@@ -574,13 +580,15 @@ public class MenuGeralAcademia {
 
         while (true) {
             resp = gui.menuCrudAcademia();
-
             switch (resp) {
                 case 1:
                     Academia acad = this.cadastraAcademia();
-                    academiaDAO.adiciona(acad);
                     System.out.println("ACADEMIA CRIADA COM SUCESSO!");
-
+                    if (academiaDAO.adiciona(acad)) {
+                        System.out.println("ACADEMIA CRIADO COM SUCESSO!");
+                    } else {
+                        System.out.println("ACADEMIA NAO CRIADA.");
+                    }
                     break;
                 case 2:
                     List<Academia> academias = academiaDAO.lista(null);
@@ -650,12 +658,16 @@ public class MenuGeralAcademia {
                     }
                     break;
                 case 2:
-                    exercicioDAO.mostrarTodosExercicios();
+                    List<Exercicio> exercicios = exercicioDAO.lista();
+                    this.mostrarTodosExercicios(exercicios);
                     break;
                 case 3:
-                    System.out.println("DIGITE O NOME DO EXERCICIO QUE DESEJA ALTERAR...: ");
-                    String nomeEx = scanner.nextLine();
-                    Exercicio exParaAlterar = exercicioDAO.buscaPorNome(nomeEx);
+                    List<Exercicio> exerciciosAlterar = exercicioDAO.lista();
+                    this.mostrarTodosExercicios(exerciciosAlterar);
+                    System.out.println("DIGITE O ID DO EXERCICIO QUE DESEJA ALTERAR...: ");
+                    Long idExercicio = Long.parseLong(scanner.nextLine());
+
+                    Exercicio exParaAlterar = exercicioDAO.buscaPorId(idExercicio);
                     if (exParaAlterar != null) {
                         System.out.println("DIGITE O NOVO NOME DO EXERCICIO...: ");
                         String novoNomeExercicio = scanner.nextLine();
@@ -664,17 +676,19 @@ public class MenuGeralAcademia {
                         String novaDescricaoExercicio = scanner.nextLine();
                         exParaAlterar.setDescricao(novaDescricaoExercicio);
                         exParaAlterar.setDataModificacao(LocalDateTime.now());
-                        System.out.println("EXERCICIO ALTERADA COM SUCESSO!");
+
+                        exercicioDAO.alterar(exParaAlterar);
+                        System.out.println("EXERCICIO ALTERADO COM SUCESSO!");
                     } else {
                         System.out.println("EXERCICIO NAO EXISTENTE NO BANCO DE DADOS.");
                     }
                     break;
                 case 4:
-                    System.out.println("DIGITE O NOME DO EXERCICIO QUE DESEJA EXCLUIR...: ");
-                    String nomeExExcluir = scanner.nextLine();
-                    Exercicio exParaExcluir = exercicioDAO.buscaPorNome(nomeExExcluir);
+                    System.out.println("DIGITE O ID DO EXERCICIO QUE DESEJA EXCLUIR...: ");
+                    Long idExercicioExcluir = Long.parseLong(scanner.nextLine());
+                    Exercicio exParaExcluir = exercicioDAO.buscaPorId(idExercicioExcluir);
                     if (exParaExcluir != null) {
-                        exercicioDAO.remover(nomeExExcluir);
+                        exercicioDAO.remover(idExercicioExcluir);
                         System.out.println("EXERCICIO EXCLUIDO COM SUCESSO!");
                     } else {
                         System.out.println("EXERCICIO NAO EXISTENTE NO BANCO DE DADOS.");
