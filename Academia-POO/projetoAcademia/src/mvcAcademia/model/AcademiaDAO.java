@@ -40,7 +40,7 @@ public class AcademiaDAO {
     }
     
 
-    public List<Academia> lista(Academia academia) {
+    public List<Academia> lista() {
         String sql = "select * from academia";
         List<Academia> academias = new ArrayList<>();
 

@@ -118,7 +118,8 @@ public class AcademiaController {
         System.out.println("2 - MOSTRAR TREINO");
         System.out.println("3 - ALTERAR TREINO");
         System.out.println("4 - EXCLUIR TREINO");
-        System.out.println("5 - VOLTAR AO MENU ANTERIOR");
+        System.out.println("5 - ASSOCIAR TREINO A UMA DIVISAO DE TREINO");
+        System.out.println("6 - VOLTAR AO MENU ANTERIOR");
         System.out.print("OPCAO...: ");
 
         return Integer.parseInt(scanner.nextLine());

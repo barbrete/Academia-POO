@@ -4,160 +4,169 @@
  */
 package mvcAcademia.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author barbrete e kitotsui
  */
 public class TreinoDAO {
-
-    private Treino[] treinos = new Treino[10];
-    
-    public TreinoDAO(){
-        LocalDate dtInicioT1 = LocalDate.of(2024, 05, 05);
-        LocalDate dtTerminoT1 = LocalDate.of(2024, 06, 05);
-        Treino t1 = new Treino();
-        t1.setNome("Transformacao Fit");
-        t1.setObjetivo("Emagrecimento");
-        //t1.setDivTreino(divisaoTreinoDAO);
-        t1.setDataInicio(dtInicioT1);
-        t1.setDataTermino(dtTerminoT1);
-        t1.setDataCriacao(LocalDateTime.now());
-        t1.setDataModificacao(LocalDateTime.now());
-        adiciona(t1);
         
-        LocalDate dtInicioT2 = LocalDate.of(2024, 10, 05);
-        LocalDate dtTerminoT2 = LocalDate.of(2024, 11, 05);
-        Treino t2 = new Treino();
-        t2.setNome("Massa Maximal");
-        t2.setObjetivo("Hipertrofia Muscular");
-        //t2.setDivisaoTreino(divisaoTreino);
-        t2.setDataInicio(dtInicioT2);
-        t2.setDataTermino(dtTerminoT2);
-        t2.setDataCriacao(LocalDateTime.now());
-        t2.setDataModificacao(LocalDateTime.now());
-        adiciona(t2);
-        
-        LocalDate dtInicioT3 = LocalDate.of(2023, 12, 20);
-        LocalDate dtTerminoT3 = LocalDate.of(2024, 01, 25);
-        Treino t3 = new Treino();
-        t3.setNome("Flex & Flow");
-        t3.setObjetivo("Flexibilidade e Mobilidade");
-        //t3.setDivisaoTreino(divisaoTreino);
-        t3.setDataInicio(dtInicioT3);
-        t3.setDataTermino(dtTerminoT3);
-        t3.setDataCriacao(LocalDateTime.now());
-        t3.setDataModificacao(LocalDateTime.now());
-        adiciona(t3);
-        
-        LocalDate dtInicioT4 = LocalDate.of(2023, 10, 05);
-        LocalDate dtTerminoT4 = LocalDate.of(2024, 01, 05);
-        Treino t4 = new Treino();
-        t4.setNome("Massa Maximal");
-        t4.setObjetivo("Hipertrofia Muscular");
-        //t4.setDivisaoTreino(divisaoTreino);
-        t4.setDataInicio(dtInicioT4);
-        t4.setDataTermino(dtTerminoT4);
-        t4.setDataCriacao(LocalDateTime.now());
-        t4.setDataModificacao(LocalDateTime.now());
-        adiciona(t4);
-        
-        LocalDate dtInicioT5 = LocalDate.of(2024, 01, 01);
-        LocalDate dtTerminoT5 = LocalDate.of(2024, 02, 05);
-        Treino t5 = new Treino();
-        t5.setNome("Massa Maximal");
-        t5.setObjetivo("Hipertrofia Muscular");
-        //t5.setDivisaoTreino(divisaoTreino);
-        t5.setDataInicio(dtInicioT5);
-        t5.setDataTermino(dtTerminoT5);
-        t5.setDataCriacao(LocalDateTime.now());
-        t5.setDataModificacao(LocalDateTime.now());
-        adiciona(t5);
-        
-    }
-
-    public Treino buscaTreinoPorId(long id) {
-        for (Treino t : treinos) {
-            if (t != null && t.getId() == id) {
-                return t;
-            }
-        }
-        return null;
-    }
-    
-    public void mostraTreino(long id) {
-       Treino t = buscaTreinoPorId(id);
-        if (t != null) {
-            System.out.println(t);
-        } else {
-            System.out.println("TREINO NAO ENCONTRADO.");
-        }
-    }
-
     public boolean adiciona(Treino treino) {
-        int proximaPosicaoLivre = proximaPosicaoLivre();
-        if (proximaPosicaoLivre != -1) {
-            treinos[proximaPosicaoLivre] = treino;
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    public void mostrarTodosTreinos() {
-        boolean temTreino = false;
-        for (Treino treino : treinos) {
-            if (treino != null) {
-                System.out.println(treino);
-                temTreino = true;
-            }
-        }
-        if (!temTreino) {
-            System.out.println("NAO EXISTEM TREINOS CADASTRADOS.");
+        String sql = "INSERT INTO treino (nome, objetivo, datainicio, datatermino, datacriacao, datamodificacao) "
+                   + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); 
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, treino.getNome());
+            stmt.setString(2, treino.getObjetivo());
+            stmt.setDate(3, java.sql.Date.valueOf(treino.getDataInicio()));
+            stmt.setDate(4, java.sql.Date.valueOf(treino.getDataTermino()));
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(treino.getDataCriacao()));
+            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(treino.getDataModificacao()));
+            //stmt.setLong(7, treino.getDivTreino().getId());
+
+            int rowsInserted = stmt.executeUpdate();
+
+            return rowsInserted > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ADICIONAR TREINO: " + e.getMessage());
         }
     }
 
-    
-      public Treino buscaPorNome(String nome) {
-        for (Treino treino : treinos) {
-            if (treino != null && treino.getNome().equals(nome)) {
-                return treino;
+    public Treino buscaPorId(long id) {
+        String sql = "SELECT * FROM treino WHERE idtreino = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); 
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String nome = rs.getString("nome");
+                    String objetivo = rs.getString("objetivo");
+                    LocalDate dataInicio = rs.getDate("datainicio").toLocalDate();
+                    LocalDate dataTermino = rs.getDate("datatermino").toLocalDate();
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+                    long idDivisaoTreino = rs.getLong("iddivisaotreino");
+
+                    DivisaoTreinoDAO divisaoTreinoDAO = new DivisaoTreinoDAO();
+                    DivisaoTreino divisaoTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
+
+                    Treino treino = new Treino();
+                    treino.setId(id);
+                    treino.setNome(nome);
+                    treino.setObjetivo(objetivo);
+                    treino.setDataInicio(dataInicio);
+                    treino.setDataTermino(dataTermino);
+                    treino.setDataCriacao(dataCriacao);
+                    treino.setDataModificacao(dataModificacao);
+                    treino.setDivTreino(divisaoTreino);
+
+                    return treino;
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO BUSCAR TREINO POR ID: " + e.getMessage());
         }
+
         return null;
     }
-      
-        public Treino buscaPorId(long id) {
-        for (Treino treino : treinos) {
-            if (treino != null && treino.getId() == id) {
+
+    public Treino alterar(Treino treino) {
+        String sql = "UPDATE treino SET nome = ?, objetivo = ?, datainicio = ?, datatermino = ?, datamodificacao = ?, iddivisaotreino = ? WHERE idtreino = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); 
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, treino.getNome());
+            stmt.setString(2, treino.getObjetivo());
+            stmt.setDate(3, java.sql.Date.valueOf(treino.getDataInicio()));
+            stmt.setDate(4, java.sql.Date.valueOf(treino.getDataTermino()));
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(treino.getDataModificacao()));
+            stmt.setLong(6, treino.getDivTreino().getId());
+            stmt.setLong(7, treino.getId());
+
+            int rowsUpdated = stmt.executeUpdate();
+
+            if (rowsUpdated > 0) {
                 return treino;
             }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ALTERAR TREINO: " + e.getMessage());
         }
+
         return null;
     }
 
-    public boolean remover(String objetivo) {
-        for (int i = 0; i < treinos.length; i++) {
-            if (treinos[i] != null && treinos[i].getObjetivo().equals(objetivo)) {
-                treinos[i] = null;
-                return true;
-            }
+    public boolean remover(long id) {
+        String sql = "DELETE FROM treino WHERE idtreino = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); 
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            int rowsDeleted = stmt.executeUpdate();
+
+            return rowsDeleted > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO REMOVER TREINO: " + e.getMessage());
         }
-        return false;
     }
 
-    private int proximaPosicaoLivre() {
-        for (int i = 0; i < treinos.length; i++) {
-            if (treinos[i] == null) {
-                return i;
+    public List<Treino> lista() {
+        String sql = "SELECT * FROM treino";
+        List<Treino> treinos = new ArrayList<>();
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); 
+             PreparedStatement stmt = connection.prepareStatement(sql); 
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                long id = rs.getLong("idtreino");
+                String nome = rs.getString("nome");
+                String objetivo = rs.getString("objetivo");
+                LocalDate dataInicio = rs.getDate("datainicio").toLocalDate();
+                LocalDate dataTermino = rs.getDate("datatermino").toLocalDate();
+                LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+                long idDivisaoTreino = rs.getLong("iddivisaotreino");
+
+                DivisaoTreinoDAO divisaoTreinoDAO = new DivisaoTreinoDAO();
+                DivisaoTreino divisaoTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
+
+                Treino treino = new Treino();
+                treino.setId(id);
+                treino.setNome(nome);
+                treino.setObjetivo(objetivo);
+                treino.setDataInicio(dataInicio);
+                treino.setDataTermino(dataTermino);
+                treino.setDataCriacao(dataCriacao);
+                treino.setDataModificacao(dataModificacao);
+                treino.setDivTreino(divisaoTreino);
+
+                treinos.add(treino);
             }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO LISTAR TREINOS: " + e.getMessage());
         }
-        return -1;
-    }
-    
-    public Treino[] getTreinos() {
+
         return treinos;
     }
+   
 }
