@@ -69,7 +69,7 @@ public class Exercicio{
 
     @Override
      public String toString() {
-         return "==================INFORMACOES DO EXERCICIO================= " 
+         return "\n==================INFORMACOES DO EXERCICIO================= " 
                  + "\nID: " + id 
                  + "\nNOME: " + nome 
                  + "\nDESCRICAO: " + descricao 

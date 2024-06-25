@@ -25,9 +25,9 @@ public class DivisaoTreinoDAO {
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(divisao.getDataCriacao()));
             stmt.setTimestamp(4, java.sql.Timestamp.valueOf(divisao.getDataModificacao()));
 
-            int rowsInserted = stmt.executeUpdate();
+            int ColunaInserida = stmt.executeUpdate();
 
-            return rowsInserted > 0;
+            return ColunaInserida > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException("ERRO AO ADICIONAR DIVISÃO DE TREINO: " + e.getMessage());
@@ -75,9 +75,9 @@ public class DivisaoTreinoDAO {
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(divisao.getDataModificacao()));
             stmt.setLong(4, divisao.getId());
 
-            int rowsUpdated = stmt.executeUpdate();
+            int linhaAtt = stmt.executeUpdate();
 
-            if (rowsUpdated > 0) {
+            if (linhaAtt > 0) {
                 return divisao;
             }
 
@@ -95,9 +95,9 @@ public class DivisaoTreinoDAO {
 
             stmt.setLong(1, id);
 
-            int rowsDeleted = stmt.executeUpdate();
+            int linhaDeletada = stmt.executeUpdate();
 
-            return rowsDeleted > 0;
+            return linhaDeletada > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException("ERRO AO REMOVER DIVISÃO DE TREINO: " + e.getMessage());

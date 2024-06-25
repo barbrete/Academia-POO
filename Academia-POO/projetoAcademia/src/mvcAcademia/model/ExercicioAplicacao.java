@@ -56,7 +56,7 @@ import java.util.Objects;
     
     @Override
      public String toString() {
-         return "==================INFORMACOES DA APLICACAO DO EXERCICIO================= " 
+         return "\n==================INFORMACOES DA APLICACAO DO EXERCICIO================= " 
                  + "\nID: " + id 
                  + "\nDESCRICAO: " + descricao 
                  + "\nDATA DE CRIACAO: " + dataCriacao 

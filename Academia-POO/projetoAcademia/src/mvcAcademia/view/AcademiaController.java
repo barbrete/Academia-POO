@@ -131,8 +131,7 @@ public class AcademiaController {
         System.out.println("2 - MOSTRAR FICHA DE TREINO APLICACAO");
         System.out.println("3 - ALTERAR FICHA DE TREINO APLICACAO");
         System.out.println("4 - EXCLUIR FICHA DE TREINO APLICACAO");
-        System.out.println("5 - ASSOCIAR E MONTAR FICHA DE TREINO");
-        System.out.println("6 - VOLTAR AO MENU ANTERIOR");
+        System.out.println("5 -  VOLTAR AO MENU ANTERIOR");
         System.out.print("OPCAO...: ");
 
         return Integer.parseInt(scanner.nextLine());

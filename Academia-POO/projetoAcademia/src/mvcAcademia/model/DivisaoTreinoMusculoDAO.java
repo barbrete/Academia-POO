@@ -15,20 +15,21 @@ import java.util.List;
 public class DivisaoTreinoMusculoDAO {
 
     public boolean adiciona(DivisaoTreinoMusculo divisaoMusculo) {
-        String sql = "INSERT INTO divisaotreinomusculo (nome, descricao, datacriacao, datamodificacao, iddivisaotreino) "
+        String sql = "INSERT INTO divisaotreinomusculo (nome, descricao, iddivisaotreino, datacriacao, datamodificacao) "
                 + "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, divisaoMusculo.getNome());
             stmt.setString(2, divisaoMusculo.getDescricao());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(divisaoMusculo.getDataCriacao()));
-            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(divisaoMusculo.getDataModificacao()));
-            stmt.setLong(5, divisaoMusculo.getDivisaoTreino().getId());
+            stmt.setLong(3, divisaoMusculo.getDivisaoTreino().getId());
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(divisaoMusculo.getDataCriacao()));
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(divisaoMusculo.getDataModificacao()));
+            
 
-            int rowsInserted = stmt.executeUpdate();
+            int linhaInserida = stmt.executeUpdate();
 
-            return rowsInserted > 0;
+            return linhaInserida > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException("ERRO AO ADICIONAR DIVISÃO DE TREINO MUSCULO: " + e.getMessage());
@@ -82,9 +83,9 @@ public class DivisaoTreinoMusculoDAO {
             stmt.setLong(4, divisaoMusculo.getDivisaoTreino().getId());
             stmt.setLong(5, divisaoMusculo.getId());
 
-            int rowsUpdated = stmt.executeUpdate();
+            int linhaAtt = stmt.executeUpdate();
 
-            if (rowsUpdated > 0) {
+            if (linhaAtt > 0) {
                 return divisaoMusculo;
             }
 
@@ -102,9 +103,9 @@ public class DivisaoTreinoMusculoDAO {
 
             stmt.setLong(1, id);
 
-            int rowsDeleted = stmt.executeUpdate();
+            int linhaApagada = stmt.executeUpdate();
 
-            return rowsDeleted > 0;
+            return linhaApagada > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException("ERRO AO REMOVER DIVISÃO DE TREINO MUSCULO: " + e.getMessage());

@@ -14,8 +14,6 @@ public class TreinoAplicacao {
 
     private static long serial = 1;
     private long id;
-    private String nome;
-    private String descricao;
     Pessoa pessoa;
     Academia academia;
     Treino treino;
@@ -30,24 +28,12 @@ public class TreinoAplicacao {
         id = TreinoAplicacao.serial++;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+    
     public long getId() {
         return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
     }
 
     public Pessoa getPessoa() {
@@ -125,10 +111,8 @@ public class TreinoAplicacao {
     @Override
     public String toString() {
         return "====================FICHA DE TREINO=====================\n" 
-                + "Id da ficha: " + id
-                + "\nDescricao da ficha: " + descricao 
-                + "\nNome da ficha de treino: " + nome
-                + "\nData de criacao da ficha: " + dataCriacao
+                + "ID DA FICHA: " + id
+                + "\nDATA DE CRIACAO DA FICHA: " + dataCriacao
                 +  academia 
                 +  pessoa
                 +  treino

@@ -108,7 +108,7 @@ public class Pessoa {
 
     @Override
     public String toString() {
-        return "==================INFORMACOES DA PESSOA================= "
+        return "\n==================INFORMACOES DA PESSOA================= "
                 + "\nID: " + id
                 + "\nNOME: " + nome
                 + "\nSEXO: " + sexo

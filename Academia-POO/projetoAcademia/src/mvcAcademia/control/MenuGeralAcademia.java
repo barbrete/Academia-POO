@@ -155,7 +155,7 @@ public class MenuGeralAcademia {
 
             switch (opcaoUsuario) {
                 case 1:
-                    TreinoAplicacao fichaTreino = treinoAplicacaoDAO.buscarPorPessoaId(pessoaLogadaId);
+                    TreinoAplicacao fichaTreino = treinoAplicacaoDAO.buscaPorId(pessoaLogadaId);
                     if (fichaTreino != null) {
                         System.out.println(fichaTreino);
                     } else {
@@ -197,7 +197,7 @@ public class MenuGeralAcademia {
                     gerenciarDivisaoTreino();
                     break;
                 case 3:
-                    gerenciaTreinoAplicacao();
+                    gerenciarTreinoAplicacao();
                     break;
                 case 4:
                     //gerenciaAvaliacaoFisica();
@@ -295,6 +295,19 @@ public class MenuGeralAcademia {
             }
         }
     }
+    
+    private void mostrarTreinoAplicacao() {
+    List<TreinoAplicacao> treinoAplicacoes = treinoAplicacaoDAO.listarTodos();
+
+    if (treinoAplicacoes.isEmpty()) {
+        System.out.println("NAO EXISTEM TREINOS APLICACAO CADASTRADOS.");
+    } else {
+        for (TreinoAplicacao ta : treinoAplicacoes) {
+            System.out.println(ta);
+        }
+    }
+}
+
 
     private Academia cadastraAcademia() {
         Academia acad = new Academia();
@@ -362,7 +375,6 @@ public class MenuGeralAcademia {
         LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
         p.setNascimento(dataNascimento);
 
-        // Obtenha a opção de tipo de usuário do menu
         opcaoTipoUsuario = gui.menuTipoUsuario();
 
         switch (opcaoTipoUsuario) {
@@ -410,6 +422,23 @@ public class MenuGeralAcademia {
         System.out.println("DESCRICAO DA DIVISAO DE TREINO MUSCULO: ");
         divMusculo.setDescricao(scanner.nextLine());
 
+        this.mostrarTodasDivisoesTreino();
+        System.out.println("ESCOLHA O ID DA DIVISAO DE TREINO QUE DESEJA ASSOCIAR: ");
+        long idDivisaoTreino = -1;
+        boolean validacao = false;
+
+        while (!validacao) {
+            try {
+                idDivisaoTreino = Long.parseLong(scanner.nextLine());
+                validacao = true;
+            } catch (NumberFormatException e) {
+                System.out.println("ID INVÁLIDO. POR FAVOR, DIGITE UM NÚMERO VÁLIDO:");
+            }
+        }
+        
+        DivisaoTreino divTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
+        divMusculo.setDivisaoTreino(divTreino);
+
         divMusculo.setDataCriacao(LocalDateTime.now());
         divMusculo.setDataModificacao(LocalDateTime.now());
 
@@ -453,6 +482,53 @@ public class MenuGeralAcademia {
 
         return novoTreino;
     }
+    
+    private TreinoAplicacao cadastrarTreinoAplicacao() {
+    TreinoAplicacao treinoAplicacao = new TreinoAplicacao();
+    System.out.println("CADASTRO DE NOVO TREINO APLICACAO:\n");
+
+    this.mostrarTodasPessoas();
+    System.out.println("DIGITE O ID DA PESSOA: ");
+    long pessoaId = Long.parseLong(scanner.nextLine());
+    treinoAplicacao.setPessoa(new PessoaDAO().buscaPorId(pessoaId));
+
+ 
+    this.mostrarTodasAcademias();
+    System.out.println("DIGITE O ID DA ACADEMIA: ");
+    long academiaId = Long.parseLong(scanner.nextLine());
+    treinoAplicacao.setAcademia(new AcademiaDAO().buscaPorId(academiaId));
+
+    this.mostrarTodosExercicios();
+    System.out.println("DIGITE O ID DO EXERCICIO: ");
+    long exercicioId = Long.parseLong(scanner.nextLine());
+    treinoAplicacao.setExercicio(new ExercicioDAO().buscaPorId(exercicioId));
+    
+    this.mostrarTodosExerciciosAplicacao();
+    System.out.println("DIGITE O ID DA APLICACAO DE EXERCICIO: ");
+    long exAplicacaoId = Long.parseLong(scanner.nextLine());
+    treinoAplicacao.setExAplicacao(new ExercicioAplicacaoDAO().buscaPorId(exAplicacaoId));
+   
+    this.mostrarTodasDivisoesTreino();
+    System.out.println("DIGITE O ID DA DIVISAO DE TREINO: ");
+    long divTreinoId = Long.parseLong(scanner.nextLine());
+    treinoAplicacao.setDivTreino(new DivisaoTreinoDAO().buscaPorId(divTreinoId));
+    
+    this.mostrarTodasDivisoesTreinoMusculo();
+    System.out.println("DIGITE O ID DA DIVISAO DE TREINO MUSCULO: ");
+    long divTreinoMuscId = Long.parseLong(scanner.nextLine());
+    treinoAplicacao.setDivTreinoMusc(new DivisaoTreinoMusculoDAO().buscaPorId(divTreinoMuscId));
+    
+    this.mostrarTodosTreinos();
+    System.out.println("DIGITE O ID DO TREINO: ");
+    long treinoId = Long.parseLong(scanner.nextLine());
+    treinoAplicacao.setTreino(new TreinoDAO().buscaPorId(treinoId));
+   
+    treinoAplicacao.setDataCriacao(LocalDateTime.now());
+    treinoAplicacao.setDataModificacao(LocalDateTime.now());
+
+    return treinoAplicacao;
+}
+
 
     private MensalidadeVigente cadastraMensalidadeVigente() {
         MensalidadeVigente novaMensalidade = new MensalidadeVigente();
@@ -509,18 +585,6 @@ public class MenuGeralAcademia {
 
         return novoAPM;
     }*/
-    private TreinoAplicacao cadastrarTreinoAplicacao() {
-        TreinoAplicacao treinoAplicacao = new TreinoAplicacao();
-        System.out.println("CADASTRO DE NOVO TREINO APLICACAO:\n");
-
-        System.out.println("NOME DO TREINO APLICACAO: ");
-        treinoAplicacao.setNome(scanner.nextLine());
-
-        System.out.println("DESCRICAO DO TREINO APLICACAO: ");
-        treinoAplicacao.setDescricao(scanner.nextLine());
-
-        return treinoAplicacao;
-    }
 
     /*private AvaliacaoFisica cadastraAvaliacaoFisica() {
         AvaliacaoFisica af = new AvaliacaoFisica();
@@ -625,7 +689,7 @@ public class MenuGeralAcademia {
                     gerenciaTreino();
                     break;
                 case 8:
-                    gerenciaTreinoAplicacao();
+                    gerenciarTreinoAplicacao();
                     break;
                 case 9:
                     //gerenciaAvaliacaoFisica();
@@ -929,7 +993,7 @@ public class MenuGeralAcademia {
             }
         }
     }
-    
+
     private void gerenciarDivisaoTreino() {
         int resp;
 
@@ -1166,148 +1230,57 @@ public class MenuGeralAcademia {
         }
     }
 
-    private void gerenciaTreinoAplicacao() {
-        int resp;
+    private void gerenciarTreinoAplicacao() {
+    int resp;
 
-        while (true) {
-            resp = gui.menuCrudTreinoAplicacao();
+    while (true) {
+        resp = gui.menuCrudTreinoAplicacao();
 
-            switch (resp) {
-                case 1:
-                    TreinoAplicacao treinoAplicacao = this.cadastrarTreinoAplicacao();
-                    if (treinoAplicacaoDAO.adiciona(treinoAplicacao)) {
-                        System.out.println("TREINO APLICACAO CRIADO COM SUCESSO!");
-                    } else {
-                        System.out.println("FALHA AO CRIAR TREINO APLICACAO.");
-                    }
-                    break;
-                case 2:
-                    treinoAplicacaoDAO.mostrarTodosTreinosAplicacoes();
-                    break;
-                case 3:
-                    System.out.println("DIGITE O ID DO TREINO APLICACAO QUE DESEJA ALTERAR...: ");
-                    long idAplicacao = Long.parseLong(scanner.nextLine());
-                    TreinoAplicacao aplicacaoParaAlterar = treinoAplicacaoDAO.buscarPorId(idAplicacao);
-                    if (aplicacaoParaAlterar != null) {
-                        System.out.println("DIGITE O NOVO NOME DO TREINO APLICACAO...: ");
-                        String novoNomeAplicacao = scanner.nextLine();
-                        aplicacaoParaAlterar.setNome(novoNomeAplicacao);
-                        System.out.println("DIGITE A NOVA DESCRICAO DO TREINO APLICACAO...: ");
-                        String novaDescricaoAplicacao = scanner.nextLine();
-                        aplicacaoParaAlterar.setDescricao(novaDescricaoAplicacao);
-                        System.out.println("TREINO APLICACAO ALTERADO COM SUCESSO!");
-
-                    } else {
-                        System.out.println("TREINO APLICACAO NAO EXISTENTE NO BANCO DE DADOS.");
-                    }
-                    break;
-                case 4:
-                    System.out.println("DIGITE O ID DO TREINO APLICACAO QUE DESEJA EXCLUIR...: ");
-                    long idAplicacaoExcluir = Long.parseLong(scanner.nextLine());
-                    if (treinoAplicacaoDAO.remover(idAplicacaoExcluir)) {
-                        System.out.println("TREINO APLICACAO EXCLUIDO COM SUCESSO!");
-                    } else {
-                        System.out.println("TREINO APLICACAO NÃO EXISTENTE NO BANCO DE DADOS.");
-                    }
-                    break;
-                /*case 5:
-                    treinoAplicacaoDAO.mostrarTodosTreinosAplicacoes();
-                    System.out.println("\nQUAL TREINO APLICACAO DESEJA GERENCIAR? DIGITE O ID:\n");
-                    long idTreinoAplicacaoAssociar = Long.parseLong(scanner.nextLine());
-                    TreinoAplicacao treinoAplicacaoAssociar = treinoAplicacaoDAO.buscarPorId(idTreinoAplicacaoAssociar);
-
-                    if (treinoAplicacaoAssociar != null) {
-                        System.out.println("ACADEMIAS EXISTENTES:\n");
-                        academiaDAO.mostrarTodasAcademias();
-                        System.out.println("QUAL ACADEMIA DESEJA ASSOCIAR? DIGITE O ID:\n");
-                        long idAcademia = Long.parseLong(scanner.nextLine());
-                        Academia academia = academiaDAO.buscaPorId(idAcademia);
-                        if (academia != null) {
-                            treinoAplicacaoAssociar.setAcademia(academia);
-                        } else {
-                            System.out.println("ACADEMIA NÃO ENCONTRADA.");
-                            break;
-                        }
-
-                        // Associar Pessoa
-                        System.out.println("PESSOAS EXISTENTES:\n");
-                        pessoaDAO.mostrarTodos();
-                        System.out.println("QUAL PESSOA DESEJA ASSOCIAR? DIGITE O ID:\n");
-                        long idPessoa = Long.parseLong(scanner.nextLine());
-                        Pessoa pessoa = pessoaDAO.buscaPessoaPorId(idPessoa);
-                        if (pessoa != null) {
-                            treinoAplicacaoAssociar.setPessoa(pessoa);
-                        } else {
-                            System.out.println("PESSOA NÃO ENCONTRADA.");
-                            break;
-                        }
-
-                        System.out.println("TREINOS EXISTENTES:\n");
-                        treinoDAO.mostrarTodosTreinos();
-                        System.out.println("QUAL TREINO DESEJA ASSOCIAR? DIGITE O ID:\n");
-                        long idTreino = Long.parseLong(scanner.nextLine());
-                        Treino treino = treinoDAO.buscaTreinoPorId(idTreino);
-                        if (treino != null) {
-                            treinoAplicacaoAssociar.setTreino(treino);
-                        } else {
-                            System.out.println("TREINO NÃO ENCONTRADO.");
-                            break;
-                        }
-
-                        System.out.println("EXERCICIOS EXISTENTES:\n");
-                        exercicioDAO.mostrarTodosExercicios();
-                        System.out.println("QUAL EXERCICIO DESEJA ASSOCIAR? DIGITE O ID:\n");
-                        long idExercicio = Long.parseLong(scanner.nextLine());
-                        Exercicio exercicio = exercicioDAO.buscaPorId(idExercicio);
-                        if (exercicio != null) {
-                            treinoAplicacaoAssociar.setExercicio(exercicio);
-                        } else {
-                            System.out.println("EXERCICIO NÃO ENCONTRADO.");
-                            break;
-                        }
-
-                        System.out.println("DIVISOES DE TREINO EXISTENTES:\n");
-                        divisaoTreinoDAO.mostrarTodasDivisoesTreino();
-                        System.out.println("QUAL DIVISAO DE TREINO DESEJA ASSOCIAR? DIGITE O ID:\n");
-                        long idDivisaoTreino = Long.parseLong(scanner.nextLine());
-                        DivisaoTreino divisaoTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
-                        if (divisaoTreino != null) {
-                            treinoAplicacaoAssociar.setDivTreino(divisaoTreino);
-                        } else {
-                            System.out.println("DIVISAO DE TREINO NÃO ENCONTRADA.");
-                            break;
-                        }
-
-                        System.out.println("DIVISOES DE TREINO MUSCULO EXISTENTES:\n");
-                        divisaoTreinoMusculoDAO.mostrarTodasDivisoesMusculo();
-                        System.out.println("QUAL DIVISAO DE TREINO MUSCULO DESEJA ASSOCIAR? DIGITE O ID:\n");
-                        long idDivisaoTreinoMusculo = Long.parseLong(scanner.nextLine());
-                        DivisaoTreinoMusculo divisaoTreinoMusculo = divisaoTreinoMusculoDAO.buscaPorId(idDivisaoTreinoMusculo);
-
-                        if (academia != null && pessoa != null && treino != null && exercicio != null && divisaoTreino != null && divisaoTreinoMusculo != null) {
-                            treinoAplicacaoAssociar.setAcademia(academia);
-                            treinoAplicacaoAssociar.setPessoa(pessoa);
-                            treinoAplicacaoAssociar.setTreino(treino);
-                            treinoAplicacaoAssociar.setExercicio(exercicio);
-                            treinoAplicacaoAssociar.setDivTreino(divisaoTreino);
-                            treinoAplicacaoAssociar.setDivTreinoMusc(divisaoTreinoMusculo);
-                            System.out.println("ASSOCIACOES REALIZADAS COM SUCESSO!");
-                        } else {
-                            System.out.println("FALHA AO REALIZAR ASSOCIACOES. CERTIFIQUE-SE DE QUE TODOS OS DADOS EXISTEM.");
-                        }
-                    } else {
-                        System.out.println("TREINO APLICACAO NÃO ENCONTRADO.");
-                    }*/
-
-                //break;
-                case 6:
-                    return;
-                default:
-                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
-                    break;
-            }
+        switch (resp) {
+            case 1:
+                TreinoAplicacao treinoAplicacao = this.cadastrarTreinoAplicacao();
+                if (treinoAplicacaoDAO.adiciona(treinoAplicacao)) {
+                    System.out.println("TREINO APLICACAO CRIADO COM SUCESSO!");
+                } else {
+                    System.out.println("FALHA AO CRIAR TREINO APLICACAO.");
+                }
+                break;
+            case 2:
+                this.mostrarTreinoAplicacao();
+                break;
+            case 3:
+                System.out.println("\nDIGITE O ID DO TREINO APLICACAO QUE DESEJA ALTERAR...: ");
+                long idAplicacao = Long.parseLong(scanner.nextLine());
+                TreinoAplicacao aplicacaoParaAlterar = treinoAplicacaoDAO.buscaPorId(idAplicacao);
+                if (aplicacaoParaAlterar != null) {
+                    System.out.println("TREINO APLICACAO ENCONTRADO: ");
+                    System.out.println(aplicacaoParaAlterar);
+                    aplicacaoParaAlterar = this.cadastrarTreinoAplicacao();
+                    treinoAplicacaoDAO.alterar(aplicacaoParaAlterar);
+                    System.out.println("TREINO APLICACAO ALTERADO COM SUCESSO!");
+                } else {
+                    System.out.println("TREINO APLICACAO NAO EXISTENTE NO BANCO DE DADOS.");
+                }
+                break;
+            case 4:
+                this.mostrarTreinoAplicacao();
+                System.out.println("\nDIGITE O ID DO TREINO APLICACAO QUE DESEJA EXCLUIR...: ");
+                long idAplicacaoExcluir = Long.parseLong(scanner.nextLine());
+                if (treinoAplicacaoDAO.remover(idAplicacaoExcluir)) {
+                    System.out.println("TREINO APLICACAO EXCLUIDO COM SUCESSO!");
+                } else {
+                    System.out.println("TREINO APLICACAO NÃO EXISTENTE NO BANCO DE DADOS.");
+                }
+                break;
+            case 5:
+                return;
+            default:
+                System.out.println("ESCOLHA UMA OPCAO VALIDA.");
+                break;
         }
     }
+}
+
 
     /*private void gerenciaAvaliacaoFisica() {
         int resp;
