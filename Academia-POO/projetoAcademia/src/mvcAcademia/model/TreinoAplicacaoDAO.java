@@ -153,17 +153,13 @@ public class TreinoAplicacaoDAO {
             stmt.setTimestamp(8, java.sql.Timestamp.valueOf(treinoAplicacao.getDataModificacao()));
             stmt.setLong(9, treinoAplicacao.getId());
 
-            int rowsUpdated = stmt.executeUpdate();
-
-            if (rowsUpdated > 0) {
-                return treinoAplicacao;
-            }
+            stmt.execute();
 
         } catch (SQLException e) {
             throw new RuntimeException("ERRO AO ALTERAR FICHA DE TREINO " + e.getMessage());
         }
 
-        return null;
+        return treinoAplicacao;
     }
 
     public boolean remover(long id) {
@@ -173,8 +169,8 @@ public class TreinoAplicacaoDAO {
 
             stmt.setLong(1, id);
 
-            int rowsDeleted = stmt.executeUpdate();
-            return rowsDeleted > 0;
+            int linhasDeletadas = stmt.executeUpdate();
+            return linhasDeletadas > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException("ERRO AO REMOVER FICHA DE TREINO " + e.getMessage());

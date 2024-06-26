@@ -20,7 +20,7 @@ public class AlunoPagamentoMensalidade {
     private LocalDate dataPagamento;
     private double valorPago;
     private Pessoa aluno;
-    private int modalidade; //VAI SER INTEIRO POR CAUSA DO PAGAMENTO RECORRENTE
+    private int modalidade; 
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
     

@@ -295,19 +295,29 @@ public class MenuGeralAcademia {
             }
         }
     }
-    
-    private void mostrarTreinoAplicacao() {
-    List<TreinoAplicacao> treinoAplicacoes = treinoAplicacaoDAO.listarTodos();
 
-    if (treinoAplicacoes.isEmpty()) {
-        System.out.println("NAO EXISTEM TREINOS APLICACAO CADASTRADOS.");
-    } else {
-        for (TreinoAplicacao ta : treinoAplicacoes) {
-            System.out.println(ta);
+    private void mostrarTreinoAplicacao() {
+        List<TreinoAplicacao> treinoAplicacoes = treinoAplicacaoDAO.listarTodos();
+
+        if (treinoAplicacoes.isEmpty()) {
+            System.out.println("NAO EXISTEM TREINOS APLICACAO CADASTRADOS.");
+        } else {
+            for (TreinoAplicacao ta : treinoAplicacoes) {
+                System.out.println(ta);
+            }
         }
     }
-}
 
+    private void mostrarMensalidadesVigentes() {
+        List<MensalidadeVigente> mensalidades = mvDAO.lista();
+        if (mensalidades.isEmpty()) {
+            System.out.println("NENHUMA MENSALIDADE VIGENTE CADASTRADA.");
+        } else {
+            for (MensalidadeVigente mv : mensalidades) {
+                System.out.println(mv);
+            }
+        }
+    }
 
     private Academia cadastraAcademia() {
         Academia acad = new Academia();
@@ -435,7 +445,7 @@ public class MenuGeralAcademia {
                 System.out.println("ID INVÁLIDO. POR FAVOR, DIGITE UM NÚMERO VÁLIDO:");
             }
         }
-        
+
         DivisaoTreino divTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
         divMusculo.setDivisaoTreino(divTreino);
 
@@ -482,74 +492,72 @@ public class MenuGeralAcademia {
 
         return novoTreino;
     }
-    
+
     private TreinoAplicacao cadastrarTreinoAplicacao() {
-    TreinoAplicacao treinoAplicacao = new TreinoAplicacao();
-    System.out.println("CADASTRO DE NOVO TREINO APLICACAO:\n");
+        TreinoAplicacao treinoAplicacao = new TreinoAplicacao();
+        System.out.println("CADASTRO DE NOVO TREINO APLICACAO:\n");
 
-    this.mostrarTodasPessoas();
-    System.out.println("DIGITE O ID DA PESSOA: ");
-    long pessoaId = Long.parseLong(scanner.nextLine());
-    treinoAplicacao.setPessoa(new PessoaDAO().buscaPorId(pessoaId));
+        this.mostrarTodasPessoas();
+        System.out.println("DIGITE O ID DA PESSOA: ");
+        long pessoaId = Long.parseLong(scanner.nextLine());
+        treinoAplicacao.setPessoa(new PessoaDAO().buscaPorId(pessoaId));
 
- 
-    this.mostrarTodasAcademias();
-    System.out.println("DIGITE O ID DA ACADEMIA: ");
-    long academiaId = Long.parseLong(scanner.nextLine());
-    treinoAplicacao.setAcademia(new AcademiaDAO().buscaPorId(academiaId));
+        this.mostrarTodasAcademias();
+        System.out.println("DIGITE O ID DA ACADEMIA: ");
+        long academiaId = Long.parseLong(scanner.nextLine());
+        treinoAplicacao.setAcademia(new AcademiaDAO().buscaPorId(academiaId));
 
-    this.mostrarTodosExercicios();
-    System.out.println("DIGITE O ID DO EXERCICIO: ");
-    long exercicioId = Long.parseLong(scanner.nextLine());
-    treinoAplicacao.setExercicio(new ExercicioDAO().buscaPorId(exercicioId));
-    
-    this.mostrarTodosExerciciosAplicacao();
-    System.out.println("DIGITE O ID DA APLICACAO DE EXERCICIO: ");
-    long exAplicacaoId = Long.parseLong(scanner.nextLine());
-    treinoAplicacao.setExAplicacao(new ExercicioAplicacaoDAO().buscaPorId(exAplicacaoId));
-   
-    this.mostrarTodasDivisoesTreino();
-    System.out.println("DIGITE O ID DA DIVISAO DE TREINO: ");
-    long divTreinoId = Long.parseLong(scanner.nextLine());
-    treinoAplicacao.setDivTreino(new DivisaoTreinoDAO().buscaPorId(divTreinoId));
-    
-    this.mostrarTodasDivisoesTreinoMusculo();
-    System.out.println("DIGITE O ID DA DIVISAO DE TREINO MUSCULO: ");
-    long divTreinoMuscId = Long.parseLong(scanner.nextLine());
-    treinoAplicacao.setDivTreinoMusc(new DivisaoTreinoMusculoDAO().buscaPorId(divTreinoMuscId));
-    
-    this.mostrarTodosTreinos();
-    System.out.println("DIGITE O ID DO TREINO: ");
-    long treinoId = Long.parseLong(scanner.nextLine());
-    treinoAplicacao.setTreino(new TreinoDAO().buscaPorId(treinoId));
-   
-    treinoAplicacao.setDataCriacao(LocalDateTime.now());
-    treinoAplicacao.setDataModificacao(LocalDateTime.now());
+        this.mostrarTodosExercicios();
+        System.out.println("DIGITE O ID DO EXERCICIO: ");
+        long exercicioId = Long.parseLong(scanner.nextLine());
+        treinoAplicacao.setExercicio(new ExercicioDAO().buscaPorId(exercicioId));
 
-    return treinoAplicacao;
-}
+        this.mostrarTodosExerciciosAplicacao();
+        System.out.println("DIGITE O ID DA APLICACAO DE EXERCICIO: ");
+        long exAplicacaoId = Long.parseLong(scanner.nextLine());
+        treinoAplicacao.setExAplicacao(new ExercicioAplicacaoDAO().buscaPorId(exAplicacaoId));
 
+        this.mostrarTodasDivisoesTreino();
+        System.out.println("DIGITE O ID DA DIVISAO DE TREINO: ");
+        long divTreinoId = Long.parseLong(scanner.nextLine());
+        treinoAplicacao.setDivTreino(new DivisaoTreinoDAO().buscaPorId(divTreinoId));
+
+        this.mostrarTodasDivisoesTreinoMusculo();
+        System.out.println("DIGITE O ID DA DIVISAO DE TREINO MUSCULO: ");
+        long divTreinoMuscId = Long.parseLong(scanner.nextLine());
+        treinoAplicacao.setDivTreinoMusc(new DivisaoTreinoMusculoDAO().buscaPorId(divTreinoMuscId));
+
+        this.mostrarTodosTreinos();
+        System.out.println("DIGITE O ID DO TREINO: ");
+        long treinoId = Long.parseLong(scanner.nextLine());
+        treinoAplicacao.setTreino(new TreinoDAO().buscaPorId(treinoId));
+
+        treinoAplicacao.setDataCriacao(LocalDateTime.now());
+        treinoAplicacao.setDataModificacao(LocalDateTime.now());
+
+        return treinoAplicacao;
+    }
 
     private MensalidadeVigente cadastraMensalidadeVigente() {
-        MensalidadeVigente novaMensalidade = new MensalidadeVigente();
-        System.out.println("CADASTRO DE MENSALIDADE VIGENTE\n");
-        System.out.println("DIGITE VALOR DA MENSALIDADE DA ACADEMIA");
-        novaMensalidade.setValor(scanner.nextInt());
+        System.out.println("DIGITE O VALOR DA MENSALIDADE...: ");
+        double valor = scanner.nextDouble();
         scanner.nextLine();
-        System.out.println("DATA DE INICIO (dd/MM/yyyy):");
+        System.out.println("DIGITE A DATA DE INICIO DA MENSALIDADE (dd/MM/yyyy)...: ");
         String dataInicioStr = scanner.nextLine();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate dataInicio = LocalDate.parse(dataInicioStr, formatter);
-        novaMensalidade.setDataInicio(dataInicio);
-        System.out.println("DATA DE TERMINO (dd/MM/yyyy):");
+        System.out.println("DIGITE A DATA DE TERMINO DA MENSALIDADE (dd/MM/yyyy)...: ");
         String dataTerminoStr = scanner.nextLine();
-        DateTimeFormatter formattert = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dataTermino = LocalDate.parse(dataTerminoStr, formattert);
-        novaMensalidade.setDataTermino(dataTermino);
-        novaMensalidade.setDataCriacao(UtilPessoa.getDiaAtual());
-        novaMensalidade.setDataModificacao(UtilPessoa.getDiaAtual());
+        LocalDate dataTermino = LocalDate.parse(dataTerminoStr, formatter);
 
-        return novaMensalidade;
+        MensalidadeVigente mv = new MensalidadeVigente();
+        mv.setValor(valor);
+        mv.setDataInicio(dataInicio);
+        mv.setDataTermino(dataTermino);
+        mv.setDataCriacao(LocalDateTime.now());
+        mv.setDataModificacao(LocalDateTime.now());
+
+        return mv;
     }
 
     /*private AlunoPagamentoMensalidade cadastraAlunoPagamentoMensalidade() {
@@ -586,7 +594,7 @@ public class MenuGeralAcademia {
         return novoAPM;
     }*/
 
-    /*private AvaliacaoFisica cadastraAvaliacaoFisica() {
+ /*private AvaliacaoFisica cadastraAvaliacaoFisica() {
         AvaliacaoFisica af = new AvaliacaoFisica();
         System.out.println("AVALIACAO FISICA");
         System.out.println("A AVALIACAO FISICA CUSTA R$20,00, VOCE ESTA CIENTE (S/N)?");
@@ -1174,6 +1182,19 @@ public class MenuGeralAcademia {
                         treinoParaAlterar.setObjetivo(novaDescricaoTreino);
                         treinoParaAlterar.setDataModificacao(LocalDateTime.now());
 
+                        // Mostrar divisões de treino existentes e permitir associação
+                        System.out.println("DIVISOES DE TREINO EXISTENTES:\n");
+                        this.mostrarTodasDivisoesTreino();
+                        System.out.println("QUAL DIVISAO DE TREINO GOSTARIA DE ASSOCIAR?");
+                        long idDivisaoTreino = Long.parseLong(scanner.nextLine());
+                        DivisaoTreino divisaoTreino = divisaoTreinoDAO.buscaPorId(idDivisaoTreino);
+
+                        if (divisaoTreino != null) {
+                            treinoParaAlterar.setDivTreino(divisaoTreino);
+                        } else {
+                            System.out.println("DIVISAO DE TREINO NÃO ENCONTRADA.");
+                        }
+
                         if (treinoDAO.alterar(treinoParaAlterar) != null) {
                             System.out.println("TREINO ALTERADO COM SUCESSO!");
                         } else {
@@ -1231,55 +1252,94 @@ public class MenuGeralAcademia {
     }
 
     private void gerenciarTreinoAplicacao() {
-    int resp;
+        int resp;
 
-    while (true) {
-        resp = gui.menuCrudTreinoAplicacao();
+        while (true) {
+            resp = gui.menuCrudTreinoAplicacao();
 
-        switch (resp) {
-            case 1:
-                TreinoAplicacao treinoAplicacao = this.cadastrarTreinoAplicacao();
-                if (treinoAplicacaoDAO.adiciona(treinoAplicacao)) {
-                    System.out.println("TREINO APLICACAO CRIADO COM SUCESSO!");
-                } else {
-                    System.out.println("FALHA AO CRIAR TREINO APLICACAO.");
-                }
-                break;
-            case 2:
-                this.mostrarTreinoAplicacao();
-                break;
-            case 3:
-                System.out.println("\nDIGITE O ID DO TREINO APLICACAO QUE DESEJA ALTERAR...: ");
-                long idAplicacao = Long.parseLong(scanner.nextLine());
-                TreinoAplicacao aplicacaoParaAlterar = treinoAplicacaoDAO.buscaPorId(idAplicacao);
-                if (aplicacaoParaAlterar != null) {
-                    System.out.println("TREINO APLICACAO ENCONTRADO: ");
-                    System.out.println(aplicacaoParaAlterar);
-                    aplicacaoParaAlterar = this.cadastrarTreinoAplicacao();
-                    treinoAplicacaoDAO.alterar(aplicacaoParaAlterar);
-                    System.out.println("TREINO APLICACAO ALTERADO COM SUCESSO!");
-                } else {
-                    System.out.println("TREINO APLICACAO NAO EXISTENTE NO BANCO DE DADOS.");
-                }
-                break;
-            case 4:
-                this.mostrarTreinoAplicacao();
-                System.out.println("\nDIGITE O ID DO TREINO APLICACAO QUE DESEJA EXCLUIR...: ");
-                long idAplicacaoExcluir = Long.parseLong(scanner.nextLine());
-                if (treinoAplicacaoDAO.remover(idAplicacaoExcluir)) {
-                    System.out.println("TREINO APLICACAO EXCLUIDO COM SUCESSO!");
-                } else {
-                    System.out.println("TREINO APLICACAO NÃO EXISTENTE NO BANCO DE DADOS.");
-                }
-                break;
-            case 5:
-                return;
-            default:
-                System.out.println("ESCOLHA UMA OPCAO VALIDA.");
-                break;
+            switch (resp) {
+                case 1:
+                    TreinoAplicacao treinoAplicacao = this.cadastrarTreinoAplicacao();
+                    if (treinoAplicacaoDAO.adiciona(treinoAplicacao)) {
+                        System.out.println("TREINO APLICACAO CRIADO COM SUCESSO!");
+                    } else {
+                        System.out.println("FALHA AO CRIAR TREINO APLICACAO.");
+                    }
+                    break;
+                case 2:
+                    this.mostrarTreinoAplicacao();
+                    break;
+                case 3:
+                    System.out.println("\nDIGITE O ID DO TREINO APLICACAO QUE DESEJA ALTERAR...: ");
+                    long idAplicacao = Long.parseLong(scanner.nextLine());
+                    TreinoAplicacao aplicacaoParaAlterar = treinoAplicacaoDAO.buscaPorId(idAplicacao);
+
+                    if (aplicacaoParaAlterar != null) {
+                        System.out.println("ALTERAR FICHA DE TREINO: \n");
+
+                        this.mostrarTodasPessoas();
+                        System.out.println("DIGITE O ID DA PESSOA: ");
+                        long pessoaId = Long.parseLong(scanner.nextLine());
+                        aplicacaoParaAlterar.setPessoa(new PessoaDAO().buscaPorId(pessoaId));
+
+                        this.mostrarTodasAcademias();
+                        System.out.println("DIGITE O ID DA ACADEMIA: ");
+                        long academiaId = Long.parseLong(scanner.nextLine());
+                        aplicacaoParaAlterar.setAcademia(new AcademiaDAO().buscaPorId(academiaId));
+
+                        this.mostrarTodosExercicios();
+                        System.out.println("DIGITE O ID DO EXERCICIO: ");
+                        long exercicioId = Long.parseLong(scanner.nextLine());
+                        aplicacaoParaAlterar.setExercicio(new ExercicioDAO().buscaPorId(exercicioId));
+
+                        this.mostrarTodosExerciciosAplicacao();
+                        System.out.println("DIGITE O ID DA APLICACAO DE EXERCICIO: ");
+                        long exAplicacaoId = Long.parseLong(scanner.nextLine());
+                        aplicacaoParaAlterar.setExAplicacao(new ExercicioAplicacaoDAO().buscaPorId(exAplicacaoId));
+
+                        this.mostrarTodasDivisoesTreino();
+                        System.out.println("DIGITE O ID DA DIVISAO DE TREINO: ");
+                        long divTreinoId = Long.parseLong(scanner.nextLine());
+                        aplicacaoParaAlterar.setDivTreino(new DivisaoTreinoDAO().buscaPorId(divTreinoId));
+
+                        this.mostrarTodasDivisoesTreinoMusculo();
+                        System.out.println("DIGITE O ID DA DIVISAO DE TREINO MUSCULO: ");
+                        long divTreinoMuscId = Long.parseLong(scanner.nextLine());
+                        aplicacaoParaAlterar.setDivTreinoMusc(new DivisaoTreinoMusculoDAO().buscaPorId(divTreinoMuscId));
+
+                        this.mostrarTodosTreinos();
+                        System.out.println("DIGITE O ID DO TREINO: ");
+                        long treinoId = Long.parseLong(scanner.nextLine());
+                        aplicacaoParaAlterar.setTreino(new TreinoDAO().buscaPorId(treinoId));
+
+                        aplicacaoParaAlterar.setDataModificacao(LocalDateTime.now());
+                            
+                        
+                        treinoAplicacaoDAO.alterar(aplicacaoParaAlterar);
+
+                        System.out.println("TREINO APLICACAO ALTERADO COM SUCESSO!");
+                    } else {
+                        System.out.println("TREINO APLICACAO NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 4:
+                    this.mostrarTreinoAplicacao();
+                    System.out.println("\nDIGITE O ID DO TREINO APLICACAO QUE DESEJA EXCLUIR...: ");
+                    long idAplicacaoExcluir = Long.parseLong(scanner.nextLine());
+                    if (treinoAplicacaoDAO.remover(idAplicacaoExcluir)) {
+                        System.out.println("TREINO APLICACAO EXCLUIDO COM SUCESSO!");
+                    } else {
+                        System.out.println("TREINO APLICACAO NÃO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
+                    break;
+            }
         }
     }
-}
 
 
     /*private void gerenciaAvaliacaoFisica() {
@@ -1382,11 +1442,9 @@ public class MenuGeralAcademia {
 
         while (true) {
             resp = gui.menuCrudMensalidadeVigente();
-
             switch (resp) {
                 case 1:
                     MensalidadeVigente mv = this.cadastraMensalidadeVigente();
-
                     if (mvDAO.adiciona(mv)) {
                         System.out.println("MENSALIDADE VIGENTE CRIADA COM SUCESSO!");
                     } else {
@@ -1394,40 +1452,42 @@ public class MenuGeralAcademia {
                     }
                     break;
                 case 2:
-                    mvDAO.mostrarTodasMensalidades();
+                    this.mostrarMensalidadesVigentes();
                     break;
                 case 3:
-                    System.out.println("DIGITE O ID DA MENSALIDADE VIGENTE QUE DESEJA ALTERAR...: ");
-                    long id = scanner.nextLong();
-                    MensalidadeVigente mvParaAlterar = mvDAO.buscaMensalidadePorId(id);
-                    if (mvParaAlterar != null) {
-                        System.out.println("DIGITE O NOVO VALOR DA MENSALIDADE...: ");
-                        double novoValorMensalidade = scanner.nextDouble();
-                        mvParaAlterar.setValor(novoValorMensalidade);
-                        scanner.nextLine();
-                        System.out.println("DIGITE A NOVA DATA DE INICIO DA MENSALIDADE (dd/MM/yyyy)...: ");
+                    this.mostrarMensalidadesVigentes();
+                    System.out.println("\nDIGITE O ID DA MENSALIDADE VIGENTE QUE DESEJA ALTERAR...: ");
+                    long idMensalidade = Long.parseLong(scanner.nextLine());
+
+                    MensalidadeVigente mensalidadeParaAlterar = mvDAO.buscaPorId(idMensalidade);
+                    if (mensalidadeParaAlterar != null) {
+                        System.out.println("DIGITE O NOVO VALOR DA MENSALIDADE: ");
+                        double novoValorMensalidade = Double.parseDouble(scanner.nextLine());
+                        System.out.println("DIGITE A NOVA DATA DE INICIO DA MENSALIDADE (dd/MM/yyyy): ");
                         String novaDataInicioStr = scanner.nextLine();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                        LocalDate dataInicio = LocalDate.parse(novaDataInicioStr, formatter);
-                        mvParaAlterar.setDataInicio(dataInicio);
-                        System.out.println("DIGITE A NOVA DATA DE DATA DE TERMINO DA MENSALIDADE(dd/MM/yyyy)...: ");
+                        LocalDate dataInicio = LocalDate.parse(novaDataInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        System.out.println("DIGITE A NOVA DATA DE TERMINO DA MENSALIDADE (dd/MM/yyyy): ");
                         String novaDataTerminoStr = scanner.nextLine();
-                        formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                        LocalDate dataTermino = LocalDate.parse(novaDataTerminoStr, formatter);
-                        mvParaAlterar.setDataTermino(dataTermino);
-                        scanner.nextLine();
-                        System.out.println("MENSALIDADE ALTERADA COM SUCESSO!");
+                        LocalDate dataTermino = LocalDate.parse(novaDataTerminoStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+                        mensalidadeParaAlterar.setValor(novoValorMensalidade);
+                        mensalidadeParaAlterar.setDataInicio(dataInicio);
+                        mensalidadeParaAlterar.setDataTermino(dataTermino);
+                        mensalidadeParaAlterar.setDataModificacao(LocalDateTime.now());
+
+                        mvDAO.alterar(mensalidadeParaAlterar);
+
+                        System.out.println("MENSALIDADE VIGENTE ALTERADA COM SUCESSO!");
                     } else {
-                        System.out.println("MENSALIDADE NAO EXISTENTE NO BANCO DE DADOS.");
+                        System.out.println("MENSALIDADE VIGENTE NAO ENCONTRADA NO BANCO DE DADOS.");
                     }
                     break;
                 case 4:
-                    System.out.println("DIGITE O ID DA MENSALIDADE VIGENTE QUE DESEJA EXCLUIR...: ");
-                    long ide = scanner.nextLong();
-                    MensalidadeVigente mvParaExcluir = mvDAO.buscaMensalidadePorId(ide);
-                    if (mvParaExcluir != null) {
-                        mvDAO.remover(ide);
-                        System.out.println("MENSALIDADE VIGENTE EXCLUIDO COM SUCESSO!");
+                    this.mostrarMensalidadesVigentes();
+                    System.out.println("\nDIGITE O ID DA MENSALIDADE VIGENTE QUE DESEJA EXCLUIR...: ");
+                    long idMensalidadeExcluir = Long.parseLong(scanner.nextLine());
+                    if (mvDAO.remover(idMensalidadeExcluir)) {
+                        System.out.println("MENSALIDADE VIGENTE EXCLUIDA COM SUCESSO!");
                     } else {
                         System.out.println("MENSALIDADE VIGENTE NAO EXISTENTE NO BANCO DE DADOS.");
                     }
@@ -1636,6 +1696,8 @@ public class MenuGeralAcademia {
             }
         }
     }*/
+    
+    
     private void gerenciaRelatorio() {
         Scanner scanner = new Scanner(System.in);
 

@@ -4,122 +4,141 @@
  */
 package mvcAcademia.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
- * @author Acer
+ * @autor barbrete e kitotsui
  */
 public class MensalidadeVigenteDAO {
-    
-    private MensalidadeVigente[] vetMensalidade = new MensalidadeVigente[5];
-    
-    public MensalidadeVigenteDAO(){
-        
-        LocalDate dataInicio1 = LocalDate.of(2024, 5, 8);
-        LocalDate dataTermino1 = LocalDate.of(2025, 6, 11);        
-        MensalidadeVigente mv1 = new MensalidadeVigente();
-        mv1.setValor(100.00);
-        mv1.setDataInicio(dataInicio1);
-        mv1.setDataTermino(dataTermino1);
-        mv1.setDataCriacao(UtilPessoa.getDiaAtual());
-        mv1.setDataModificacao(UtilPessoa.getDiaAtual());
-        adiciona(mv1);
-        
-        LocalDate dataInicio2 = LocalDate.of(2023, 4, 10);
-        LocalDate dataTermino2 = LocalDate.of(2026, 6, 11);        
-        MensalidadeVigente mv2 = new MensalidadeVigente();
-        mv2.setValor(120.00);
-        mv2.setDataInicio(dataInicio2);
-        mv2.setDataTermino(dataTermino2);
-        mv2.setDataCriacao(UtilPessoa.getDiaAtual());
-        mv2.setDataModificacao(UtilPessoa.getDiaAtual());
-        adiciona(mv2);
-        
-        LocalDate dataInicio3 = LocalDate.of(2022, 1, 1);
-        LocalDate dataTermino3 = LocalDate.of(2024, 12, 12);        
-        MensalidadeVigente mv3 = new MensalidadeVigente();
-        mv3.setValor(80.00);
-        mv3.setDataInicio(dataInicio3);
-        mv3.setDataTermino(dataTermino3);
-        mv3.setDataCriacao(UtilPessoa.getDiaAtual());
-        mv3.setDataModificacao(UtilPessoa.getDiaAtual());
-        adiciona(mv3);
 
+    public boolean adiciona(MensalidadeVigente mensalidade) {
+        String sql = "insert into mensalidadevigente (valor, datainicio, datatermino, datacriacao, datamodificacao) values (?, ?, ?, ?, ?)";
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setDouble(1, mensalidade.getValor());
+            stmt.setDate(2, java.sql.Date.valueOf(mensalidade.getDataInicio()));
+            stmt.setDate(3, java.sql.Date.valueOf(mensalidade.getDataTermino()));
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(mensalidade.getDataCriacao()));
+            stmt.setTimestamp(5, java.sql.Timestamp.valueOf(mensalidade.getDataModificacao()));
+
+            stmt.execute();
+            return true;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ADICIONAR MENSALIDADE VIGENTE: " + e.getMessage());
+        }
     }
-    
-    public MensalidadeVigente buscaMensalidadePorId(long id) {
-        for (MensalidadeVigente mv : vetMensalidade) {
-            if (mv != null && mv.getId() == id) {
-                return mv;
+
+    public List<MensalidadeVigente> lista() {
+        String sql = "select * from mensalidadevigente";
+        List<MensalidadeVigente> mensalidades = new ArrayList<>();
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                long id = rs.getLong("idmensalidadevigente");
+                double valor = rs.getDouble("valor");
+                LocalDate dataInicio = rs.getDate("datainicio").toLocalDate();
+                LocalDate dataTermino = rs.getDate("datatermino").toLocalDate();
+                LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                MensalidadeVigente mensalidade = new MensalidadeVigente();
+                mensalidade.setId(id);
+                mensalidade.setValor(valor);
+                mensalidade.setDataInicio(dataInicio);
+                mensalidade.setDataTermino(dataTermino);
+                mensalidade.setDataCriacao(dataCriacao);
+                mensalidade.setDataModificacao(dataModificacao);
+
+                mensalidades.add(mensalidade);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return mensalidades;
+    }
+
+    public MensalidadeVigente buscaPorId(long id) {
+        String sql = "select * from mensalidadevigente where idmensalidadevigente = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    double valor = rs.getDouble("valor");
+                    LocalDate dataInicio = rs.getDate("datainicio").toLocalDate();
+                    LocalDate dataTermino = rs.getDate("datatermino").toLocalDate();
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                    MensalidadeVigente mensalidade = new MensalidadeVigente();
+                    mensalidade.setId(id);
+                    mensalidade.setValor(valor);
+                    mensalidade.setDataInicio(dataInicio);
+                    mensalidade.setDataTermino(dataTermino);
+                    mensalidade.setDataCriacao(dataCriacao);
+                    mensalidade.setDataModificacao(dataModificacao);
+
+                    return mensalidade;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
-      
-   public void mostraMensalidade(long id) {//mostra mensalidade especifica
-       MensalidadeVigente mv = buscaMensalidadePorId(id);
-        if (mv != null) {
-            System.out.println(mv);
-        } else {
-            System.out.println("MENSALIDADE NAO ENCONTRADA.");
+
+    public MensalidadeVigente alterar(MensalidadeVigente mensalidade) {
+        String sql = "update mensalidadevigente set valor = ?, datainicio = ?, datatermino = ?, datamodificacao = ? where idmensalidadevigente = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setDouble(1, mensalidade.getValor());
+            stmt.setDate(2, java.sql.Date.valueOf(mensalidade.getDataInicio()));
+            stmt.setDate(3, java.sql.Date.valueOf(mensalidade.getDataTermino()));
+            stmt.setTimestamp(4, java.sql.Timestamp.valueOf(mensalidade.getDataModificacao()));
+            stmt.setLong(5, mensalidade.getId());
+
+            stmt.execute();
+            
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ALTERAR MENSALIDADE VIGENTE: " + e.getMessage());
         }
-    }
-   
-    public MensalidadeVigente mostraMensalidadeVigente(long id) {
-       MensalidadeVigente mv = buscaMensalidadePorId(id);
-        if (mv != null) {
-            return mv;
-        } else {
-            return null;
-        }
-    }
-    
-    
-    public boolean adiciona(MensalidadeVigente mv) {
-        int proximaPosicaoLivre = proximaPosicaoLivre();
-        if (proximaPosicaoLivre != -1) {
-            vetMensalidade[proximaPosicaoLivre] = mv;
-            return true;
-        } else {
-            return false;
-        }
+        return mensalidade;
     }
 
-    public void mostrarTodasMensalidades(){
-        boolean temMensalide = false;
-        for (MensalidadeVigente mv : vetMensalidade) {
-            if (mv != null) {
-                System.out.println(mv);
-                temMensalide = true;
-            }
-        }
-        if (!temMensalide) {
-            System.out.println("NAO EXISTEM APLICACOES DE EXERCICIO CADASTRADA.");
-        }
-    }
+    public boolean remover (long id) {
+        String sql = "delete from mensalidadevigente where idmensalidadevigente = ?";
 
-    public boolean remover(long id) {
-        for (int i = 0; i < vetMensalidade.length; i++) {
-            if (vetMensalidade[i] != null && vetMensalidade[i].getId() == id) {
-                for (int j = i; j < vetMensalidade.length - 1; j++) {
-                    vetMensalidade[j] = vetMensalidade[j + 1];
-                }
-                vetMensalidade[vetMensalidade.length - 1] = null;
-                return true;
-            }
-        }
-        return false;
-    }
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-    private int proximaPosicaoLivre() {
-        for (int i = 0; i < vetMensalidade.length; i++) {
-            if (vetMensalidade[i] == null) {
-                return i;
-            }
+            stmt.setLong(1, id);
+
+            int linhasDeletadas = stmt.executeUpdate();
+            return linhasDeletadas > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO REMOVER MENSALIDADE VIGENTE: " + e.getMessage());
         }
-        return -1;  
     }
 }
-

@@ -31,7 +31,7 @@ CREATE TABLE `academia` (
   `datacriacao` timestamp NULL DEFAULT NULL,
   `datamodificacao` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`idacademia`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +40,7 @@ CREATE TABLE `academia` (
 
 LOCK TABLES `academia` WRITE;
 /*!40000 ALTER TABLE `academia` DISABLE KEYS */;
-INSERT INTO `academia` VALUES (1,'ACADEMIA BIOTECH','AV. LEOPOLDINO DE OLVEIRA','1997-09-11 10:23:50','2024-06-19 17:44:51'),(2,'ACADEMIA EQUILIBRIO','AV. DOM LUIZ MARIA DE SANTANA','2024-06-13 02:40:52','2024-06-13 02:40:52'),(3,'ACADEMIA NOVO CORPO','EDILSON LAMARTINE MENDES','2024-06-13 02:40:52','2024-06-13 02:40:52');
+INSERT INTO `academia` VALUES (1,'ACADEMIA BIOTECH','AV. LEOPOLDINO DE OLVEIRA','1997-09-11 10:23:50','2024-06-19 17:44:51'),(2,'ACADEMIA EQUILIBRIO','AV. DOM LUIZ MARIA DE SANTANA','2024-06-13 02:40:52','2024-06-13 02:40:52'),(3,'ACADEMIA NOVO CORPO','EDILSON LAMARTINE MENDES','2024-06-13 02:40:52','2024-06-13 02:40:52'),(8,'sarue','sarue','2024-06-26 03:02:21','2024-06-26 03:02:54');
 /*!40000 ALTER TABLE `academia` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -155,6 +155,68 @@ INSERT INTO `exercicioaplicacao` VALUES (1,'4x12 com rest pause','2024-06-19 15:
 UNLOCK TABLES;
 
 --
+-- Table structure for table `mensalidadevigente`
+--
+
+DROP TABLE IF EXISTS `mensalidadevigente`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mensalidadevigente` (
+  `idmensalidadevigente` int NOT NULL AUTO_INCREMENT,
+  `valor` decimal(7,2) DEFAULT NULL,
+  `datainicio` date DEFAULT NULL,
+  `datatermino` date DEFAULT NULL,
+  `datacriacao` timestamp NULL DEFAULT NULL,
+  `datamodificacao` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idmensalidadevigente`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mensalidadevigente`
+--
+
+LOCK TABLES `mensalidadevigente` WRITE;
+/*!40000 ALTER TABLE `mensalidadevigente` DISABLE KEYS */;
+INSERT INTO `mensalidadevigente` VALUES (1,149.90,'2022-05-11','2022-07-14','2024-06-19 15:00:00','2024-06-26 02:58:54'),(2,130.00,'2024-06-25','2024-07-29','2024-06-19 15:00:00','2024-06-19 15:00:00'),(3,160.00,'1997-09-11','1997-09-11','2024-06-19 15:00:00','2024-06-26 03:27:42');
+/*!40000 ALTER TABLE `mensalidadevigente` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pagamentomensalidade`
+--
+
+DROP TABLE IF EXISTS `pagamentomensalidade`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pagamentomensalidade` (
+  `idPagamentoMensalidade` bigint NOT NULL AUTO_INCREMENT,
+  `id_MensalidadeVigente` int DEFAULT NULL,
+  `dataVencimento` date DEFAULT NULL,
+  `dataPagamento` date DEFAULT NULL,
+  `valorPago` decimal(7,2) DEFAULT NULL,
+  `id_Pessoa` int DEFAULT NULL,
+  `modalidadePagamento` int DEFAULT NULL,
+  `dataCriacao` timestamp NULL DEFAULT NULL,
+  `dataModificacao` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idPagamentoMensalidade`),
+  KEY `id_Pessoa` (`id_Pessoa`),
+  KEY `id_MensalidadeVigente` (`id_MensalidadeVigente`),
+  CONSTRAINT `pagamentomensalidade_ibfk_1` FOREIGN KEY (`id_Pessoa`) REFERENCES `pessoa` (`idpessoa`),
+  CONSTRAINT `pagamentomensalidade_ibfk_2` FOREIGN KEY (`id_MensalidadeVigente`) REFERENCES `mensalidadevigente` (`idmensalidadevigente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `pagamentomensalidade`
+--
+
+LOCK TABLES `pagamentomensalidade` WRITE;
+/*!40000 ALTER TABLE `pagamentomensalidade` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pagamentomensalidade` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `pessoa`
 --
 
@@ -204,7 +266,7 @@ CREATE TABLE `treino` (
   PRIMARY KEY (`idtreino`),
   KEY `fkey_treino_idx` (`iddivisaotreino`),
   CONSTRAINT `fkey_treino` FOREIGN KEY (`iddivisaotreino`) REFERENCES `divisaotreino` (`iddivisaotreino`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -250,7 +312,7 @@ CREATE TABLE `treinoaplicacao` (
   CONSTRAINT `treinoaplicacao_ibfk_5` FOREIGN KEY (`exAplicacao_id`) REFERENCES `exercicioaplicacao` (`idexercicioaplicacao`),
   CONSTRAINT `treinoaplicacao_ibfk_6` FOREIGN KEY (`divTreino_id`) REFERENCES `divisaotreino` (`iddivisaotreino`),
   CONSTRAINT `treinoaplicacao_ibfk_7` FOREIGN KEY (`divTreinoMusc_id`) REFERENCES `divisaotreinomusculo` (`iddivisaotreinomusculo`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -259,7 +321,7 @@ CREATE TABLE `treinoaplicacao` (
 
 LOCK TABLES `treinoaplicacao` WRITE;
 /*!40000 ALTER TABLE `treinoaplicacao` DISABLE KEYS */;
-INSERT INTO `treinoaplicacao` VALUES (1,1,1,1,1,1,1,1,'2024-06-25 04:38:53','2024-06-25 04:38:53'),(2,3,3,3,3,3,3,3,'2024-06-25 04:39:04','2024-06-25 04:39:04');
+INSERT INTO `treinoaplicacao` VALUES (1,1,1,1,1,1,1,1,'2024-06-25 04:38:53','2024-06-25 04:38:53'),(2,3,3,3,3,3,3,3,'2024-06-25 04:39:04','2024-06-25 04:39:04'),(3,3,3,3,3,3,3,3,'2024-06-26 03:40:11','2024-06-26 03:50:26');
 /*!40000 ALTER TABLE `treinoaplicacao` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -272,4 +334,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-25  1:41:46
+-- Dump completed on 2024-06-26  1:09:18
