@@ -20,8 +20,7 @@ import java.util.List;
 public class AcademiaDAO {
 
     public boolean adiciona(Academia academia) {
-        String sql = "insert into academia" + "(nome, endereco, datacriacao, datamodificacao)"
-                + "values (?, ?, ?, ?)";
+        String sql = "insert into academia (nome, endereco, datacriacao, datamodificacao) values (?, ?, ?, ?)";
 
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
@@ -141,4 +140,5 @@ public class AcademiaDAO {
         }
         return elemento;
     }
+    
 }

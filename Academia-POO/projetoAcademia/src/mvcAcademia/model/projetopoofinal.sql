@@ -31,7 +31,7 @@ CREATE TABLE `academia` (
   `datacriacao` timestamp NULL DEFAULT NULL,
   `datamodificacao` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`idacademia`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,8 +40,43 @@ CREATE TABLE `academia` (
 
 LOCK TABLES `academia` WRITE;
 /*!40000 ALTER TABLE `academia` DISABLE KEYS */;
-INSERT INTO `academia` VALUES (1,'ACADEMIA BIOTECH','AV. LEOPOLDINO DE OLVEIRA','1997-09-11 10:23:50','2024-06-19 17:44:51'),(2,'ACADEMIA EQUILIBRIO','AV. DOM LUIZ MARIA DE SANTANA','2024-06-13 02:40:52','2024-06-13 02:40:52'),(3,'ACADEMIA NOVO CORPO','EDILSON LAMARTINE MENDES','2024-06-13 02:40:52','2024-06-13 02:40:52'),(8,'sarue','sarue','2024-06-26 03:02:21','2024-06-26 03:02:54');
+INSERT INTO `academia` VALUES (1,'ACADEMIA BIOTECH','AV. LEOPOLDINO DE OLVEIRA','1997-09-11 10:23:50','2024-06-19 17:44:51'),(2,'ACADEMIA EQUILIBRIO','AV. DOM LUIZ MARIA DE SANTANA','2024-06-13 02:40:52','2024-06-13 02:40:52'),(3,'ACADEMIA NOVO CORPO','EDILSON LAMARTINE MENDES','2024-06-13 02:40:52','2024-06-13 02:40:52');
 /*!40000 ALTER TABLE `academia` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `alunopagamentomensalidade`
+--
+
+DROP TABLE IF EXISTS `alunopagamentomensalidade`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `alunopagamentomensalidade` (
+  `id_aluno_pagamento_mensalidade` int NOT NULL AUTO_INCREMENT,
+  `mv_aluno_pagamento_id` int NOT NULL,
+  `data_vencimento` date NOT NULL,
+  `data_pagamento` date DEFAULT NULL,
+  `valor_pago` double NOT NULL,
+  `aluno_id` int NOT NULL,
+  `modalidade` int NOT NULL,
+  `data_criacao` timestamp NOT NULL,
+  `data_modificacao` timestamp NOT NULL,
+  PRIMARY KEY (`id_aluno_pagamento_mensalidade`),
+  KEY `mv_aluno_pagamento_id` (`mv_aluno_pagamento_id`),
+  KEY `aluno_id` (`aluno_id`),
+  CONSTRAINT `alunopagamentomensalidade_ibfk_1` FOREIGN KEY (`mv_aluno_pagamento_id`) REFERENCES `mensalidadevigente` (`idmensalidadevigente`),
+  CONSTRAINT `alunopagamentomensalidade_ibfk_2` FOREIGN KEY (`aluno_id`) REFERENCES `pessoa` (`idpessoa`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `alunopagamentomensalidade`
+--
+
+LOCK TABLES `alunopagamentomensalidade` WRITE;
+/*!40000 ALTER TABLE `alunopagamentomensalidade` DISABLE KEYS */;
+INSERT INTO `alunopagamentomensalidade` VALUES (3,4,'2023-05-01',NULL,0,4,1,'2024-06-27 03:41:58','2024-06-27 03:41:58'),(4,2,'2023-05-01','2023-05-01',150,3,1,'2024-06-27 03:41:58','2024-06-27 03:41:58');
+/*!40000 ALTER TABLE `alunopagamentomensalidade` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -178,8 +213,40 @@ CREATE TABLE `mensalidadevigente` (
 
 LOCK TABLES `mensalidadevigente` WRITE;
 /*!40000 ALTER TABLE `mensalidadevigente` DISABLE KEYS */;
-INSERT INTO `mensalidadevigente` VALUES (1,149.90,'2022-05-11','2022-07-14','2024-06-19 15:00:00','2024-06-26 02:58:54'),(2,130.00,'2024-06-25','2024-07-29','2024-06-19 15:00:00','2024-06-19 15:00:00'),(3,160.00,'1997-09-11','1997-09-11','2024-06-19 15:00:00','2024-06-26 03:27:42');
+INSERT INTO `mensalidadevigente` VALUES (1,149.90,'2022-05-11','2022-07-14','2024-06-19 15:00:00','2024-06-26 02:58:54'),(2,130.00,'2024-06-25','2024-07-29','2024-06-19 15:00:00','2024-06-19 15:00:00'),(3,160.00,'1997-09-11','1997-09-11','2024-06-19 15:00:00','2024-06-26 03:27:42'),(4,39.99,'2026-11-11','2026-12-12','2024-06-19 15:00:00','2024-06-27 04:09:16');
 /*!40000 ALTER TABLE `mensalidadevigente` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pagamento_recorrente`
+--
+
+DROP TABLE IF EXISTS `pagamento_recorrente`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pagamento_recorrente` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `pessoa_id` int DEFAULT NULL,
+  `data` date DEFAULT NULL,
+  `cartao_credito` varchar(255) DEFAULT NULL,
+  `valor` double DEFAULT NULL,
+  `data_inicio` date DEFAULT NULL,
+  `numero_meses_autorizados` int DEFAULT NULL,
+  `data_criacao` timestamp NULL DEFAULT NULL,
+  `data_modificacao` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `pessoa_id` (`pessoa_id`),
+  CONSTRAINT `pagamento_recorrente_ibfk_1` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoa` (`idpessoa`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `pagamento_recorrente`
+--
+
+LOCK TABLES `pagamento_recorrente` WRITE;
+/*!40000 ALTER TABLE `pagamento_recorrente` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pagamento_recorrente` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -234,7 +301,7 @@ CREATE TABLE `pessoa` (
   `datacriacao` timestamp NULL DEFAULT NULL,
   `datamodificacao` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`idpessoa`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -243,7 +310,7 @@ CREATE TABLE `pessoa` (
 
 LOCK TABLES `pessoa` WRITE;
 /*!40000 ALTER TABLE `pessoa` DISABLE KEYS */;
-INSERT INTO `pessoa` VALUES (1,'Rogerio','M','1997-09-11','Rojas','123','Administrador','2024-06-19 17:44:51','2024-06-19 17:44:51'),(2,'Barbrete','F','1966-06-06','Babs','123','Professor','2024-06-19 19:50:36','2024-06-19 19:50:36'),(3,'Eduardo','M','1966-06-06','Dudu','123','Aluno','2024-06-19 19:50:36','2024-06-19 19:50:36');
+INSERT INTO `pessoa` VALUES (1,'Rogerio','M','1997-09-11','Rojas','123','Administrador','2024-06-19 17:44:51','2024-06-19 17:44:51'),(2,'Barbrete','F','1966-06-06','Babs','123','Professor','2024-06-19 19:50:36','2024-06-19 19:50:36'),(3,'Eduardo','M','1966-06-06','Dudu','123','Aluno','2024-06-19 19:50:36','2024-06-19 19:50:36'),(4,'João Silva','M','1966-06-06','Joao','123','Aluno','2024-06-19 19:50:36','2024-06-19 19:50:36'),(9,'sarue','m','2002-09-11','sarue','123','Aluno','2024-06-27 04:42:36','2024-06-27 04:42:36');
 /*!40000 ALTER TABLE `pessoa` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -334,4 +401,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-26  1:09:18
+-- Dump completed on 2024-06-27  2:22:42

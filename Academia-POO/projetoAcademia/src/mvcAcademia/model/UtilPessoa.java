@@ -41,8 +41,9 @@ public class UtilPessoa {
     }
 
     public static void incrementaDias(int dias) {
-        diaAtual.plusDays(dias);
-    }
+    diaAtual = diaAtual.plusDays(dias); 
+}
+
     
     public static void incrementaMes(int numeroMeses) {
         diaAtual.plusMonths(numeroMeses);

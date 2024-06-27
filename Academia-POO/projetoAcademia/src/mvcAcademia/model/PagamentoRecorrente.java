@@ -16,17 +16,23 @@ public class PagamentoRecorrente {
     private static long serial = 1;
     private long id;
     private Pessoa pessoa;
-    private LocalDateTime data;
+    private LocalDate data;
     private String cartaoCredito;
     private double valor;
-    private LocalDateTime dataInicio;
-    private int numMesesAutorizados;
+    private LocalDate dataInicio;
+    private LocalDate dataVencimento;
+    private int numeroMesesAutorizados;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
 
     public PagamentoRecorrente() {
         id = PagamentoRecorrente.serial++;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+    
 
     public long getId() {
         return id;
@@ -40,11 +46,11 @@ public class PagamentoRecorrente {
         this.pessoa = pessoa;
     }
 
-    public LocalDateTime getData() {
+    public LocalDate getData() {
         return data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(LocalDate data) {
         this.data = data;
     }
 
@@ -64,20 +70,28 @@ public class PagamentoRecorrente {
         this.valor = valor;
     }
 
-    public LocalDateTime getDataInicio() {
+    public LocalDate getDataInicio() {
         return dataInicio;
     }
 
-    public void setDataInicio(LocalDateTime dataInicio) {
+    public void setDataInicio(LocalDate dataInicio) {
         this.dataInicio = dataInicio;
     }
 
-    public int getNumMesesAutorizados() {
-        return numMesesAutorizados;
+    public LocalDate getDataVencimento() {
+        return dataVencimento;
     }
 
+    public void setDataVencimento(LocalDate dataVencimento) {
+        this.dataVencimento = dataVencimento;
+    } 
+    
+    public int getNumMesesAutorizados() {
+        return numeroMesesAutorizados;
+    }
+        
     public void setNumMesesAutorizados(int numMesesAutorizados) {
-        this.numMesesAutorizados = numMesesAutorizados;
+        this.numeroMesesAutorizados = numMesesAutorizados;
     }
 
     public LocalDateTime getDataCriacao() {
@@ -104,7 +118,7 @@ public class PagamentoRecorrente {
                 + "Cartao de Credito: " + cartaoCredito + "\n"
                 + "Valor: " + valor + "\n"
                 + "Data de Inicio: " + dataInicio + "\n"
-                + "Numero de Meses Autorizados: " + numMesesAutorizados + "\n"
+                + "Numero de Meses Autorizados: " + numeroMesesAutorizados + "\n"
                 + "Data de Criacao: " + dataCriacao + "\n"
                 + "Data de Modificacao: " + dataModificacao;
     }

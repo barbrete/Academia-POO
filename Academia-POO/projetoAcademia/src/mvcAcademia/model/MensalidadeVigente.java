@@ -74,7 +74,7 @@ public class MensalidadeVigente {
 
     @Override
     public String toString() {
-        return "==================INFORMACOES DA MENSALIDADE VIGENTE=================" +
+        return "\n==================INFORMACOES DA MENSALIDADE VIGENTE=================" +
                 "\nID: " + id +
                 "\nVALOR: " + valor +
                 "\nDATA INICIO: " + dataInicio + 

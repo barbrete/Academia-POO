@@ -4,8 +4,15 @@
  */
 package mvcAcademia.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -13,75 +20,148 @@ import java.time.LocalDateTime;
  */
 public class PagamentoRecorrenteDAO {
 
-    private PagamentoRecorrente[] pagamentos = new PagamentoRecorrente[5];
-    PessoaDAO pessoaDAO = new PessoaDAO();
+    public boolean adiciona(PagamentoRecorrente pagamentoRecorrente) {
+        String sql = "insert into pagamento_recorrente (pessoa_id, data, cartao_credito, valor, data_inicio, numero_meses_autorizados, data_criacao, data_modificacao) values (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-    public PagamentoRecorrente buscaPagamentoPorId(long id) {
-        for (PagamentoRecorrente pagamento : pagamentos) {
-            if (pagamento != null && pagamento.getId() == id) {
-                return pagamento;
+            stmt.setLong(1, pagamentoRecorrente.getPessoa().getId());
+            stmt.setDate(2, java.sql.Date.valueOf(pagamentoRecorrente.getData()));
+            stmt.setString(3, pagamentoRecorrente.getCartaoCredito());
+            stmt.setDouble(4, pagamentoRecorrente.getValor());
+            stmt.setDate(5, java.sql.Date.valueOf(pagamentoRecorrente.getDataInicio()));
+            stmt.setInt(6, pagamentoRecorrente.getNumMesesAutorizados());
+            stmt.setTimestamp(7, Timestamp.valueOf(pagamentoRecorrente.getDataCriacao()));
+            stmt.setTimestamp(8, Timestamp.valueOf(pagamentoRecorrente.getDataModificacao()));
+
+            stmt.execute();
+            return true;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ADICIONAR PAGAMENTO RECORRENTE: " + e.getMessage());
+        }
+    }
+
+    public List<PagamentoRecorrente> lista() {
+        String sql = "select * from pagamento_recorrente";
+        List<PagamentoRecorrente> pagamentos = new ArrayList<>();
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                long id = rs.getLong("id");
+                long pessoaId = rs.getLong("pessoa_id");
+                LocalDate data = rs.getDate("data").toLocalDate();
+                String cartaoCredito = rs.getString("cartao_credito");
+                double valor = rs.getDouble("valor");
+                LocalDate dataInicio = rs.getDate("data_inicio").toLocalDate();
+                int numeroMesesAutorizados = rs.getInt("numero_meses_autorizados");
+                LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+
+                PagamentoRecorrente pagamento = new PagamentoRecorrente();
+                pagamento.setId(id);
+                pagamento.setPessoa(buscaPessoaPorId(pessoaId)); // Método para buscar pessoa pelo ID
+                pagamento.setData(data);
+                pagamento.setCartaoCredito(cartaoCredito);
+                pagamento.setValor(valor);
+                pagamento.setDataInicio(dataInicio);
+                pagamento.setNumMesesAutorizados(numeroMesesAutorizados);
+                pagamento.setDataCriacao(dataCriacao);
+                pagamento.setDataModificacao(dataModificacao);
+
+                pagamentos.add(pagamento);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return pagamentos;
+    }
+
+    public PagamentoRecorrente buscaPorId(long id) {
+        String sql = "select * from pagamento_recorrente where id = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    long pessoaId = rs.getLong("pessoa_id");
+                    LocalDate data = rs.getDate("data").toLocalDate();
+                    String cartaoCredito = rs.getString("cartao_credito");
+                    double valor = rs.getDouble("valor");
+                    LocalDate dataInicio = rs.getDate("data_inicio").toLocalDate();
+                    int numeroMesesAutorizados = rs.getInt("numero_meses_autorizados");
+                    LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+
+                    PagamentoRecorrente pagamento = new PagamentoRecorrente();
+                    pagamento.setId(id);
+                    pagamento.setPessoa(buscaPessoaPorId(pessoaId)); // Método para buscar pessoa pelo ID
+                    pagamento.setData(data);
+                    pagamento.setCartaoCredito(cartaoCredito);
+                    pagamento.setValor(valor);
+                    pagamento.setDataInicio(dataInicio);
+                    pagamento.setNumMesesAutorizados(numeroMesesAutorizados);
+                    pagamento.setDataCriacao(dataCriacao);
+                    pagamento.setDataModificacao(dataModificacao);
+
+                    return pagamento;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
 
-    public void mostrarPagamento(long id) {
-        PagamentoRecorrente pagamento = buscaPagamentoPorId(id);
-        if (pagamento != null) {
-            System.out.println(pagamento);
-        } else {
-            System.out.println("PAGAMENTO RECORRENTE NÃO ENCONTRADO.");
-        }
-    }
+    public PagamentoRecorrente alterar(PagamentoRecorrente pagamentoRecorrente) {
+        String sql = "update pagamento_recorrente set pessoa_id = ?, data = ?, cartao_credito = ?, valor = ?, data_inicio = ?, numero_meses_autorizados = ?, data_modificacao = ? where id = ?";
 
-    public PagamentoRecorrente[] mostrarTodosPagamentos() {
-        int count = 0;
-        for (PagamentoRecorrente pag : pagamentos) {
-            if (pag != null) {
-                count++;
-            }
-        }
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-        PagamentoRecorrente[] listaPagamentos = new PagamentoRecorrente[count];
-        int index = 0;
-        for (PagamentoRecorrente pag : pagamentos) {
-            if (pag != null) {
-                listaPagamentos[index++] = pag;
-            }
-        }
+            stmt.setLong(1, pagamentoRecorrente.getPessoa().getId());
+            stmt.setDate(2, java.sql.Date.valueOf(pagamentoRecorrente.getData()));
+            stmt.setString(3, pagamentoRecorrente.getCartaoCredito());
+            stmt.setDouble(4, pagamentoRecorrente.getValor());
+            stmt.setDate(5, java.sql.Date.valueOf(pagamentoRecorrente.getDataInicio()));
+            stmt.setInt(6, pagamentoRecorrente.getNumMesesAutorizados());
+            stmt.setTimestamp(7, Timestamp.valueOf(pagamentoRecorrente.getDataModificacao()));
+            stmt.setLong(8, pagamentoRecorrente.getId());
 
-        return listaPagamentos;
-    }
+            stmt.execute();
+            return pagamentoRecorrente;
 
-    public boolean adiciona(PagamentoRecorrente pagamento) {
-        int proximaPosicaoLivre = proximaPosicaoLivre();
-        if (proximaPosicaoLivre != -1) {
-            pagamentos[proximaPosicaoLivre] = pagamento;
-            return true;
-        } else {
-            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ALTERAR PAGAMENTO RECORRENTE: " + e.getMessage());
         }
     }
 
     public boolean remover(long id) {
-        for (int i = 0; i < pagamentos.length; i++) {
-            if (pagamentos[i] != null && pagamentos[i].getId() == id) {
-                pagamentos[i] = null;
-                return true;
-            }
+        String sql = "delete from pagamento_recorrente where id = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            int linhasDeletadas = stmt.executeUpdate();
+            return linhasDeletadas > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO REMOVER PAGAMENTO RECORRENTE: " + e.getMessage());
         }
-        return false;
     }
 
-    private int proximaPosicaoLivre() {
-        for (int i = 0; i < pagamentos.length; i++) {
-            if (pagamentos[i] == null) {
-                return i;
-            }
-        }
-        return -1;
+    
+    private Pessoa buscaPessoaPorId(long pessoaId) {
+        PessoaDAO pessoaDAO = new PessoaDAO();
+        return pessoaDAO.buscaPorId(pessoaId);
     }
-
 }

@@ -23,8 +23,7 @@ public class ConexaoAcademia {
             
             String url = "jdbc:mysql://localhost/projetopoofinal";
             return DriverManager.getConnection(url, properties);
-            
-            
+              
         }catch(SQLException e){
             throw new RuntimeException(e);
         }

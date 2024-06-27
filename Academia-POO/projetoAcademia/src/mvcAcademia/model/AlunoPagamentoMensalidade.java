@@ -27,6 +27,11 @@ public class AlunoPagamentoMensalidade {
     public AlunoPagamentoMensalidade(){
         id = AlunoPagamentoMensalidade.serial++;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+    
     
     public long getId() {
         return id;
@@ -107,7 +112,7 @@ public class AlunoPagamentoMensalidade {
                 + "\nDATA DE MODIFICACAO: " + dataModificacao
                 + "\nVALOR PAGO: " + valorPago 
                 + "\nMENSALIDADE VIGENTE: " + mvAlunoPagamento
-                + "\nALUNO: " + aluno;
+                + "\n======================= ALUNO ========================== " + aluno;
                 
     }
 
