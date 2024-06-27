@@ -27,6 +27,8 @@ public class Calendario {
     public void avancarData(int dias) {
         this.dataAtual = this.dataAtual.plusDays(dias);
     }
+    
+    
 
     public void verificarVencimentos() {
         AlunoPagamentoMensalidadeDAO alunoPagamentoMensalidadeDAO = new AlunoPagamentoMensalidadeDAO();

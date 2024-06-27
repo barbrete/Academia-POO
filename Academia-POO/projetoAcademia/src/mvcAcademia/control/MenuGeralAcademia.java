@@ -86,9 +86,19 @@ public class MenuGeralAcademia {
                     break;
                 case 2:
                     Pessoa pu = this.cadastrarLogin();
-                    if (pessoaDAO.adiciona(pu)) {
+                    long idPessoa = pessoaDAO.adiciona(pu);
 
+                    if (idPessoa != -1) {
                         System.out.println("USUARIO ADICIONADO COM SUCESSO");
+
+                        System.out.println("DESEJA REGISTRAR UM PAGAMENTO DE MENSALIDADE?");
+                        System.out.println("1 - SIM");
+                        System.out.println("2 - NAO");
+                        int opcaoPagamento = Integer.parseInt(scanner.nextLine());
+
+                        if (opcaoPagamento == 1) {
+                            this.registrarPagamentoMensalidadePorId(idPessoa);
+                        }
                     } else {
                         System.out.println("USUARIO NAO ADICIONADO.");
                     }
@@ -119,83 +129,90 @@ public class MenuGeralAcademia {
         }
     }
 
-    /*private void registrarPagamentoInicialMensalidade(Pessoa pessoa) {
-        System.out.println("Deseja registrar um pagamento inicial da mensalidade? (S/N)");
-        String resposta = scanner.nextLine();
+    private void registrarPagamentoMensalidade(Pessoa p) {
+        AlunoPagamentoMensalidade apm = new AlunoPagamentoMensalidade();
+        LocalDate dataAtual = LocalDate.now();
 
-        if (resposta.equalsIgnoreCase("S")) {
-            MensalidadeVigenteDAO mvDAO = new MensalidadeVigenteDAO();
-            List<MensalidadeVigente> mensalidades = mvDAO.lista();
-
-            if (!mensalidades.isEmpty()) {
-                MensalidadeVigente mensalidadeVigente = mensalidades.get(0);
-                for (MensalidadeVigente mv : mensalidades) {
-                    if (mv.getDataTermino().isAfter(mensalidadeVigente.getDataTermino())) {
-                        mensalidadeVigente = mv;
-                    }
-                }
-
-                System.out.println("Valor da Mensalidade Vigente: R$" + mensalidadeVigente.getValor());
-
-                System.out.println("Escolha a forma de pagamento:");
-                System.out.println("1 - Dinheiro");
-                System.out.println("2 - PIX");
-                System.out.println("3 - Débito Automático");
-                System.out.println("4 - Pagamento Recorrente");
-                int formaPagamento = scanner.nextInt();
-                scanner.nextLine(); // Limpar o buffer
-
-                AlunoPagamentoMensalidadeDAO apmDAO = new AlunoPagamentoMensalidadeDAO();
-                AlunoPagamentoMensalidade apm = new AlunoPagamentoMensalidade();
-                apm.setMvAlunoPagamento(mensalidadeVigente);
-                apm.setAluno(pessoa);
-                apm.setDataVencimento(UtilPessoa.getDiaAtualL().plusDays(32)); 
-                apm.setValorPago(mensalidadeVigente.getValor());
-                apm.setDataPagamento(UtilPessoa.getDiaAtualL()); 
-                apm.setModalidade(formaPagamento);
-                apm.setDataCriacao(UtilPessoa.getDiaAtual());
-                apm.setDataModificacao(UtilPessoa.getDiaAtual());
-
-                switch (formaPagamento) {
-                    case 1:
-                        System.out.println("Pagamento realizado em dinheiro.");
-                        break;
-                    case 2:
-                        System.out.println("Pagamento realizado via PIX.");
-                        break;
-                    case 3:
-                        System.out.println("Pagamento realizado via débito automático.");
-                        break;
-                    case 4:
-                        System.out.println("Pagamento recorrente registrado.");
-                        PagamentoRecorrente pagamentoRecorrente = new PagamentoRecorrente();
-                        pagamentoRecorrente.setPessoa(pessoa); 
-                        pagamentoRecorrente.setData(UtilPessoa.getDiaAtualL()); 
-                        pagamentoRecorrente.setValor(mensalidadeVigente.getValor());
-                        pagamentoRecorrente.setDataInicio(UtilPessoa.getDiaAtualL()); 
-                        pagamentoRecorrente.setNumMesesAutorizados(12); 
-                        pagamentoRecorrente.setDataCriacao(UtilPessoa.getDiaAtual());
-                        pagamentoRecorrente.setDataModificacao(UtilPessoa.getDiaAtual());
-
-                        Calendario calendario = new Calendario();
-                        calendario.avancarData(30);
-                        pagamentoRecorrente.setDataVencimento(calendario.getDataAtual());
-
-                        PagamentoRecorrenteDAO prDAO = new PagamentoRecorrenteDAO();
-                        prDAO.adiciona(pagamentoRecorrente);
-                        break;
-                    default:
-                        System.out.println("Forma de pagamento inválida.");
-                        break;
-                }
-
-                apmDAO.adiciona(apm);
-            } else {
-                System.out.println("Não foi possível encontrar a mensalidade vigente.");
+        List<MensalidadeVigente> mensalidadesVigentes = mvDAO.lista();
+        MensalidadeVigente mensalidadeVigenteAtual = null;
+        for (MensalidadeVigente mv : mensalidadesVigentes) {
+            if ((dataAtual.isAfter(mv.getDataInicio()) || dataAtual.isEqual(mv.getDataInicio()))
+                    && (dataAtual.isBefore(mv.getDataTermino()) || dataAtual.isEqual(mv.getDataTermino()))) {
+                mensalidadeVigenteAtual = mv;
+                break;
             }
         }
-        return;
-    }*/
+
+        if (mensalidadeVigenteAtual == null) {
+            System.out.println("NENHUMA MENSALIDADE VIGENTE ENCONTRADA PARA A DATA ATUAL.");
+            return;
+        }
+
+        System.out.println("MENSALIDADE VIGENTE ATUAL: " + mensalidadeVigenteAtual.getValor());
+        apm.setMvAlunoPagamento(mensalidadeVigenteAtual);
+        apm.setDataVencimento(mensalidadeVigenteAtual.getDataTermino());
+        apm.setDataPagamento(dataAtual);
+        apm.setValorPago(mensalidadeVigenteAtual.getValor());
+
+        System.out.println("MODALIDADE: \n0 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
+        int modalidade = Integer.parseInt(scanner.nextLine());
+
+        apm.setAluno(p);
+        apm.setModalidade(modalidade);
+        apm.setDataCriacao(LocalDateTime.now());
+        apm.setDataModificacao(LocalDateTime.now());
+
+        if (apmDAO.adiciona(apm)) {
+            System.out.println("PAGAMENTO DA MENSALIDADE REGISTRADO COM SUCESSO!");
+        } else {
+            System.out.println("FALHA AO REGISTRAR O PAGAMENTO DA MENSALIDADE.");
+        }
+    }
+
+    private void registrarPagamentoMensalidadePorId(long idPessoa) {
+        AlunoPagamentoMensalidade apm = new AlunoPagamentoMensalidade();
+        LocalDate dataAtual = LocalDate.now();
+        Pessoa p = pessoaDAO.buscaPorId(idPessoa);
+        if (p == null) {
+            System.out.println("PESSOA NÃO ENCONTRADA.");
+            return;
+        }
+
+        List<MensalidadeVigente> mensalidadesVigentes = mvDAO.lista();
+        MensalidadeVigente mensalidadeVigenteAtual = null;
+        for (MensalidadeVigente mv : mensalidadesVigentes) {
+            if ((dataAtual.isAfter(mv.getDataInicio()) || dataAtual.isEqual(mv.getDataInicio()))
+                    && (dataAtual.isBefore(mv.getDataTermino()) || dataAtual.isEqual(mv.getDataTermino()))) {
+                mensalidadeVigenteAtual = mv;
+                break;
+            }
+        }
+
+        if (mensalidadeVigenteAtual == null) {
+            System.out.println("NENHUMA MENSALIDADE VIGENTE ENCONTRADA PARA A DATA ATUAL.");
+            return;
+        }
+
+        System.out.println("MENSALIDADE VIGENTE ATUAL: " + mensalidadeVigenteAtual.getValor());
+        apm.setMvAlunoPagamento(mensalidadeVigenteAtual);
+        apm.setDataVencimento(mensalidadeVigenteAtual.getDataTermino());
+        apm.setDataPagamento(dataAtual);
+        apm.setValorPago(mensalidadeVigenteAtual.getValor());
+
+        System.out.println("MODALIDADE: \n0 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
+        int modalidade = Integer.parseInt(scanner.nextLine());
+
+        apm.setAluno(p);
+        apm.setModalidade(modalidade);
+        apm.setDataCriacao(LocalDateTime.now());
+        apm.setDataModificacao(LocalDateTime.now());
+
+        if (apmDAO.adiciona(apm)) {
+            System.out.println("PAGAMENTO DA MENSALIDADE REGISTRADO COM SUCESSO!");
+        } else {
+            System.out.println("FALHA AO REGISTRAR O PAGAMENTO DA MENSALIDADE.");
+        }
+    }
 
     private void fazerLogin() {
         System.out.println("LOGIN:");
@@ -210,10 +227,23 @@ public class MenuGeralAcademia {
 
             if (pessoaLogada.getTipoUsuario().equals("Aluno")) {
                 if (mensalidadeEstaEmDia(pessoaLogada)) {
-                    System.out.println("MENSALIDADE EM DIA. ACESSO PERMITIDO!");
+                    System.out.println("╔═════════════════════════════╗");
+                    System.out.println("║    MENSALIDADE EM DIA!  ║");
+                    System.out.println("║                         ║");
+                    System.out.println("║     ACESSO LIBERADO!    ║");
+                    System.out.println("╚═════════════════════════════╝");
+                    
                     exibirMenuAluno();
                 } else {
-                    System.out.println("MENSALIDADE ATRASADA! Procure a recepção para regularizar.");
+                    System.out.println("╔══════════════════════════════════════════╗");
+                    System.out.println("║        MENSALIDADE ATRASADA!       ║");
+                    System.out.println("║                                    ║");
+                    System.out.println("║PROCURE A RECEPÇÃO PARA REGULARIZAR.║");
+                    System.out.println("╚══════════════════════════════════════════╝");
+                    
+               
+                    System.out.println("");
+
                 }
             } else {
                 switch (pessoaLogada.getTipoUsuario()) {
@@ -405,6 +435,18 @@ public class MenuGeralAcademia {
         }
     }
 
+    private void mostrarPagamentosMensalidade() {
+        List<AlunoPagamentoMensalidade> pagamentos = apmDAO.lista();
+        if (pagamentos.isEmpty()) {
+            System.out.println("NENHUM PAGAMENTO REGISTRADO.");
+        } else {
+            for (AlunoPagamentoMensalidade pagamento : pagamentos) {
+                System.out.println(pagamento);
+            }
+        }
+
+    }
+
     private Academia cadastraAcademia() {
         Academia acad = new Academia();
         System.out.println("NOME: ");
@@ -443,14 +485,25 @@ public class MenuGeralAcademia {
 
     private Pessoa cadastrarLogin() {
         Pessoa pu = new Pessoa();
-        System.out.println("CADASTRO DE LOGIN:");
+        System.out.println("\nCADASTRO DE LOGIN:");
+
         System.out.println("NOME: ");
         pu.setNome(scanner.nextLine());
         System.out.println("LOGIN: ");
         pu.setLogin(scanner.nextLine());
         System.out.println("SENHA: ");
         pu.setSenha(scanner.nextLine());
+        System.out.println("SEXO [M/F]:");
+        pu.setSexo(scanner.nextLine());
+        System.out.println("DATA DE NASCIMENTO (dd/MM/yyyy):");
+        String dataNascimentoStr = scanner.nextLine();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr, formatter);
+        pu.setNascimento(dataNascimento);
         pu.setTipoUsuario("Aluno");
+        pu.setDataCriacao(UtilPessoa.getDiaAtual());
+        pu.setDataModificacao(UtilPessoa.getDiaAtual());
+
         return pu;
 
     }
@@ -647,45 +700,52 @@ public class MenuGeralAcademia {
         return mv;
     }
 
-    private AlunoPagamentoMensalidade cadastraAlunoPagamentoMensalidade() {
-        AlunoPagamentoMensalidade novoAPM = new AlunoPagamentoMensalidade();
-        System.out.println("CADASTRO DE NOVO PAGAMENTO DE MENSALIDADE DO ALUNO:\n");
+    private AlunoPagamentoMensalidade cadastraPagamentoMensalidade() {
+        AlunoPagamentoMensalidade apm = new AlunoPagamentoMensalidade();
+        LocalDate dataAtual = LocalDate.now();
 
-        System.out.println("DIGITE ID DO ALUNO: ");
-        long idPessoa = Long.parseLong(scanner.nextLine());
-        Pessoa p = pessoaDAO.buscaPorId(idPessoa);
+        List<MensalidadeVigente> mensalidadesVigentes = mvDAO.lista();
+        MensalidadeVigente mensalidadeVigenteAtual = null;
+        for (MensalidadeVigente mv : mensalidadesVigentes) {
+            if ((dataAtual.isAfter(mv.getDataInicio()) || dataAtual.isEqual(mv.getDataInicio()))
+                    && (dataAtual.isBefore(mv.getDataTermino()) || dataAtual.isEqual(mv.getDataTermino()))) {
+                mensalidadeVigenteAtual = mv;
+                break;
+            }
+        }
 
-        System.out.println("ESCOLHA O ID DA MENSALIDADE VIGENTE ASSOCIADA A ESSA PESSOA: ");
-        long idMensalidadeVigente = Long.parseLong(scanner.nextLine());
-        MensalidadeVigente mv = mvDAO.buscaPorId(idMensalidadeVigente);
+        if (mensalidadeVigenteAtual == null) {
+            System.out.println("NENHUMA MENSALIDADE VIGENTE PARA A DATA ATUAL.");
+            return null;
+        }
 
-        novoAPM.setMvAlunoPagamento(mv);
-        novoAPM.setAluno(p);
+        System.out.println("MENSALIDADE VIGENTE ATUAL: " + mensalidadeVigenteAtual.getValor());
 
-        LocalDateTime dataCriacao = LocalDateTime.now();
-        LocalDate dataVencimento = dataCriacao.toLocalDate().plusMonths(1);
-        novoAPM.setDataVencimento(dataVencimento);
+        apm.setMvAlunoPagamento(mensalidadeVigenteAtual);
+        apm.setDataVencimento(mensalidadeVigenteAtual.getDataTermino());
+        apm.setDataPagamento(dataAtual);
+        apm.setValorPago(mensalidadeVigenteAtual.getValor());
 
-        System.out.println("VALOR PAGO: ");
-        double valorPago = scanner.nextDouble();
-        novoAPM.setValorPago(valorPago);
-        scanner.nextLine();
+        this.mostrarTodasPessoas();
+        System.out.println("\nDIGITE O ID DO ALUNO...: ");
+        long idAluno = Long.parseLong(scanner.nextLine());
 
-        System.out.println("MODALIDADE: \n1 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
-        int modalidade = scanner.nextInt();
-        novoAPM.setModalidade(modalidade);
-        scanner.nextLine();
+        PessoaDAO pessoaDAO = new PessoaDAO();
+        Pessoa aluno = pessoaDAO.buscaPorId(idAluno);
+        if (aluno == null) {
+            System.out.println("ALUNO NAO ENCONTRADO.");
+            return null;
+        }
 
-        System.out.println("DIGITE A DATA DE PAGAMENTO (dd/MM/yyyy): ");
-        String dataPagamentoStr = scanner.nextLine();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dataPagamento = LocalDate.parse(dataPagamentoStr, formatter);
-        novoAPM.setDataPagamento(dataPagamento);
+        System.out.println("\nMODALIDADE: \n1 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
+        int modalidade = Integer.parseInt(scanner.nextLine());
 
-        novoAPM.setDataCriacao(LocalDateTime.now());
-        novoAPM.setDataModificacao(LocalDateTime.now());
+        apm.setAluno(aluno);
+        apm.setModalidade(modalidade);
+        apm.setDataCriacao(LocalDateTime.now());
+        apm.setDataModificacao(LocalDateTime.now());
 
-        return novoAPM;
+        return apm;
     }
 
 
@@ -803,7 +863,7 @@ public class MenuGeralAcademia {
 
                     break;
                 case 11:
-                    //gerenciaAlunoPagamentoMensalidade();
+                    gerenciaAlunoPagamentoMensalidade();
 
                     break;
                 case 12:
@@ -904,7 +964,15 @@ public class MenuGeralAcademia {
                     Pessoa p = this.cadastraPessoa();
                     pessoaDAO.adiciona(p);
                     System.out.println("USUARIO ADICIONADO COM SUCESSO!");
-                    //registrarPagamentoInicialMensalidade(p);
+
+                    System.out.println("DESEJA REGISTRAR UM PAGAMENTO DE MENSALIDADE?");
+                    System.out.println("1 - SIM");
+                    System.out.println("2 - NAO");
+                    int opcaoPagamento = Integer.parseInt(scanner.nextLine());
+
+                    if (opcaoPagamento == 1) {
+                        this.registrarPagamentoMensalidade(p);
+                    }
                     break;
                 case 2:
                     this.mostrarTodasPessoas();
@@ -1670,6 +1738,79 @@ public class MenuGeralAcademia {
             }
         }
     }*/
+    private void gerenciaAlunoPagamentoMensalidade() {
+        int resp;
+
+        while (true) {
+            resp = gui.menuCrudAlunoPagamentoMensalidade();
+
+            switch (resp) {
+                case 1:
+                    AlunoPagamentoMensalidade apm = this.cadastraPagamentoMensalidade();
+                    if (apmDAO.adiciona(apm)) {
+                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO CRIADO COM SUCESSO!");
+                    } else {
+                        System.out.println("FALHA AO CRIAR PAGAMENTO DA MENSALIDADE DO ALUNO.");
+                    }
+                    break;
+                case 2:
+                    this.mostrarPagamentosMensalidade();
+                    break;
+                case 3:
+                    this.mostrarPagamentosMensalidade();
+                    System.out.println("DIGITE O ID DO PAGAMENTO DA MENSALIDADE QUE DESEJA ALTERAR...: ");
+                    long id = scanner.nextLong();
+                    scanner.nextLine(); // Consumir nova linha
+
+                    AlunoPagamentoMensalidade apmParaAlterar = apmDAO.buscaPorId(id);
+                    if (apmParaAlterar != null) {
+                        System.out.println("DIGITE O NOVO VALOR QUE IRA PAGAR...: ");
+                        double novoValorAPM = scanner.nextDouble();
+                        apmParaAlterar.setValorPago(novoValorAPM);
+                        scanner.nextLine(); // Consumir nova linha
+
+                        System.out.println("MODALIDADE: \n0 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
+                        int novaModalidade = scanner.nextInt();
+                        apmParaAlterar.setModalidade(novaModalidade);
+                        scanner.nextLine(); // Consumir nova linha
+
+                        System.out.println("DIGITE A NOVA DATA DE PAGAMENTO (dd/MM/yyyy)...: ");
+                        String novaDataPagamentoStr = scanner.nextLine();
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                        LocalDate dataPagamento = LocalDate.parse(novaDataPagamentoStr, formatter);
+                        apmParaAlterar.setDataPagamento(dataPagamento);
+
+                        apmParaAlterar.setDataModificacao(UtilPessoa.getDiaAtual());
+
+                        apmDAO.alterar(apmParaAlterar);
+                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO ALTERADO COM SUCESSO!");
+                    } else {
+                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 4:
+                    this.mostrarPagamentosMensalidade();
+                    System.out.println("DIGITE O ID DO PAGAMENTO DA MENSALIDADE QUE DESEJA EXCLUIR...: ");
+                    long ide = scanner.nextLong();
+                    scanner.nextLine(); // Consumir nova linha
+
+                    AlunoPagamentoMensalidade apmParaExcluir = apmDAO.buscaPorId(ide);
+                    if (apmParaExcluir != null) {
+                        apmDAO.remover(ide);
+                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO EXCLUIDO COM SUCESSO!");
+                    } else {
+                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO NAO EXISTENTE NO BANCO DE DADOS.");
+                    }
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
+                    break;
+            }
+        }
+    }
+
     private void gerenciaMovimentacaoFinanceira() {
         int opcao;
 
@@ -1724,84 +1865,6 @@ public class MenuGeralAcademia {
             }
         }
     }
-
-    /*private void gerenciaAlunoPagamentoMensalidade() {
-        int resp;
-
-        while (true) {
-            resp = gui.menuCrudAlunoPagamentoMensalidade();
-
-            switch (resp) {
-                case 1:
-                    AlunoPagamentoMensalidade apm = cadastraAlunoPagamentoMensalidade();
-                    if (apmDAO.adiciona(apm)) {
-                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO CRIADO COM SUCESSO!");
-                    } else {
-                        System.out.println("FALHA AO CRIAR PAGAMENTO DA MENSALIDADE DO ALUNO.");
-                    }
-                    break;
-                case 2:
-                    List<AlunoPagamentoMensalidade> pagamentos = apmDAO.lista();
-                    if (pagamentos.isEmpty()) {
-                        System.out.println("Nenhum pagamento de mensalidade encontrado.");
-                    } else {
-                        pagamentos.forEach(System.out::println);
-                    }
-                    break;
-                case 3:
-                    System.out.println("DIGITE O ID DO PAGAMENTO DA MENSALIDADE DO ALUNO QUE DESEJA ALTERAR...: ");
-                    long id = scanner.nextLong();
-                    AlunoPagamentoMensalidade apmParaAlterar = apmDAO.buscaPorId(id);
-                    if (apmParaAlterar != null) {
-                        System.out.println("DIGITE O NOVO VALOR QUE IRA PAGAR...: ");
-                        double novoValorAPM = scanner.nextDouble();
-                        apmParaAlterar.setValorPago(novoValorAPM);
-                        scanner.nextLine();
-
-                        System.out.println("MODALIDADE: \n1 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
-                        int novaModalidade = scanner.nextInt();
-                        apmParaAlterar.setModalidade(novaModalidade);
-                        scanner.nextLine();
-
-                        System.out.println("DIGITE A NOVA DATA DE PAGAMENTO (dd/MM/yyyy)...: ");
-                        String novaDataPagamentoStr = scanner.nextLine();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                        LocalDate dataPagamento = LocalDate.parse(novaDataPagamentoStr, formatter);
-                        apmParaAlterar.setDataPagamento(dataPagamento);
-
-                        apmParaAlterar.setDataModificacao(LocalDateTime.now());
-
-                        if (apmDAO.alterar(apmParaAlterar) != null) {
-                            System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO ALTERADA COM SUCESSO!");
-                        } else {
-                            System.out.println("FALHA AO ALTERAR PAGAMENTO DA MENSALIDADE DO ALUNO.");
-                        }
-                    } else {
-                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO NAO EXISTENTE NO BANCO DE DADOS.");
-                    }
-                    break;
-                case 4:
-                    System.out.println("DIGITE O ID DO PAGAMENTO DA MENSALIDADE DO ALUNO QUE DESEJA EXCLUIR...: ");
-                    long ide = scanner.nextLong();
-                    AlunoPagamentoMensalidade apmParaExcluir = apmDAO.buscaPorId(ide);
-                    if (apmParaExcluir != null) {
-                        if (apmDAO.remover(ide)) {
-                            System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO EXCLUÍDO COM SUCESSO!");
-                        } else {
-                            System.out.println("FALHA AO EXCLUIR PAGAMENTO DA MENSALIDADE DO ALUNO.");
-                        }
-                    } else {
-                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO NAO EXISTENTE NO BANCO DE DADOS.");
-                    }
-                    break;
-                case 5:
-                    return;
-                default:
-                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
-                    break;
-            }
-        }
-    }*/
 
     private void gerenciaRelatorio() {
         Scanner scanner = new Scanner(System.in);

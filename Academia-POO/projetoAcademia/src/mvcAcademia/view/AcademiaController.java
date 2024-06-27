@@ -19,7 +19,7 @@ public class AcademiaController {
     }
 
     public int menuBemVindo() {
-        System.out.println("SEJA BEM VINDO!\n");
+        System.out.println("\n\nSEJA BEM VINDO!\n");
         System.out.println("1 - LOGIN");
         System.out.println("2 - CADASTRAR");
         System.out.println("3 - SAIR");
@@ -40,8 +40,8 @@ public class AcademiaController {
         System.out.println("8 - FICHA DE TREINO");
         System.out.println("9 - AVALIACAO FISICA");
         System.out.println("10 - MENSALIDADE VIGENTE");
-        System.out.println("11 - GERAR PAGAMENTO MENSALIDADE");
-        System.out.println("12 - PAGAMENTO RECORRENTE");
+        System.out.println("11 - PAGAMENTO DE MENSALIDADE");
+        System.out.println("12 - CADASTRAR PAGAMENTO RECORRENTE");
         System.out.println("13 - MOVIMENTACOES FINANCEIRAS");
         System.out.println("14 - RELATORIO DE ALUNOS ADIMPLENTES");
         System.out.println("15 - RELATORIO MOVIMENTACAO FINANCEIRA");
@@ -164,8 +164,8 @@ public class AcademiaController {
 
     public int menuCrudAlunoPagamentoMensalidade() {
         System.out.println("\n=============== CRUD ALUNO PAGAMENTO MENSALIDADE ================");
-        System.out.println("1 - ADICIONAR PAGAMENTO DA MENSALIDADE DO ALUNO");
-        System.out.println("2 - MOSTRAR PAGAMENTO DA MENSALIDADE DO ALUNO");
+        System.out.println("1 - PAGAR MENSALIDADE");
+        System.out.println("2 - MOSTRAR PAGAMENTOS DE MENSALIDADE");
         System.out.println("3 - ALTERAR PAGAMENTO DA MENSALIDADE DO ALUNO");
         System.out.println("4 - REMOVER PAGAMENTO DA MENSALIDADE DO ALUNO");
         System.out.println("5 - VOLTAR AO MENU ANTERIOR");

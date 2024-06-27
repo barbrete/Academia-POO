@@ -21,7 +21,7 @@ import java.util.List;
 public class AlunoPagamentoMensalidadeDAO {
 
     public boolean adiciona(AlunoPagamentoMensalidade apm) {
-        String sql = "INSERT INTO alunopagamentomensalidade (mv_aluno_pagamento_id, data_vencimento, data_pagamento, valor_pago, aluno_id, modalidade, data_criacao, data_modificacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO alunopagamentomensalidade (id_mensalidadevigente, datavencimento, datapagamento, valorpago, id_pessoa, modalidadepagamento, datacriacao, datamodificacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
@@ -49,15 +49,15 @@ public class AlunoPagamentoMensalidadeDAO {
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                long id = rs.getLong("id_aluno_pagamento_mensalidade");
-                long mvAlunoPagamentoId = rs.getLong("mv_aluno_pagamento_id");
-                LocalDate dataVencimento = rs.getDate("data_vencimento").toLocalDate();
-                LocalDate dataPagamento = rs.getDate("data_pagamento").toLocalDate();
-                double valorPago = rs.getDouble("valor_pago");
-                long alunoId = rs.getLong("aluno_id");
-                int modalidade = rs.getInt("modalidade");
-                LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
-                LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+                long id = rs.getLong("idalunopagamentomensalidade");
+                long mvAlunoPagamentoId = rs.getLong("id_mensalidadevigente");
+                LocalDate dataVencimento = rs.getDate("datavencimento").toLocalDate();
+                LocalDate dataPagamento = rs.getDate("datapagamento").toLocalDate();
+                double valorPago = rs.getDouble("valorpago");
+                long alunoId = rs.getLong("id_pessoa");
+                int modalidade = rs.getInt("modalidadepagamento");
+                LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
 
                 // Buscar objetos relacionados
                 MensalidadeVigenteDAO mvDAO = new MensalidadeVigenteDAO();
@@ -86,7 +86,7 @@ public class AlunoPagamentoMensalidadeDAO {
     }
 
     public AlunoPagamentoMensalidade buscaPorId(long id) {
-        String sql = "SELECT * FROM alunopagamentomensalidade WHERE id_aluno_pagamento_mensalidade = ?";
+        String sql = "SELECT * FROM alunopagamentomensalidade WHERE idalunopagamentomensalidade = ?";
 
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
@@ -94,14 +94,14 @@ public class AlunoPagamentoMensalidadeDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    long mvAlunoPagamentoId = rs.getLong("mv_aluno_pagamento_id");
-                    LocalDate dataVencimento = rs.getDate("data_vencimento").toLocalDate();
-                    LocalDate dataPagamento = rs.getDate("data_pagamento").toLocalDate();
-                    double valorPago = rs.getDouble("valor_pago");
-                    long alunoId = rs.getLong("aluno_id");
-                    int modalidade = rs.getInt("modalidade");
-                    LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
-                    LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+                    long mvAlunoPagamentoId = rs.getLong("id_mensalidadevigente");
+                    LocalDate dataVencimento = rs.getDate("datavencimento").toLocalDate();
+                    LocalDate dataPagamento = rs.getDate("datapagamento").toLocalDate();
+                    double valorPago = rs.getDouble("valorpago");
+                    long alunoId = rs.getLong("id_pessoa");
+                    int modalidade = rs.getInt("modalidadepagamento");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
 
                     // Buscar objetos relacionados
                     MensalidadeVigenteDAO mvDAO = new MensalidadeVigenteDAO();
@@ -131,7 +131,7 @@ public class AlunoPagamentoMensalidadeDAO {
     }
 
     public AlunoPagamentoMensalidade alterar(AlunoPagamentoMensalidade apm) {
-        String sql = "UPDATE alunopagamentomensalidade SET mv_aluno_pagamento_id = ?, data_vencimento = ?, data_pagamento = ?, valor_pago = ?, aluno_id = ?, modalidade = ?, data_modificacao = ? WHERE id_aluno_pagamento_mensalidade = ?";
+        String sql = "UPDATE alunopagamentomensalidade SET id_mensalidadevigente = ?, datavencimento = ?, datapagamento = ?, valorpago = ?, id_pessoa = ?, modalidadepagamento = ?, datamodificacao = ? WHERE idalunopagamentomensalidade = ?";
 
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
@@ -153,7 +153,7 @@ public class AlunoPagamentoMensalidadeDAO {
     }
 
     public boolean remover(long id) {
-        String sql = "DELETE FROM alunopagamentomensalidade WHERE id_aluno_pagamento_mensalidade = ?";
+        String sql = "DELETE FROM alunopagamentomensalidade WHERE idalunopagamentomensalidade = ?";
 
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
@@ -168,7 +168,7 @@ public class AlunoPagamentoMensalidadeDAO {
     }
 
     public AlunoPagamentoMensalidade buscarUltimoPagamentoDoAluno(long alunoId) {
-        String sql = "SELECT * FROM alunopagamentomensalidade WHERE aluno_id = ? ORDER BY data_vencimento DESC LIMIT 1";
+        String sql = "SELECT * FROM alunopagamentomensalidade WHERE id_pessoa = ? ORDER BY datavencimento DESC LIMIT 1";
 
         try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
@@ -176,16 +176,15 @@ public class AlunoPagamentoMensalidadeDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    long id = rs.getLong("id_aluno_pagamento_mensalidade");
-                    long mvAlunoPagamentoId = rs.getLong("mv_aluno_pagamento_id");
-                    LocalDate dataVencimento = rs.getDate("data_vencimento").toLocalDate();
-                    LocalDate dataPagamento = rs.getDate("data_pagamento") != null ? rs.getDate("data_pagamento").toLocalDate() : null;
-                    double valorPago = rs.getDouble("valor_pago");
-                    int modalidade = rs.getInt("modalidade");
-                    LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
-                    LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+                    long id = rs.getLong("idalunopagamentomensalidade");
+                    long mvAlunoPagamentoId = rs.getLong("id_mensalidadevigente");
+                    LocalDate dataVencimento = rs.getDate("datavencimento").toLocalDate();
+                    LocalDate dataPagamento = rs.getDate("datapagamento") != null ? rs.getDate("datapagamento").toLocalDate() : null;
+                    double valorPago = rs.getDouble("valorpago");
+                    int modalidade = rs.getInt("modalidadepagamento");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
 
-                    // Buscar objetos relacionados
                     MensalidadeVigenteDAO mvDAO = new MensalidadeVigenteDAO();
                     PessoaDAO pessoaDAO = new PessoaDAO();
 
@@ -212,5 +211,4 @@ public class AlunoPagamentoMensalidadeDAO {
 
         return null;
     }
-
 }
