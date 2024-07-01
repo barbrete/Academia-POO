@@ -62,11 +62,11 @@ CREATE TABLE `alunopagamentomensalidade` (
   `datacriacao` timestamp NULL DEFAULT NULL,
   `datamodificacao` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`idalunopagamentomensalidade`),
-  KEY `id_pessoa` (`id_pessoa`),
   KEY `id_mensalidadevigente` (`id_mensalidadevigente`),
-  CONSTRAINT `alunopagamentomensalidade_ibfk_1` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoa` (`idpessoa`),
+  KEY `alunopagamentomensalidade_ibfk_1` (`id_pessoa`),
+  CONSTRAINT `alunopagamentomensalidade_ibfk_1` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoa` (`idpessoa`) ON DELETE CASCADE,
   CONSTRAINT `alunopagamentomensalidade_ibfk_2` FOREIGN KEY (`id_mensalidadevigente`) REFERENCES `mensalidadevigente` (`idmensalidadevigente`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `alunopagamentomensalidade` (
 
 LOCK TABLES `alunopagamentomensalidade` WRITE;
 /*!40000 ALTER TABLE `alunopagamentomensalidade` DISABLE KEYS */;
-INSERT INTO `alunopagamentomensalidade` VALUES (2,2,4,'2024-07-29','2024-06-27',130,2,'2024-06-27 17:39:05','2024-06-27 17:39:05');
+INSERT INTO `alunopagamentomensalidade` VALUES (2,2,4,'2024-07-29','2024-06-27',130,2,'2024-06-27 17:39:05','2024-06-27 17:39:05'),(4,2,1,'2024-07-29','2024-06-27',130,2,'2024-06-27 19:23:33','2024-06-27 19:23:33');
 /*!40000 ALTER TABLE `alunopagamentomensalidade` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -235,7 +235,7 @@ CREATE TABLE `pessoa` (
   `datacriacao` timestamp NULL DEFAULT NULL,
   `datamodificacao` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`idpessoa`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -244,7 +244,7 @@ CREATE TABLE `pessoa` (
 
 LOCK TABLES `pessoa` WRITE;
 /*!40000 ALTER TABLE `pessoa` DISABLE KEYS */;
-INSERT INTO `pessoa` VALUES (1,'Rogerio','M','1997-09-11','Rojas','123','Administrador','2024-06-19 17:44:51','2024-06-19 17:44:51'),(2,'Barbrete','F','1966-06-06','Babs','123','Professor','2024-06-19 19:50:36','2024-06-19 19:50:36'),(3,'Eduardo','M','1966-06-06','Dudu','123','Aluno','2024-06-19 19:50:36','2024-06-19 19:50:36'),(4,'João Silva','M','1966-06-06','Joao','123','Aluno','2024-06-19 19:50:36','2024-06-19 19:50:36'),(9,'sarue','m','2002-09-11','sarue','123','Aluno','2024-06-27 04:42:36','2024-06-27 04:42:36');
+INSERT INTO `pessoa` VALUES (1,'Rogerio','M','1997-09-11','Rojas','123','Administrador','2024-06-19 17:44:51','2024-06-19 17:44:51'),(2,'Barbrete','F','1966-06-06','Babs','123','Professor','2024-06-19 19:50:36','2024-06-19 19:50:36'),(3,'Eduardo','M','1966-06-06','Dudu','123','Aluno','2024-06-19 19:50:36','2024-06-19 19:50:36'),(4,'João Silva','M','1966-06-06','Joao','123','Aluno','2024-06-19 19:50:36','2024-06-19 19:50:36'),(25,'sarue','M','1789-09-11','senta','fofo','Aluno','2024-06-27 19:45:48','2024-06-27 19:45:48');
 /*!40000 ALTER TABLE `pessoa` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -335,4 +335,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-27 14:40:35
+-- Dump completed on 2024-06-27 17:12:05

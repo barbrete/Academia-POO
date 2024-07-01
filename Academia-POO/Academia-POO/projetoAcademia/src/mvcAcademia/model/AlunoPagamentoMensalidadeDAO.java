@@ -213,27 +213,51 @@ public class AlunoPagamentoMensalidadeDAO {
     }
 
     public List<AlunoPagamentoMensalidade> mostrarAdimplentesNoMesEAno(int mes, int ano) {
-            List<AlunoPagamentoMensalidade> alunos = new ArrayList<>();
-            String sql = "SELECT id, nome, adimplente FROM alunos WHERE adimplente = true";
-    
-            try (Statement statement = connection.createStatement();
-                 ResultSet resultSet = statement.executeQuery(sql)) {
-    
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String nome = resultSet.getString("nome");
-                    boolean adimplente = resultSet.getBoolean("adimplente");
-    
-                    Aluno aluno = new Aluno(id, nome, adimplente);
-                    alunos.add(aluno);
+        List<AlunoPagamentoMensalidade> adimplentes = new ArrayList<>();
+        String sql = "SELECT * FROM alunopagamentomensalidade WHERE MONTH(datapagamento) = ? AND YEAR(datapagamento) = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, mes);
+            stmt.setInt(2, ano);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    long id = rs.getLong("idalunopagamentomensalidade");
+                    long mvAlunoPagamentoId = rs.getLong("id_mensalidadevigente");
+                    LocalDate dataVencimento = rs.getDate("datavencimento").toLocalDate();
+                    LocalDate dataPagamento = rs.getDate("datapagamento").toLocalDate();
+                    double valorPago = rs.getDouble("valorpago");
+                    long alunoId = rs.getLong("id_pessoa");
+                    int modalidade = rs.getInt("modalidadepagamento");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                    MensalidadeVigenteDAO mvDAO = new MensalidadeVigenteDAO();
+                    PessoaDAO pessoaDAO = new PessoaDAO();
+
+                    MensalidadeVigente mvAlunoPagamento = mvDAO.buscaPorId(mvAlunoPagamentoId);
+                    Pessoa aluno = pessoaDAO.buscaPorId(alunoId);
+
+                    AlunoPagamentoMensalidade pagamento = new AlunoPagamentoMensalidade();
+                    pagamento.setId(id);
+                    pagamento.setMvAlunoPagamento(mvAlunoPagamento);
+                    pagamento.setDataVencimento(dataVencimento);
+                    pagamento.setDataPagamento(dataPagamento);
+                    pagamento.setValorPago(valorPago);
+                    pagamento.setAluno(aluno);
+                    pagamento.setModalidade(modalidade);
+                    pagamento.setDataCriacao(dataCriacao);
+                    pagamento.setDataModificacao(dataModificacao);
+
+                    adimplentes.add(pagamento);
                 }
             }
-    
-            return alunos;
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO LISTAR ALUNOS ADIMPLENTES: " + e.getMessage());
         }
-    
+
+        return adimplentes;
     }
-        
-        return movimentacoes;
-    }
+
 }

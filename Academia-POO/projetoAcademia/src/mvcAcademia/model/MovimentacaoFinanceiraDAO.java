@@ -4,124 +4,172 @@
  */
 package mvcAcademia.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
- * @author Rogério
+ * @author barbrete e Kitotsui
  */
-public class MovimentacaoFinanceiraDAO {
 
-    private MovimentacaoFinanceira[] movimentacoes = new MovimentacaoFinanceira[10];
-    private int tamanhoAtual = 0;
-    
-    
+public class MovimentacaoFinanceiraDAO { 
 
-    public MovimentacaoFinanceiraDAO() {
+    public boolean adiciona(MovimentacaoFinanceira movimentacaoFinanceira) {
+        String sql = "insert into movimentacao_financeira (tipo, descricao, valor, data_criacao, data_modificacao) values (?, ?, ?, ?, ?)";
 
-        MovimentacaoFinanceira movimentacao1 = new MovimentacaoFinanceira();
-        movimentacao1.setValor(1000.0);
-        movimentacao1.setTipo("ENTRADA");
-        movimentacao1.setDescricao("Recebimento mensalidade");
-        movimentacao1.setDataCriacao(LocalDateTime.now());
-        movimentacao1.setDataModificacao(LocalDateTime.now());
-        adiciona(movimentacao1);
+        try (Connection connection = new ConexaoAcademia().getConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-        MovimentacaoFinanceira movimentacao2 = new MovimentacaoFinanceira();
+            stmt.setString(1, movimentacaoFinanceira.getTipo());
+            stmt.setString(2, movimentacaoFinanceira.getDescricao());
+            stmt.setDouble(3, movimentacaoFinanceira.getValor());
+            stmt.setTimestamp(4, Timestamp.valueOf(movimentacaoFinanceira.getDataCriacao()));
+            stmt.setTimestamp(5, Timestamp.valueOf(movimentacaoFinanceira.getDataModificacao()));
 
-        movimentacao2.setValor(500.0);
-        movimentacao2.setTipo("SAIDA");
-        movimentacao2.setDescricao("Pagamento fornecedor");
-        movimentacao2.setDataCriacao(LocalDateTime.now());
-        movimentacao2.setDataModificacao(LocalDateTime.now());
-        adiciona(movimentacao2);
-
-        MovimentacaoFinanceira movimentacao3 = new MovimentacaoFinanceira();
-        movimentacao3.setValor(300.0);
-        movimentacao3.setTipo("ENTRADA");
-        movimentacao3.setDescricao("Recebimento de venda de equipamento");
-        movimentacao3.setDataCriacao(LocalDateTime.now());
-        movimentacao3.setDataModificacao(LocalDateTime.now());
-        adiciona(movimentacao3);
-
-        MovimentacaoFinanceira movimentacao4 = new MovimentacaoFinanceira();
-        movimentacao4.setValor(200.0);
-        movimentacao4.setTipo("SAIDA");
-        movimentacao4.setDescricao("Pagamento de conta de agua");
-        movimentacao4.setDataCriacao(LocalDateTime.now());
-        movimentacao4.setDataModificacao(LocalDateTime.now());
-        adiciona(movimentacao4);
-
-        MovimentacaoFinanceira movimentacao5 = new MovimentacaoFinanceira();
-        movimentacao5.setValor(700.0);
-        movimentacao5.setTipo("ENTRADA");
-        movimentacao5.setDescricao("Recebimento de emprestimo");
-        movimentacao5.setDataCriacao(LocalDateTime.now());
-        movimentacao5.setDataModificacao(LocalDateTime.now());
-        adiciona(movimentacao5);
-
-    }
-
-    public boolean adiciona(MovimentacaoFinanceira movimentacao) {
-        int proximaPosicaoLivre = proximaPosicaoLivre();
-        if (proximaPosicaoLivre != -1) {
-            movimentacoes[proximaPosicaoLivre] = movimentacao;
-            tamanhoAtual++; // Incrementa o tamanho atual
+            stmt.execute();
             return true;
-        } else {
-            return false;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ADICIONAR A MOVIMENTACAO FINANCEIRA: " + e.getMessage());
         }
     }
 
-    public void mostrarTodasNoMesEAno(int mes, int ano) {
-        boolean encontrouMovimentacao = false;
-        for (MovimentacaoFinanceira movimentacao : movimentacoes) {
-            if (movimentacao != null && movimentacao.getDataCriacao().getMonthValue() == mes
-                    && movimentacao.getDataCriacao().getYear() == ano) {
-                System.out.println(movimentacao);
-                encontrouMovimentacao = true;
+    public List<MovimentacaoFinanceira> lista() {
+        String sql = "select * from movimentacao_financeira";
+        List<MovimentacaoFinanceira> movimentacaoFinanceiras = new ArrayList<>();
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                long id = rs.getLong("id");
+                String tipo = rs.getString("tipo");
+                String descricao = rs.getString("descricao");
+                double valor = rs.getDouble("valor");
+                LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+
+                MovimentacaoFinanceira movimentacaoFinanceira = new MovimentacaoFinanceira();
+                movimentacaoFinanceira.setId(id);
+                movimentacaoFinanceira.setTipo(tipo);
+                movimentacaoFinanceira.setDescricao(descricao);
+                movimentacaoFinanceira.setValor(valor);
+                movimentacaoFinanceira.setDataCriacao(dataCriacao);
+                movimentacaoFinanceira.setDataModificacao(dataModificacao);
+
+                movimentacaoFinanceiras.add(movimentacaoFinanceira);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        if (!encontrouMovimentacao) {
-            System.out.println("NENHUMA MOVIMENTACAO FINANCEIRA ENCONTRADA EM " + mes + " DE " + ano);
-        }
+        return movimentacaoFinanceiras;
     }
 
-    public MovimentacaoFinanceira buscarMovimentacaoPorId(long id) {
-        for (MovimentacaoFinanceira movimentacao : movimentacoes) {
-            if (movimentacao != null && movimentacao.getId() == id) {
-                return movimentacao;
+    public List<MovimentacaoFinanceira> mostrarTodasNoMesEAno(int mes, int ano) {
+        String sql = "select * from movimentacao_financeira WHERE MONTH(data_criacao) = ? AND YEAR(data_criacao) = ?";
+        List<MovimentacaoFinanceira> movimentacoes = new ArrayList<>();
+        
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+    
+            stmt.setInt(1, mes);
+            stmt.setInt(2, ano);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    MovimentacaoFinanceira movimentacao = new MovimentacaoFinanceira();
+                    movimentacao.setId(rs.getLong("id"));
+                    movimentacao.setTipo(rs.getString("tipo"));
+                    movimentacao.setDescricao(rs.getString("descricao"));
+                    movimentacao.setValor(rs.getDouble("valor"));
+                    movimentacao.setDataCriacao(rs.getTimestamp("data_criacao").toLocalDateTime());
+                    movimentacao.setDataModificacao(rs.getTimestamp("data_modificacao").toLocalDateTime());
+                    
+                    movimentacoes.add(movimentacao);
+                }
             }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar movimentações financeiras: " + e.getMessage());
+        }
+        
+        return movimentacoes;
+    }
+
+
+    public MovimentacaoFinanceira buscaPorId(long id) {
+        String sql = "select * from movimentacao_financeira where id = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    id = rs.getLong("id");
+                    String tipo = rs.getString("tipo");
+                    String descricao = rs.getString("descricao");
+                    double valor = rs.getDouble("valor");
+                    LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+
+                    MovimentacaoFinanceira movimentacaoFinanceira = new MovimentacaoFinanceira();
+                    movimentacaoFinanceira.setId(id);
+                    movimentacaoFinanceira.setTipo(tipo);
+                    movimentacaoFinanceira.setDescricao(descricao);
+                    movimentacaoFinanceira.setValor(valor);
+                    movimentacaoFinanceira.setDataCriacao(dataCriacao);
+                    movimentacaoFinanceira.setDataModificacao(dataModificacao);
+                    
+                    return movimentacaoFinanceira;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
 
-    public boolean remover(long id) {
-        for (int i = 0; i < movimentacoes.length; i++) {
-            if (movimentacoes[i] != null && movimentacoes[i].getId() == id) {
-                movimentacoes[i] = null;
-                return true;
-            }
+    public MovimentacaoFinanceira alterar(MovimentacaoFinanceira movimentacaoFinanceira) {
+        String sql = "update movimentacao_financeira set id = ?, tipo = ?, descricao = ?, valor = ?, data_modificacao = ? where id = ?";
+
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+                stmt.setString(1, movimentacaoFinanceira.getTipo());
+                stmt.setString(2, movimentacaoFinanceira.getDescricao());
+                stmt.setDouble(3, movimentacaoFinanceira.getValor());
+                stmt.setTimestamp(4, Timestamp.valueOf(movimentacaoFinanceira.getDataCriacao()));
+
+            stmt.execute();
+            return movimentacaoFinanceira;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO ALTERAR MOVIMENTACAO FINANCEIRA: " + e.getMessage());
         }
-        return false;
     }
 
-    public void mostrarTodas() {
-        if (tamanhoAtual == 0) {
-            System.out.println("NAO HA MOVIMENTACOES FINANCEIRAS CADASTRADAS.");
-        } else {
-            for (int i = 0; i < tamanhoAtual; i++) {
-                System.out.println(movimentacoes[i]);
-            }
-        }
-    }
+    public boolean remover (long id) {
+        String sql = "delete from movimentacao_financeira where idmovimentacao_financeira = ?";
 
-    private int proximaPosicaoLivre() {
-        for (int i = 0; i < movimentacoes.length; i++) {
-            if (movimentacoes[i] == null) {
-                return i;
-            }
+        try (Connection connection = new ConexaoAcademia().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            int linhasDeletadas = stmt.executeUpdate();
+            return linhasDeletadas > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERRO AO REMOVER MOVIMENTACAO FINANCEIRA: " + e.getMessage());
         }
-        return -1;
     }
 }

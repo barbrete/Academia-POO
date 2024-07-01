@@ -108,6 +108,18 @@ public class Treino {
                 + "\nDATA DE MODIFICACAO: " + dataModificacao;
     }
 
+    public String toStringAluno() {
+        return "\n------------------ ULTIMO TREINO ------------------" 
+                + "\nID: " + id 
+                +"\nNOME: " + nome
+                + "\nOBJETIVO: " + objetivo 
+                + "\nDATA INICIO: " + dataInicio 
+                + "\nDATA TERMINO: " + dataTermino 
+                + "\nDIVISAO DE TREINO: " + divTreino.toStringAluno()
+                + "\nDATA DE CRIACAO: " + dataCriacao 
+                + "\nDATA DE MODIFICACAO: " + dataModificacao;
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;

@@ -28,6 +28,10 @@ public class MovimentacaoFinanceira {
         return id;
     }
 
+    public void setId(long id){
+        this.id = id;
+    }
+
     public double getValor() {
         return valor;
     }
@@ -70,12 +74,12 @@ public class MovimentacaoFinanceira {
 
     @Override
     public String toString() {
-        return "\n==================INFORMACOES DA PESSOA=================\n " 
-                +"ID: " + id + "\n"
-                + "Valor: " + valor + "\n"
-                + "Tipo: " + tipo + "\n"
-                + "Descricao: " + descricao + "\n"
-                + "Data de Criacao: " + dataCriacao + "\n"
-                + "Data de Modificacao: " + dataModificacao;
+        return "\n==================INFORMACOES DA MOVIMENTACAO FINANCEIRA=================\n " 
+                + "ID: " + id + "\n"
+                + "VALOR: " + valor + "\n"
+                + "TIPO: " + tipo + "\n"
+                + "DESCRICAO: " + descricao + "\n"
+                + "DATA DE CRIACAO: " + dataCriacao + "\n"
+                + "DATA DE MODIFICACAO: " + dataModificacao;
     }
 }

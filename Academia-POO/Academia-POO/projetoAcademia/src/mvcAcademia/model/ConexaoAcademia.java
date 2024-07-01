@@ -14,8 +14,8 @@ public class ConexaoAcademia {
         
         try{
             Properties properties = new Properties();
-            properties.setProperty("user", "barbara");
-            properties.setProperty("password", "barbara");
+            properties.setProperty("user", "root");
+            properties.setProperty("password", "admwindows");
             properties.setProperty("useSSL", "false");
             properties.setProperty("useTimezone", "true");
             properties.setProperty("serverTimezone", "America/Sao_Paulo");

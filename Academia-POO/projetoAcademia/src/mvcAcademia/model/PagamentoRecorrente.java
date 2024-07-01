@@ -1,19 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mvcAcademia.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-/**
- *
- * @author Rogério
- */
 public class PagamentoRecorrente {
 
-    private static long serial = 1;
+    private static long serial;
     private long id;
     private Pessoa pessoa;
     private LocalDate data;
@@ -26,16 +19,30 @@ public class PagamentoRecorrente {
     private LocalDateTime dataModificacao;
 
     public PagamentoRecorrente() {
-        id = PagamentoRecorrente.serial++;
+        this.id = PagamentoRecorrente.serial++;
+        this.dataCriacao = LocalDateTime.now();
+        this.dataModificacao = LocalDateTime.now();
+    }
+
+    public PagamentoRecorrente(Pessoa pessoa, LocalDate data, String cartaoCredito, double valor, LocalDate dataInicio, LocalDate dataVencimento, int numeroMesesAutorizados, LocalDateTime dataCriacao, LocalDateTime dataModificacao) {
+        this.id = PagamentoRecorrente.serial++;
+        this.pessoa = pessoa;
+        this.data = data;
+        this.cartaoCredito = cartaoCredito;
+        this.valor = valor;
+        this.dataInicio = dataInicio;
+        this.dataVencimento = dataVencimento;
+        this.numeroMesesAutorizados = numeroMesesAutorizados;
+        this.dataCriacao = dataCriacao;
+        this.dataModificacao = dataModificacao;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public void setId(long id) {
         this.id = id;
-    }
-    
-
-    public long getId() {
-        return id;
     }
 
     public Pessoa getPessoa() {
@@ -84,14 +91,14 @@ public class PagamentoRecorrente {
 
     public void setDataVencimento(LocalDate dataVencimento) {
         this.dataVencimento = dataVencimento;
-    } 
-    
-    public int getNumMesesAutorizados() {
+    }
+
+    public int getNumeroMesesAutorizados() {
         return numeroMesesAutorizados;
     }
-        
-    public void setNumMesesAutorizados(int numMesesAutorizados) {
-        this.numeroMesesAutorizados = numMesesAutorizados;
+
+    public void setNumeroMesesAutorizados(int numeroMesesAutorizados) {
+        this.numeroMesesAutorizados = numeroMesesAutorizados;
     }
 
     public LocalDateTime getDataCriacao() {
@@ -112,15 +119,34 @@ public class PagamentoRecorrente {
 
     @Override
     public String toString() {
-        return "ID: " + id + "\n"
-                + "Pessoa: " + pessoa + "\n"
-                + "Data: " + data + "\n"
-                + "Cartao de Credito: " + cartaoCredito + "\n"
-                + "Valor: " + valor + "\n"
-                + "Data de Inicio: " + dataInicio + "\n"
-                + "Numero de Meses Autorizados: " + numeroMesesAutorizados + "\n"
-                + "Data de Criacao: " + dataCriacao + "\n"
-                + "Data de Modificacao: " + dataModificacao;
+        return "================== INFORMACOES DE PAGAMENTO RECORRENTE ================="
+                + "\nID: " + id
+                + "\nPESSOA: " + pessoa
+                + "\nDATA: " + data
+                + "\nCARTÃO DE CRÉDITO: " + cartaoCredito
+                + "\nVALOR: " + valor
+                + "\nDATA DE INÍCIO: " + dataInicio
+                + "\nDATA DE VENCIMENTO: " + dataVencimento
+                + "\nNÚMERO DE MESES AUTORIZADOS: " + numeroMesesAutorizados
+                + "\nDATA DE CRIAÇÃO: " + dataCriacao
+                + "\nDATA DE MODIFICAÇÃO: " + dataModificacao
+                + "\n===================================================================";
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, pessoa);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PagamentoRecorrente that = (PagamentoRecorrente) o;
+        return id == that.id && Objects.equals(pessoa, that.pessoa);
+    }
 }

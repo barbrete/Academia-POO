@@ -78,6 +78,15 @@ public class DivisaoTreino {
                  + "\nDATA DE MODIFICACAO: " + dataModificacao;
     }
 
+    public String toStringAluno() {
+        return "\n-----------------DIVISAO DE TREINO-----------------" 
+                 + "\nID: " + id 
+                 + "\nNOME: " + nome 
+                 + "\nDESCRICAO: " + descricao 
+                 + "\nDATA DE CRIACAO: " + dataCriacao 
+                 + "\nDATA DE MODIFICACAO: " + dataModificacao;
+    }
+
     
 
     @Override

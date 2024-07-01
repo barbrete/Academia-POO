@@ -127,7 +127,7 @@ CREATE TABLE `divisaotreinomusculo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `divisaotreinomusculo`
+-- Dtreinoaplicacaoacademiaacademiadivisaotreinoalunopagamentomensalidadeid_mensalidadevigentealunopagamentomensalidadealunopagamentomensalidadealunopagamentomensalidadealunopagamentomensalidadealunopagamentomensalidadealunopagamentomensalidadeumping data for table `divisaotreinomusculo`
 --
 
 LOCK TABLES `divisaotreinomusculo` WRITE;
@@ -198,7 +198,7 @@ DROP TABLE IF EXISTS `mensalidadevigente`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mensalidadevigente` (
   `idmensalidadevigente` int NOT NULL AUTO_INCREMENT,
-  `valor` decimal(7,2) DEFAULT NULL,
+  `valor` double DEFAULT NULL,
   `datainicio` date DEFAULT NULL,
   `datatermino` date DEFAULT NULL,
   `datacriacao` timestamp NULL DEFAULT NULL,
@@ -281,6 +281,66 @@ INSERT INTO `treino` VALUES (1,'Transformacao Fit','Emagrecimento','1997-09-11',
 UNLOCK TABLES;
 
 --
+-- Table structure for table `avaliacao_fisica`
+--
+
+DROP TABLE IF EXISTS `avaliacao_fisica`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `avaliacao_fisica` (
+  `idavaliacaofisica` INT NOT NULL AUTO_INCREMENT,
+  `id_pessoa` INT DEFAULT NULL,
+  `id_ultimo_treino` INT DEFAULT NULL,
+  `peso` double DEFAULT NULL,
+  `altura` double DEFAULT NULL,
+  `imc` double DEFAULT NULL,
+  `indice_satisfacao` INT DEFAULT NULL,
+  `data_criacao` TIMESTAMP NULL DEFAULT NULL,
+  `data_modificacao` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`idavaliacaofisica`),
+  KEY `pessoa_avaliacao_fk` (`id_pessoa`),
+  KEY `treino_avaliacao_fk` (`id_ultimo_treino`),
+  CONSTRAINT `fk_pessoa_avaliacao` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoa` (`idpessoa`),
+  CONSTRAINT `fk_treino_avaliacao` FOREIGN KEY (`id_ultimo_treino`) REFERENCES `treino` (`idtreino`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Table structure for table `pagamento_recorrente`
+--
+
+DROP TABLE IF EXISTS `pagamento_recorrente`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pagamento_recorrente` (
+  `idpagamentorecorrente` int NOT NULL AUTO_INCREMENT,
+  `id_pessoa` int NOT NULL,
+  `data` date NOT NULL,
+  `cartao_credito` varchar(100) DEFAULT NULL,
+  `valor` double DEFAULT NULL,
+  `data_inicio` date NOT NULL,
+  `data_vencimento` date NOT NULL,
+  `numero_meses_autorizados` int DEFAULT NULL,
+  `data_criacao` timestamp NULL DEFAULT NULL,
+  `data_modificacao` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idpagamentorecorrente`),
+  KEY `pessoa_pagamento_fk` (`id_pessoa`),
+  CONSTRAINT `fk_pessoa_pagamento` FOREIGN KEY (`id_pessoa`) REFERENCES `pessoa` (`idpessoa`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `pagamento_recorrente`
+--
+
+LOCK TABLES `pagamento_recorrente` WRITE;
+/*!40000 ALTER TABLE `pagamento_recorrente` DISABLE KEYS */;
+INSERT INTO `pagamento_recorrente` VALUES ();
+/*!40000 ALTER TABLE `pagamento_recorrente` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `treinoaplicacao`
 --
 
@@ -336,3 +396,4 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2024-06-27 17:12:05
+

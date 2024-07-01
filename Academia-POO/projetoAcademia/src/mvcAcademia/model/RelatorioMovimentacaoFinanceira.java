@@ -4,6 +4,8 @@
  */
 package mvcAcademia.model;
 
+import java.util.List;
+
 /**
  *
  * @author Rogério
@@ -17,10 +19,23 @@ public class RelatorioMovimentacaoFinanceira {
     }
 
     public void exibirRelatorio(int mes, int ano) {
-        System.out.println("=== RELATORIO DE MOVIMENTACAO FINANCEIRA ===");
-        System.out.println("MES: " + mes + ", ANO: " + ano);
-        System.out.println("--------------------------------------------");
-        movimentacaoDAO.mostrarTodasNoMesEAno(mes, ano);
+        List<MovimentacaoFinanceira> movimentacoes = movimentacaoDAO.mostrarTodasNoMesEAno(mes, ano);
+
+        if (movimentacoes.isEmpty()) {
+            System.out.println("Nenhuma movimentação financeira encontrada no período especificado.");
+            return;
+        }
+
+        System.out.println("=== RELATÓRIO DE MOVIMENTAÇÃO FINANCEIRA ===");
+        System.out.println("Mês: " + mes + ", Ano: " + ano);
+        for (MovimentacaoFinanceira movimentacao : movimentacoes) {
+            System.out.println("ID: " + movimentacao.getId());
+            System.out.println("Tipo: " + movimentacao.getTipo());
+            System.out.println("Descrição: " + movimentacao.getDescricao());
+            System.out.println("Valor: " + movimentacao.getValor());
+            System.out.println("Data de Criação: " + movimentacao.getDataCriacao());
+            System.out.println("-------------------------------------");
+        }
     }
 
 }

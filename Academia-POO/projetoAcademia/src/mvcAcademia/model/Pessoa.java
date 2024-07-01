@@ -108,7 +108,7 @@ public class Pessoa {
 
     @Override
     public String toString() {
-        return "\n==================INFORMACOES DA PESSOA================= "
+        return "\n==================INFORMACOES DA PESSOA================="
                 + "\nID: " + id
                 + "\nNOME: " + nome
                 + "\nSEXO: " + sexo
@@ -118,6 +118,20 @@ public class Pessoa {
                 + "\nTIPO DE USUARIO: " + tipoUsuario
                 + "\nDATA DE CRIACAO: " + dataCriacao
                 + "\nDATA DE MODIFICACAO: " + dataModificacao;
+    }
+
+    public String toStringAluno() {
+        return "\n----------------------- ALUNO -----------------------"
+                + "\nID: " + id
+                + "\nNOME: " + nome
+                + "\nSEXO: " + sexo
+                + "\nNASCIMENTO: " + nascimento
+                + "\nLOGIN: " + login
+                + "\nSENHA: " + senha
+                + "\nTIPO DE USUARIO: " + tipoUsuario
+                + "\nDATA DE CRIACAO: " + dataCriacao
+                + "\nDATA DE MODIFICACAO: " + dataModificacao
+                + "\n==================================================";
     }
 
     @Override

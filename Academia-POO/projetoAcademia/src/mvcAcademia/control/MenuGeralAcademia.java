@@ -4,6 +4,7 @@
  */
 package mvcAcademia.control;
 
+import java.sql.SQLException;
 /**
  *
  * @author barbrete e kitotsui
@@ -41,6 +42,7 @@ import mvcAcademia.model.Treino;
 import mvcAcademia.model.TreinoDAO;
 import mvcAcademia.model.Pessoa;
 import mvcAcademia.model.PessoaDAO;
+import mvcAcademia.model.RelatorioAlunoAdimplentes;
 import mvcAcademia.model.RelatorioMovimentacaoFinanceira;
 import mvcAcademia.model.TreinoAplicacao;
 import mvcAcademia.model.TreinoAplicacaoDAO;
@@ -63,7 +65,8 @@ public class MenuGeralAcademia {
     private PagamentoRecorrenteDAO pagamentoRecorrenteDAO = new PagamentoRecorrenteDAO();
     private AlunoPagamentoMensalidadeDAO apmDAO = new AlunoPagamentoMensalidadeDAO();
     private MovimentacaoFinanceiraDAO movimentacaoFinanceiraDAO = new MovimentacaoFinanceiraDAO();
-    RelatorioMovimentacaoFinanceira relatorio = new RelatorioMovimentacaoFinanceira(movimentacaoFinanceiraDAO);
+    private RelatorioMovimentacaoFinanceira relatorioMov = new RelatorioMovimentacaoFinanceira(movimentacaoFinanceiraDAO);
+    private RelatorioAlunoAdimplentes relatorioAluno = new RelatorioAlunoAdimplentes(apmDAO);
 
     private Scanner scanner = new Scanner(System.in);
     private boolean sair = false;
@@ -75,10 +78,17 @@ public class MenuGeralAcademia {
     }
 
     public void iniciar() {
-        int opcaoUsuario;
+        int opcaoUsuario = 0;
+        boolean resp = false;
 
         while (!sair) {
-            opcaoUsuario = gui.menuBemVindo();
+
+            try {
+                opcaoUsuario = gui.menuBemVindo();
+                resp = true;
+            } catch (NumberFormatException e) {
+                System.out.println("ENTRADA INVALIDA.");
+            }
 
             switch (opcaoUsuario) {
                 case 1:
@@ -129,6 +139,15 @@ public class MenuGeralAcademia {
         }
     }
 
+    private boolean pagamentoRecorrenteEstaEmDia(Pessoa aluno) {
+        PagamentoRecorrente pagamentoRecorrente = pagamentoRecorrenteDAO.buscarUltimoPagamentoDoAluno(aluno.getId());
+        if (pagamentoRecorrente == null) {
+            return false;
+        }
+        LocalDate dataVencimento = pagamentoRecorrente.getDataVencimento();
+        return LocalDate.now().isBefore(dataVencimento.plusDays(2));
+    }
+
     private void registrarPagamentoMensalidade(Pessoa p) {
         AlunoPagamentoMensalidade apm = new AlunoPagamentoMensalidade();
         LocalDate dataAtual = LocalDate.now();
@@ -162,10 +181,15 @@ public class MenuGeralAcademia {
         apm.setDataCriacao(LocalDateTime.now());
         apm.setDataModificacao(LocalDateTime.now());
 
-        if (apmDAO.adiciona(apm)) {
-            System.out.println("PAGAMENTO DA MENSALIDADE REGISTRADO COM SUCESSO!");
+        if (modalidade == 4) {
+            PagamentoRecorrente novoPagamentoRecorrente = cadastraPagamentoRecorrente();
+            pagamentoRecorrenteDAO.adiciona(novoPagamentoRecorrente);
         } else {
-            System.out.println("FALHA AO REGISTRAR O PAGAMENTO DA MENSALIDADE.");
+            if (apmDAO.adiciona(apm)) {
+                System.out.println("PAGAMENTO DA MENSALIDADE REGISTRADO COM SUCESSO!");
+            } else {
+                System.out.println("FALHA AO REGISTRAR O PAGAMENTO DA MENSALIDADE.");
+            }
         }
     }
 
@@ -207,10 +231,15 @@ public class MenuGeralAcademia {
         apm.setDataCriacao(LocalDateTime.now());
         apm.setDataModificacao(LocalDateTime.now());
 
-        if (apmDAO.adiciona(apm)) {
-            System.out.println("PAGAMENTO DA MENSALIDADE REGISTRADO COM SUCESSO!");
+        if (modalidade == 4) {
+            PagamentoRecorrente novoPagamentoRecorrente = cadastraPagamentoRecorrente();
+            pagamentoRecorrenteDAO.adiciona(novoPagamentoRecorrente);
         } else {
-            System.out.println("FALHA AO REGISTRAR O PAGAMENTO DA MENSALIDADE.");
+            if (apmDAO.adiciona(apm)) {
+                System.out.println("PAGAMENTO DA MENSALIDADE REGISTRADO COM SUCESSO!");
+            } else {
+                System.out.println("FALHA AO REGISTRAR O PAGAMENTO DA MENSALIDADE.");
+            }
         }
     }
 
@@ -226,13 +255,13 @@ public class MenuGeralAcademia {
             pessoaLogadaId = pessoaLogada.getId();
 
             if (pessoaLogada.getTipoUsuario().equals("Aluno")) {
-                if (mensalidadeEstaEmDia(pessoaLogada)) {
+                if (mensalidadeEstaEmDia(pessoaLogada) || pagamentoRecorrenteEstaEmDia(pessoaLogada)) {
                     System.out.println("╔═════════════════════════════╗");
                     System.out.println("║    MENSALIDADE EM DIA!  ║");
                     System.out.println("║                         ║");
                     System.out.println("║     ACESSO LIBERADO!    ║");
                     System.out.println("╚═════════════════════════════╝");
-                    
+
                     exibirMenuAluno();
                 } else {
                     System.out.println("╔══════════════════════════════════════════╗");
@@ -240,8 +269,7 @@ public class MenuGeralAcademia {
                     System.out.println("║                                    ║");
                     System.out.println("║PROCURE A RECEPÇÃO PARA REGULARIZAR.║");
                     System.out.println("╚══════════════════════════════════════════╝");
-                    
-               
+
                     System.out.println("");
 
                 }
@@ -279,11 +307,11 @@ public class MenuGeralAcademia {
                     }
                     break;
                 case 2:
-                    // IMPRIMIR FICHA DE TREINO?  
+                    // IMPRIMIR FICHA DE TREINO?
                     System.out.println("FICHA DE TREINO SENDO IMPRESSA............");
                     break;
                 case 3:
-                    AvaliacaoFisica avaliacaoFisica = avFisDAO.buscaAvaliacaoPorPessoaId(pessoaLogadaId);
+                    AvaliacaoFisica avaliacaoFisica = avFisDAO.buscaPorId(pessoaLogadaId);
                     if (avaliacaoFisica != null) {
                         System.out.println(avaliacaoFisica);
                     } else {
@@ -316,7 +344,7 @@ public class MenuGeralAcademia {
                     gerenciarTreinoAplicacao();
                     break;
                 case 4:
-                    //gerenciaAvaliacaoFisica();
+                    gerenciaAvaliacaoFisica();
                     break;
                 case 5:
                     return;
@@ -445,6 +473,41 @@ public class MenuGeralAcademia {
             }
         }
 
+    }
+
+    private void mostrarPagamentoRecorrente() {
+        List<PagamentoRecorrente> pagamentoRecorrente = pagamentoRecorrenteDAO.lista();
+        if (pagamentoRecorrente.isEmpty()) {
+            System.out.println("NENHUM PAGAMENTO RECORRENTE REGISTRADO.");
+        } else {
+            for (PagamentoRecorrente pagamento : pagamentoRecorrente) {
+                System.out.println(pagamento);
+            }
+        }
+
+    }
+
+    private void mostrarMovimentacaoFinanceira() {
+        List<MovimentacaoFinanceira> movimentacaoFinanceiras = movimentacaoFinanceiraDAO.lista();
+
+        if (movimentacaoFinanceiras.isEmpty()) {
+            System.out.println("NAO EXISTEM MOVIMENTACOES FINANCEIRAS CADASTRADAS.");
+        } else {
+            for (MovimentacaoFinanceira mv : movimentacaoFinanceiras) {
+                System.out.println(mv);
+            }
+        }
+    }
+
+    private void mostrarAvaliacaoFisica() {
+        List<AvaliacaoFisica> avaliacoes = avFisDAO.lista();
+        if (!avaliacoes.isEmpty()) {
+            for (AvaliacaoFisica avaliacao : avaliacoes) {
+                System.out.println(avaliacao);
+            }
+        } else {
+            System.out.println("NAO EXISTEM AVALIACOES FISICAS CADASTRADAS.");
+        }
     }
 
     private Academia cadastraAcademia() {
@@ -745,56 +808,30 @@ public class MenuGeralAcademia {
         apm.setDataCriacao(LocalDateTime.now());
         apm.setDataModificacao(LocalDateTime.now());
 
-        return apm;
-    }
-
-
-    /*private AvaliacaoFisica cadastraAvaliacaoFisica() {
-        AvaliacaoFisica af = new AvaliacaoFisica();
-        System.out.println("AVALIACAO FISICA");
-        System.out.println("A AVALIACAO FISICA CUSTA R$20,00, VOCE ESTA CIENTE (S/N)?");
-        String resp = scanner.nextLine();
-
-        if ("S".equalsIgnoreCase(resp)) {
-            System.out.println("DIGITE SEU ID: ");
-            long idPessoa = Long.parseLong(scanner.nextLine());
-            Pessoa p = pessoaDAO.buscaPessoaPorId(idPessoa);
-            Treino t = treinoDAO.buscaTreinoPorId(idPessoa);
-
-            if (p != null) {
-                af.setPessoa(p);
-                System.out.println("DIGITE SEU PESO: ");
-                double peso = scanner.nextDouble();
-                System.out.println("DIGITE SUA ALTURA: ");
-                double altura = scanner.nextDouble();
-                double imc = avFisDAO.calculaIMC(peso, altura);
-                scanner.nextLine();
-                avFisDAO.interpretaIMC(imc);
-                System.out.println("QUAL O SEU INDICE DE SATISFACAO COM O RESULTADO? ");
-                af.setIndiceSatisfacao(scanner.nextInt());
-                scanner.nextLine();
-                af.setPeso(peso);
-                af.setAltura(altura);
-                af.setImc(imc);
-                af.setDataCriacao(new Date());
-                af.setDataModificacao(new Date());
-                System.out.println("OBRIGADO POR REALIZAR A AVALIACAO FISICA! SERA ADICIONADO O VALOR DE R$20,00 NA SUA MENSALIDADE!");
+        if (modalidade == 4) {
+            PagamentoRecorrente pr = this.cadastraPagamentoRecorrente();
+            if (pr != null) {
+                pagamentoRecorrenteDAO.adiciona(pr);
             } else {
-                System.out.println("PESSOA NAO ENCONTRADA");
+                System.out.println("FALHA AO CRIAR PAGAMENTO RECORRENTE.");
+                return null;
             }
-        } else {
-            System.out.println("AVALIACAO FISICA NAO FOI CRIADA.");
         }
-        return af;
+
+        return apm;
     }
 
     private PagamentoRecorrente cadastraPagamentoRecorrente() {
         PagamentoRecorrente pagamentoRecorrente = new PagamentoRecorrente();
+        Calendario calendario = new Calendario();
+        LocalDate dataAtual = calendario.getDataAtual();
+
         System.out.println("CADASTRO DE PAGAMENTO RECORRENTE");
 
+        this.mostrarTodasPessoas();
         System.out.println("DIGITE O ID DA PESSOA: ");
         long idPessoa = Long.parseLong(scanner.nextLine());
-        Pessoa pessoa = pessoaDAO.buscaPessoaPorId(idPessoa);
+        Pessoa pessoa = pessoaDAO.buscaPorId(idPessoa);
         if (pessoa != null) {
             pagamentoRecorrente.setPessoa(pessoa);
         } else {
@@ -802,8 +839,68 @@ public class MenuGeralAcademia {
             return null;
         }
 
+        System.out.println("DIGITE O VALOR DO PAGAMENTO: ");
+        double valor = Double.parseDouble(scanner.nextLine());
+        pagamentoRecorrente.setValor(valor);
+
+        pagamentoRecorrente.setDataInicio(dataAtual);
+
+        System.out.println("DIGITE O NÚMERO DE MESES AUTORIZADOS: ");
+        int numeroMesesAutorizados = Integer.parseInt(scanner.nextLine());
+        LocalDate dataVencimento = dataAtual.plusMonths(numeroMesesAutorizados);
+        pagamentoRecorrente.setDataVencimento(dataVencimento);
+        pagamentoRecorrente.setNumeroMesesAutorizados(numeroMesesAutorizados);
+
+        System.out.println("DIGITE O CARTÃO DE CRÉDITO: ");
+        String cartaoCredito = scanner.nextLine();
+        pagamentoRecorrente.setCartaoCredito(cartaoCredito);
+
+        pagamentoRecorrente.setData(LocalDate.now());
+        pagamentoRecorrente.setDataCriacao(LocalDateTime.now());
+        pagamentoRecorrente.setDataModificacao(LocalDateTime.now());
+
+        System.out.println("PAGAMENTO RECORRENTE CADASTRADO COM SUCESSO!");
+
         return pagamentoRecorrente;
-    }*/
+    }
+
+    private AvaliacaoFisica cadastraAvaliacaoFisica() {
+        AvaliacaoFisica av = new AvaliacaoFisica();
+
+        this.mostrarTodasPessoas();
+        System.out.println("\nDIGITE O ID DA PESSOA: ");
+        long idPessoa = Long.parseLong(scanner.nextLine());
+        Pessoa pessoa = pessoaDAO.buscaPorId(idPessoa);
+        Treino treino = treinoDAO.buscaPorId(idPessoa);
+        if (pessoa != null) {
+            av.setPessoa(pessoa);
+            System.out.println("DIGITE SEU PESO: ");
+            double peso = scanner.nextDouble();
+            scanner.nextLine();
+            System.out.println("DIGITE SUA ALTURA: ");
+            double altura = scanner.nextDouble();
+            scanner.nextLine();
+            double calcula = av.calculaIMC(peso, altura);
+            double imc = av.interpretaIMC(calcula);
+            System.out.println("DIGITE SEU INDICE DE SATISFACAO: ");
+            int indice = scanner.nextInt();
+            scanner.nextLine();
+
+            av.setPessoa(pessoa);
+            av.setUltimoTreino(treino);
+            av.setImc(imc);
+            av.setPeso(peso);
+            av.setAltura(altura);
+            av.setIndiceSatisfacao(indice);
+            av.setDataCriacao(LocalDateTime.now());
+            av.setDataModificacao(LocalDateTime.now());
+        } else {
+            System.out.println("PESSOA NÃO ENCONTRADA.");
+            return null;
+        }
+        return av;
+    }
+
     private MovimentacaoFinanceira cadastraMovimentacaoFinanceira() {
         MovimentacaoFinanceira movimentacao = new MovimentacaoFinanceira();
         System.out.println("CADASTRO DE MOVIMENTACAO FINANCEIRA");
@@ -824,7 +921,7 @@ public class MenuGeralAcademia {
     }
 
     private void exibirMenuCRUD() {
-        int resp;
+        int resp = 0;
 
         while (true) {
             resp = gui.exibirMenuCruds();
@@ -855,29 +952,25 @@ public class MenuGeralAcademia {
                     gerenciarTreinoAplicacao();
                     break;
                 case 9:
-                    //gerenciaAvaliacaoFisica();
-
+                    gerenciaAvaliacaoFisica();
                     break;
                 case 10:
                     gerenciaMensalidadeVigente();
-
                     break;
                 case 11:
                     gerenciaAlunoPagamentoMensalidade();
-
                     break;
                 case 12:
-                    //gerenciaPagamentoRecorrente();
+                    gerenciaPagamentoRecorrente();
                     break;
                 case 13:
                     gerenciaMovimentacaoFinanceira();
                     break;
                 case 14:
-                    //gerenciaRelatorioAlunoAdimplentes();
-                    System.out.println("CRUD EM ESTADO DE DESENVOLVIMENTO");
+                    gerenciaRelatorioAlunoAdimplentes();
                     break;
                 case 15:
-                    //gerenciaRelatorio();
+                    gerenciaRelatorioMovimentacaoFinanceira();
                     break;
                 case 16:
                     return;
@@ -1288,7 +1381,8 @@ public class MenuGeralAcademia {
                         this.mostrarTodasDivisoesTreinoMusculo();
                         System.out.println("QUAL DIVISAO DE TREINO MUSCULO GOSTARIA DE ASSSOCIAR?");
                         long idDivisaoTreinoMusculo = Long.parseLong(scanner.nextLine());
-                        DivisaoTreinoMusculo divTreinoMusculo = divisaoTreinoMusculoDAO.buscaPorId(idDivisaoTreinoMusculo);
+                        DivisaoTreinoMusculo divTreinoMusculo = divisaoTreinoMusculoDAO
+                                .buscaPorId(idDivisaoTreinoMusculo);
 
                         if (divTreinoMusculo != null) {
                             divTreinoMusculo.setDivisaoTreino(divTreino);
@@ -1468,7 +1562,8 @@ public class MenuGeralAcademia {
                         this.mostrarTodasDivisoesTreinoMusculo();
                         System.out.println("DIGITE O ID DA DIVISAO DE TREINO MUSCULO: ");
                         long divTreinoMuscId = Long.parseLong(scanner.nextLine());
-                        aplicacaoParaAlterar.setDivTreinoMusc(new DivisaoTreinoMusculoDAO().buscaPorId(divTreinoMuscId));
+                        aplicacaoParaAlterar
+                                .setDivTreinoMusc(new DivisaoTreinoMusculoDAO().buscaPorId(divTreinoMuscId));
 
                         this.mostrarTodosTreinos();
                         System.out.println("DIGITE O ID DO TREINO: ");
@@ -1503,8 +1598,7 @@ public class MenuGeralAcademia {
         }
     }
 
-
-    /*private void gerenciaAvaliacaoFisica() {
+    private void gerenciaAvaliacaoFisica() {
         int resp;
 
         while (true) {
@@ -1516,7 +1610,6 @@ public class MenuGeralAcademia {
                     String respCriacao = scanner.nextLine();
 
                     if ("S".equalsIgnoreCase(respCriacao)) {
-
                         AvaliacaoFisica novaAvaliacao = this.cadastraAvaliacaoFisica();
                         if (avFisDAO.adiciona(novaAvaliacao)) {
                             System.out.println("AVALIACAO FISICA CRIADA COM SUCESSO!");
@@ -1528,22 +1621,21 @@ public class MenuGeralAcademia {
                     }
                     break;
                 case 2:
-                    // Mostrar Todas as Avaliações Físicas
-                    avFisDAO.mostrarAvaliacaoFisica();
+                    this.mostrarAvaliacaoFisica();
                     break;
                 case 3:
-                    // Alterar Avaliação Física
+                    this.mostrarAvaliacaoFisica();
                     System.out.println("DIGITE O ID DA AVALIACAO FISICA QUE DESEJA ALTERAR: ");
                     long idAvaliacao = Long.parseLong(scanner.nextLine());
-                    AvaliacaoFisica avaliacaoParaAlterar = avFisDAO.buscaAvaliacaoID(idAvaliacao);
+                    AvaliacaoFisica avaliacaoParaAlterar = avFisDAO.buscaPorId(idAvaliacao);
                     if (avaliacaoParaAlterar != null) {
                         System.out.println("DIGITE O NOVO PESO: ");
                         double novoPeso = scanner.nextDouble();
                         System.out.println("DIGITE A NOVA ALTURA: ");
                         double novaAltura = scanner.nextDouble();
-                        double novoImc = avFisDAO.calculaIMC(novoPeso, novaAltura);
+                        double novoImc = avaliacaoParaAlterar.calculaIMC(novoPeso, novaAltura);
                         scanner.nextLine();
-                        avFisDAO.interpretaIMC(novoImc);
+                        avaliacaoParaAlterar.interpretaIMC(novoImc);
                         System.out.println("QUAL O NOVO INDICE DE SATISFACAO? ");
                         int novoIndiceSatisfacao = scanner.nextInt();
                         scanner.nextLine();
@@ -1551,17 +1643,17 @@ public class MenuGeralAcademia {
                         avaliacaoParaAlterar.setAltura(novaAltura);
                         avaliacaoParaAlterar.setImc(novoImc);
                         avaliacaoParaAlterar.setIndiceSatisfacao(novoIndiceSatisfacao);
-                        avaliacaoParaAlterar.setDataModificacao(new Date());
+                        avaliacaoParaAlterar.setDataModificacao(LocalDateTime.now());
                         System.out.println("AVALIACAO FISICA ALTERADA COM SUCESSO!");
                     } else {
                         System.out.println("AVALIACAO FISICA NAO EXISTENTE NO BANCO DE DADOS.");
                     }
                     break;
                 case 4:
-                    // Excluir Avaliação Física
+                    this.mostrarAvaliacaoFisica();
                     System.out.println("DIGITE O ID DA AVALIACAO FISICA QUE DESEJA EXCLUIR: ");
                     long idAvaliacaoExcluir = Long.parseLong(scanner.nextLine());
-                    AvaliacaoFisica avaliacaoParaExcluir = avFisDAO.buscaAvaliacaoID(idAvaliacaoExcluir);
+                    AvaliacaoFisica avaliacaoParaExcluir = avFisDAO.buscaPorId(idAvaliacaoExcluir);
                     if (avaliacaoParaExcluir != null) {
                         avFisDAO.remover(avaliacaoParaExcluir.getId());
                         System.out.println("AVALIACAO FISICA EXCLUIDA COM SUCESSO!");
@@ -1572,14 +1664,14 @@ public class MenuGeralAcademia {
                 case 5:
                     System.out.println("DIGITE O ID DA PESSOA PARA ASSOCIAR A AVALIACAO FISICA: ");
                     long idPessoa = Long.parseLong(scanner.nextLine());
-                    Pessoa pessoaParaAssociar = pessoaDAO.buscaPessoaPorId(idPessoa);
+                    Pessoa pessoaParaAssociar = pessoaDAO.buscaPorId(idPessoa);
 
                     if (pessoaParaAssociar != null) {
                         System.out.println("AVALIACOES FISICAS EXISTENTES:\n");
-                        avFisDAO.mostrarAvaliacaoFisica();
+                        this.mostrarAvaliacaoFisica();
                         System.out.println("\nQUAL AVALIACAO FISICA DESEJA ASSOCIAR? DIGITE O ID:\n");
                         long idAvaliacaoAssociar = Long.parseLong(scanner.nextLine());
-                        AvaliacaoFisica avaliacaoAssociar = avFisDAO.buscaAvaliacaoID(idAvaliacaoAssociar);
+                        AvaliacaoFisica avaliacaoAssociar = avFisDAO.buscaPorId(idAvaliacaoAssociar);
 
                         if (avaliacaoAssociar != null) {
                             avaliacaoAssociar.setPessoa(pessoaParaAssociar);
@@ -1598,7 +1690,8 @@ public class MenuGeralAcademia {
                     break;
             }
         }
-    }*/
+    }
+
     private void gerenciaMensalidadeVigente() {
         int resp;
 
@@ -1627,10 +1720,12 @@ public class MenuGeralAcademia {
                         double novoValorMensalidade = Double.parseDouble(scanner.nextLine());
                         System.out.println("DIGITE A NOVA DATA DE INICIO DA MENSALIDADE (dd/MM/yyyy): ");
                         String novaDataInicioStr = scanner.nextLine();
-                        LocalDate dataInicio = LocalDate.parse(novaDataInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        LocalDate dataInicio = LocalDate.parse(novaDataInicioStr,
+                                DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                         System.out.println("DIGITE A NOVA DATA DE TERMINO DA MENSALIDADE (dd/MM/yyyy): ");
                         String novaDataTerminoStr = scanner.nextLine();
-                        LocalDate dataTermino = LocalDate.parse(novaDataTerminoStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        LocalDate dataTermino = LocalDate.parse(novaDataTerminoStr,
+                                DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
                         mensalidadeParaAlterar.setValor(novoValorMensalidade);
                         mensalidadeParaAlterar.setDataInicio(dataInicio);
@@ -1663,7 +1758,7 @@ public class MenuGeralAcademia {
         }
     }
 
-    /*private void gerenciaPagamentoRecorrente() {
+    private void gerenciaPagamentoRecorrente() {
         int resp;
 
         while (true) {
@@ -1672,72 +1767,62 @@ public class MenuGeralAcademia {
             switch (resp) {
                 case 1:
                     PagamentoRecorrente novoPagamento = this.cadastraPagamentoRecorrente();
-                    if (pagamentoRecorrenteDAO.adiciona(novoPagamento)) {
+                    if (novoPagamento != null && pagamentoRecorrenteDAO.adiciona(novoPagamento)) {
                         System.out.println("PAGAMENTO RECORRENTE CRIADO COM SUCESSO!");
                     } else {
                         System.out.println("ERRO AO CRIAR O PAGAMENTO RECORRENTE.");
                     }
                     break;
                 case 2:
-                    PagamentoRecorrente[] pagamentos = pagamentoRecorrenteDAO.mostrarTodosPagamentos();
-                    if (pagamentos.length > 0) {
-                        System.out.println("PAGAMENTOS RECORRENTES:");
-                        for (PagamentoRecorrente pagamento : pagamentos) {
-                            System.out.println(pagamento);
-                        }
-                    } else {
-                        System.out.println("NÃO HÁ PAGAMENTOS RECORRENTES REGISTRADOS.");
-                    }
+                    this.mostrarPagamentoRecorrente();
                     break;
                 case 3:
-                    System.out.println("DIGITE O ID DO PAGAMENTO RECORRENTE QUE DESEJA ALTERAR: ");
-                    int idPagamento = Integer.parseInt(scanner.nextLine());
-                    PagamentoRecorrente pagamentoParaAlterar = pagamentoRecorrenteDAO.buscaPagamentoPorId(idPagamento);
+                    this.mostrarPagamentoRecorrente();
+                    System.out.println("\nDIGITE O ID DO PAGAMENTO RECORRENTE QUE DESEJA ALTERAR...: ");
+                    long idPagamento = Long.parseLong(scanner.nextLine());
+
+                    PagamentoRecorrente pagamentoParaAlterar = pagamentoRecorrenteDAO.buscaPorId(idPagamento);
                     if (pagamentoParaAlterar != null) {
-                        System.out.println("IMPLEMENTAR LÓGICA PARA ALTERAR O PAGAMENTO RECORRENTE.");
+                        System.out.println("DIGITE O NOVO VALOR DO PAGAMENTO: ");
+                        double novoValor = Double.parseDouble(scanner.nextLine());
+                        System.out.println("DIGITE A NOVA DATA DE INICIO DO PAGAMENTO (dd/MM/yyyy): ");
+                        String novaDataInicioStr = scanner.nextLine();
+                        LocalDate novaDataInicio = LocalDate.parse(novaDataInicioStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                        System.out.println("DIGITE A NOVA DATA DE TERMINO DO PAGAMENTO (dd/MM/yyyy): ");
+                        String novaDataTerminoStr = scanner.nextLine();
+                        LocalDate novaDataVencimento = LocalDate.parse(novaDataTerminoStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+                        pagamentoParaAlterar.setValor(novoValor);
+                        pagamentoParaAlterar.setDataInicio(novaDataInicio);
+                        pagamentoParaAlterar.setDataVencimento(novaDataVencimento);
+                        pagamentoParaAlterar.setDataModificacao(LocalDateTime.now());
+
+                        pagamentoRecorrenteDAO.alterar(pagamentoParaAlterar);
+
+                        System.out.println("PAGAMENTO RECORRENTE ALTERADO COM SUCESSO!");
                     } else {
-                        System.out.println("PAGAMENTO RECORRENTE NÃO ENCONTRADO.");
+                        System.out.println("PAGAMENTO RECORRENTE NAO ENCONTRADO NO BANCO DE DADOS.");
                     }
                     break;
                 case 4:
-                    System.out.println("DIGITE O ID DO PAGAMENTO RECORRENTE QUE DESEJA EXCLUIR: ");
-                    int idPagamentoExcluir = Integer.parseInt(scanner.nextLine());
+                    this.mostrarPagamentoRecorrente();
+                    System.out.println("\nDIGITE O ID DO PAGAMENTO RECORRENTE QUE DESEJA EXCLUIR...: ");
+                    long idPagamentoExcluir = Long.parseLong(scanner.nextLine());
                     if (pagamentoRecorrenteDAO.remover(idPagamentoExcluir)) {
-                        System.out.println("PAGAMENTO RECORRENTE EXCLUÍDO COM SUCESSO!");
+                        System.out.println("PAGAMENTO RECORRENTE EXCLUIDO COM SUCESSO!");
                     } else {
-                        System.out.println("PAGAMENTO RECORRENTE NÃO ENCONTRADO.");
+                        System.out.println("PAGAMENTO RECORRENTE NAO EXISTENTE NO BANCO DE DADOS.");
                     }
                     break;
                 case 5:
-                    System.out.println("DIGITE O ID DA PESSOA PARA ASSOCIAR AO PAGAMENTO RECORRENTE: ");
-                    long idPessoa = Long.parseLong(scanner.nextLine());
-                    Pessoa pessoaParaAssociar = pessoaDAO.buscaPessoaPorId(idPessoa);
-
-                    if (pessoaParaAssociar != null) {
-                        System.out.println("PAGAMENTOS RECORRENTES EXISTENTES:\n");
-                        pagamentoRecorrenteDAO.mostrarTodosPagamentos();
-                        System.out.println("\nQUAL PAGAMENTO RECORRENTE DESEJA ASSOCIAR? DIGITE O ID:\n");
-                        long idPagamentoAssociar = Long.parseLong(scanner.nextLine());
-                        PagamentoRecorrente pagamentoAssociar = pagamentoRecorrenteDAO.buscaPagamentoPorId(idPagamentoAssociar);
-
-                        if (pagamentoAssociar != null) {
-                            pagamentoAssociar.setPessoa(pessoaParaAssociar);
-                            System.out.println("PAGAMENTO RECORRENTE ASSOCIADO COM SUCESSO!");
-                        } else {
-                            System.out.println("PAGAMENTO RECORRENTE NAO ENCONTRADO.");
-                        }
-                    } else {
-                        System.out.println("PESSOA NAO ENCONTRADA.");
-                    }
-                    break;
-                case 6:
                     return;
                 default:
-                    System.out.println("ESCOLHA UMA OPÇÃO VÁLIDA.");
+                    System.out.println("ESCOLHA UMA OPCAO VALIDA.");
                     break;
             }
         }
-    }*/
+    }
+
     private void gerenciaAlunoPagamentoMensalidade() {
         int resp;
 
@@ -1747,10 +1832,20 @@ public class MenuGeralAcademia {
             switch (resp) {
                 case 1:
                     AlunoPagamentoMensalidade apm = this.cadastraPagamentoMensalidade();
-                    if (apmDAO.adiciona(apm)) {
-                        System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO CRIADO COM SUCESSO!");
-                    } else {
-                        System.out.println("FALHA AO CRIAR PAGAMENTO DA MENSALIDADE DO ALUNO.");
+                    if (apm != null) {
+                        if (apm.getModalidade() == 4) { // Pagamento Recorrente
+                            PagamentoRecorrente pr = this.cadastraPagamentoRecorrente();
+                            if (pr != null) {
+                                pagamentoRecorrenteDAO.adiciona(pr);
+                            } else {
+                                System.out.println("FALHA AO CRIAR PAGAMENTO RECORRENTE.");
+                            }
+                        }
+                        if (apmDAO.adiciona(apm)) {
+                            System.out.println("PAGAMENTO DA MENSALIDADE DO ALUNO CRIADO COM SUCESSO!");
+                        } else {
+                            System.out.println("FALHA AO CRIAR PAGAMENTO DA MENSALIDADE DO ALUNO.");
+                        }
                     }
                     break;
                 case 2:
@@ -1760,19 +1855,29 @@ public class MenuGeralAcademia {
                     this.mostrarPagamentosMensalidade();
                     System.out.println("DIGITE O ID DO PAGAMENTO DA MENSALIDADE QUE DESEJA ALTERAR...: ");
                     long id = scanner.nextLong();
-                    scanner.nextLine(); // Consumir nova linha
+                    scanner.nextLine();
 
                     AlunoPagamentoMensalidade apmParaAlterar = apmDAO.buscaPorId(id);
                     if (apmParaAlterar != null) {
                         System.out.println("DIGITE O NOVO VALOR QUE IRA PAGAR...: ");
                         double novoValorAPM = scanner.nextDouble();
                         apmParaAlterar.setValorPago(novoValorAPM);
-                        scanner.nextLine(); // Consumir nova linha
+                        scanner.nextLine();
 
-                        System.out.println("MODALIDADE: \n0 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
+                        System.out.println(
+                                "MODALIDADE: \n1 - DINHEIRO\n2 - PIX\n3 - DEBITO AUTOMATICO\n4 - PAGAMENTO RECORRENTE");
                         int novaModalidade = scanner.nextInt();
                         apmParaAlterar.setModalidade(novaModalidade);
-                        scanner.nextLine(); // Consumir nova linha
+                        scanner.nextLine();
+
+                        if (novaModalidade == 4) {
+                            PagamentoRecorrente pr = this.cadastraPagamentoRecorrente();
+                            if (pr != null) {
+                                pagamentoRecorrenteDAO.adiciona(pr);
+                            } else {
+                                System.out.println("FALHA AO CRIAR PAGAMENTO RECORRENTE.");
+                            }
+                        }
 
                         System.out.println("DIGITE A NOVA DATA DE PAGAMENTO (dd/MM/yyyy)...: ");
                         String novaDataPagamentoStr = scanner.nextLine();
@@ -1792,7 +1897,7 @@ public class MenuGeralAcademia {
                     this.mostrarPagamentosMensalidade();
                     System.out.println("DIGITE O ID DO PAGAMENTO DA MENSALIDADE QUE DESEJA EXCLUIR...: ");
                     long ide = scanner.nextLong();
-                    scanner.nextLine(); // Consumir nova linha
+                    scanner.nextLine();
 
                     AlunoPagamentoMensalidade apmParaExcluir = apmDAO.buscaPorId(ide);
                     if (apmParaExcluir != null) {
@@ -1821,18 +1926,19 @@ public class MenuGeralAcademia {
                 case 1:
                     MovimentacaoFinanceira novaMovimentacao = this.cadastraMovimentacaoFinanceira();
                     if (movimentacaoFinanceiraDAO.adiciona(novaMovimentacao)) {
-                        System.out.println("Movimentação financeira cadastrada com sucesso!");
+                        System.out.println("MOVIMENTACAO FINANCEIRA CADASTRADA COM SUCESSO");
                     } else {
-                        System.out.println("Erro ao cadastrar movimentação financeira.");
+                        System.out.println("ERRO AO CADASTRAR MOVIMENTACAO FINANCEIRA");
                     }
                     break;
                 case 2:
-                    movimentacaoFinanceiraDAO.mostrarTodas();
+                    this.mostrarMovimentacaoFinanceira();
                     break;
                 case 3:
                     System.out.println("Digite o ID da movimentação financeira que deseja alterar: ");
                     long idMovimentacao = Long.parseLong(scanner.nextLine());
-                    MovimentacaoFinanceira movimentacaoParaAlterar = movimentacaoFinanceiraDAO.buscarMovimentacaoPorId(idMovimentacao);
+                    MovimentacaoFinanceira movimentacaoParaAlterar = movimentacaoFinanceiraDAO
+                            .buscaPorId(idMovimentacao);
                     if (movimentacaoParaAlterar != null) {
                         System.out.println("Digite o novo valor: ");
                         double novoValor = Double.parseDouble(scanner.nextLine());
@@ -1841,7 +1947,10 @@ public class MenuGeralAcademia {
                         movimentacaoParaAlterar.setValor(novoValor);
                         movimentacaoParaAlterar.setDescricao(novaDescricao);
                         movimentacaoParaAlterar.setDataModificacao(LocalDateTime.now());
+                        movimentacaoFinanceiraDAO.alterar(movimentacaoParaAlterar);
+
                         System.out.println("Movimentação financeira alterada com sucesso!");
+
                     } else {
                         System.out.println("Movimentação financeira não encontrada.");
                     }
@@ -1849,7 +1958,8 @@ public class MenuGeralAcademia {
                 case 4:
                     System.out.println("Digite o ID da movimentação financeira que deseja excluir: ");
                     long idMovimentacaoExcluir = Long.parseLong(scanner.nextLine());
-                    MovimentacaoFinanceira movimentacaoParaExcluir = movimentacaoFinanceiraDAO.buscarMovimentacaoPorId(idMovimentacaoExcluir);
+                    MovimentacaoFinanceira movimentacaoParaExcluir = movimentacaoFinanceiraDAO
+                            .buscaPorId(idMovimentacaoExcluir);
                     if (movimentacaoParaExcluir != null) {
                         movimentacaoFinanceiraDAO.remover(idMovimentacaoExcluir);
                         System.out.println("Movimentação financeira excluída com sucesso!");
@@ -1864,31 +1974,64 @@ public class MenuGeralAcademia {
                     break;
             }
         }
+
     }
 
-    private void gerenciaRelatorio() {
-        Scanner scanner = new Scanner(System.in);
-
+    private void gerenciaRelatorioAlunoAdimplentes() {
         System.out.println("DIGITE O MES (1 A 12): ");
-        int MES = 0;
+        int mes = 0;
         if (scanner.hasNextInt()) {
-            MES = scanner.nextInt();
+            mes = scanner.nextInt();
+            if (mes < 1 || mes > 12) {
+                System.out.println("Mês inválido. Digite um número de 1 a 12.");
+                return;
+            }
         } else {
             System.out.println("ENTRADA INVALIDA PARA O MES.");
             return;
         }
 
         System.out.println("DIGITE O ANO: ");
-        int ANO = 0;
+        int ano = 0;
         if (scanner.hasNextInt()) {
-            ANO = scanner.nextInt();
+            ano = scanner.nextInt();
+            if (ano < 0) {
+                System.out.println("Ano inválido. Digite um número positivo.");
+                return;
+            }
         } else {
             System.out.println("ENTRADA INVALIDA PARA O ANO.");
             return;
         }
-        relatorio.exibirRelatorio(MES, ANO);
 
-        scanner.close();
+        scanner.nextLine();
+
+        AlunoPagamentoMensalidadeDAO apmDAO = new AlunoPagamentoMensalidadeDAO();
+
+        RelatorioAlunoAdimplentes relatorioAluno = new RelatorioAlunoAdimplentes(apmDAO);
+
+        relatorioAluno.exibirRelatorio(mes, ano);
+    }
+
+    private void gerenciaRelatorioMovimentacaoFinanceira() {
+        System.out.println("DIGITE O MES (1 A 12): ");
+        int mes = 0;
+        if (scanner.hasNextInt()) {
+            mes = scanner.nextInt();
+        } else {
+            System.out.println("ENTRADA INVALIDA PARA O MES.");
+            return;
+        }
+
+        System.out.println("DIGITE O ANO: ");
+        int ano = 0;
+        if (scanner.hasNextInt()) {
+            ano = scanner.nextInt();
+        } else {
+            System.out.println("ENTRADA INVALIDA PARA O ANO.");
+            return;
+        }
+        relatorioMov.exibirRelatorio(mes, ano);
     }
 
     public static void main(String[] args) {

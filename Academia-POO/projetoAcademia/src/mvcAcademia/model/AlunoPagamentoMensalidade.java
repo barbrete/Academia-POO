@@ -24,6 +24,16 @@ public class AlunoPagamentoMensalidade {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
     
+    
+     public AlunoPagamentoMensalidade(Pessoa aluno, LocalDate dataVencimento, double valorPago, LocalDateTime dataCriacao, LocalDateTime dataModificacao) {
+        this.id = AlunoPagamentoMensalidade.serial++;
+        this.aluno = aluno;
+        this.dataVencimento = dataVencimento;
+        this.valorPago = valorPago;
+        this.dataCriacao = dataCriacao;
+        this.dataModificacao = dataModificacao;
+    }
+    
     public AlunoPagamentoMensalidade(){
         id = AlunoPagamentoMensalidade.serial++;
     }
@@ -31,8 +41,7 @@ public class AlunoPagamentoMensalidade {
     public void setId(long id) {
         this.id = id;
     }
-    
-    
+
     public long getId() {
         return id;
     }

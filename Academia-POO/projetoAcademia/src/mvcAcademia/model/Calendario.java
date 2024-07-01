@@ -26,23 +26,29 @@ public class Calendario {
 
     public void avancarData(int dias) {
         this.dataAtual = this.dataAtual.plusDays(dias);
+         verificarVencimentos();
     }
     
     
 
-    public void verificarVencimentos() {
+     public void verificarVencimentos() {
         AlunoPagamentoMensalidadeDAO alunoPagamentoMensalidadeDAO = new AlunoPagamentoMensalidadeDAO();
         MensalidadeVigenteDAO mensalidadeVigenteDAO = new MensalidadeVigenteDAO();
-        PessoaDAO pessoaDAO = new PessoaDAO();
+        PagamentoRecorrenteDAO pagamentoRecorrenteDAO = new PagamentoRecorrenteDAO();
 
-        List<AlunoPagamentoMensalidade> pagamentos = alunoPagamentoMensalidadeDAO.lista();
+        List<PagamentoRecorrente> pagamentos = pagamentoRecorrenteDAO.lista();
 
-        for (AlunoPagamentoMensalidade apm : pagamentos) {
-            if (apm != null && dataAtual.equals(apm.getDataVencimento())) {
-                MensalidadeVigente mensalidadeVigente = mensalidadeVigenteDAO.buscaPorId(apm.getMvAlunoPagamento().getId());
-                if (mensalidadeVigente != null) {
-                    registrarPagamentoMensalidade(apm.getAluno(), mensalidadeVigente.getValor());
+        for (PagamentoRecorrente pr : pagamentos) {
+            if (pr != null && dataAtual.equals(pr.getDataVencimento())) {
+                MensalidadeVigente mensalidadeVigente = mensalidadeVigenteDAO.buscaPorId(pr.getPessoa().getId());
+                if (mensalidadeVigente == null) {
+                    mensalidadeVigente = new MensalidadeVigente(pr.getPessoa(), pr.getValor(), dataAtual, dataAtual.plusMonths(1), LocalDateTime.now(), LocalDateTime.now());
+                    mensalidadeVigenteDAO.adiciona(mensalidadeVigente);
+                } else {
+                    mensalidadeVigente.setDataTermino(dataAtual.plusMonths(1));
+                    mensalidadeVigenteDAO.alterar(mensalidadeVigente);
                 }
+                alunoPagamentoMensalidadeDAO.adiciona(new AlunoPagamentoMensalidade(pr.getPessoa(), dataAtual, pr.getValor(), LocalDateTime.now(), LocalDateTime.now()));
             }
         }
     }

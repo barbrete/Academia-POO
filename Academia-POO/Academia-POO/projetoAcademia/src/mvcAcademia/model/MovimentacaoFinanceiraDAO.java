@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  *
- * @author barbrete
+ * @author barbrete e Kitotsui
  */
 
 public class MovimentacaoFinanceiraDAO { 

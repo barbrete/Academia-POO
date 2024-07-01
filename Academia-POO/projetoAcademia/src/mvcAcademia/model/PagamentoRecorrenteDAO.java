@@ -20,94 +20,101 @@ import java.util.List;
  */
 public class PagamentoRecorrenteDAO {
 
-    public boolean adiciona(PagamentoRecorrente pagamentoRecorrente) {
-        String sql = "insert into pagamento_recorrente (pessoa_id, data, cartao_credito, valor, data_inicio, numero_meses_autorizados, data_criacao, data_modificacao) values (?, ?, ?, ?, ?, ?, ?, ?)";
+    public boolean adiciona(PagamentoRecorrente pr) {
+        String sql = "INSERT INTO pagamentorecorrente (id_pessoa, data, cartaocredito, valor, datainicio, datavencimento, numeroMesesAutorizados, datacriacao, datamodificacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection connection = new ConexaoAcademia().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-            stmt.setLong(1, pagamentoRecorrente.getPessoa().getId());
-            stmt.setDate(2, java.sql.Date.valueOf(pagamentoRecorrente.getData()));
-            stmt.setString(3, pagamentoRecorrente.getCartaoCredito());
-            stmt.setDouble(4, pagamentoRecorrente.getValor());
-            stmt.setDate(5, java.sql.Date.valueOf(pagamentoRecorrente.getDataInicio()));
-            stmt.setInt(6, pagamentoRecorrente.getNumMesesAutorizados());
-            stmt.setTimestamp(7, Timestamp.valueOf(pagamentoRecorrente.getDataCriacao()));
-            stmt.setTimestamp(8, Timestamp.valueOf(pagamentoRecorrente.getDataModificacao()));
+            stmt.setLong(1, pr.getPessoa().getId());
+            stmt.setDate(2, java.sql.Date.valueOf(pr.getData()));
+            stmt.setString(3, pr.getCartaoCredito());
+            stmt.setDouble(4, pr.getValor());
+            stmt.setDate(5, java.sql.Date.valueOf(pr.getDataInicio()));
+            stmt.setDate(6, java.sql.Date.valueOf(pr.getDataVencimento()));
+            stmt.setInt(7, pr.getNumeroMesesAutorizados());
+            stmt.setTimestamp(8, Timestamp.valueOf(pr.getDataCriacao()));
+            stmt.setTimestamp(9, Timestamp.valueOf(pr.getDataModificacao()));
 
             stmt.execute();
             return true;
 
         } catch (SQLException e) {
-            throw new RuntimeException("ERRO AO ADICIONAR PAGAMENTO RECORRENTE: " + e.getMessage());
+            throw new RuntimeException("Erro ao adicionar pagamento recorrente: " + e.getMessage());
         }
     }
 
     public List<PagamentoRecorrente> lista() {
-        String sql = "select * from pagamento_recorrente";
+        String sql = "SELECT * FROM pagamentorecorrente";
         List<PagamentoRecorrente> pagamentos = new ArrayList<>();
 
-        try (Connection connection = new ConexaoAcademia().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                long id = rs.getLong("id");
-                long pessoaId = rs.getLong("pessoa_id");
+                long id = rs.getLong("idpagamentorecorrente");
+                long pessoaId = rs.getLong("id_pessoa");
                 LocalDate data = rs.getDate("data").toLocalDate();
-                String cartaoCredito = rs.getString("cartao_credito");
+                String cartaoCredito = rs.getString("cartaocredito");
                 double valor = rs.getDouble("valor");
-                LocalDate dataInicio = rs.getDate("data_inicio").toLocalDate();
-                int numeroMesesAutorizados = rs.getInt("numero_meses_autorizados");
-                LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
-                LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+                LocalDate dataInicio = rs.getDate("datainicio").toLocalDate();
+                LocalDate dataVencimento = rs.getDate("datavencimento").toLocalDate();
+                int numeroMesesAutorizados = rs.getInt("numeroMesesAutorizados");
+                LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                PessoaDAO pessoaDAO = new PessoaDAO();
+                Pessoa pessoa = pessoaDAO.buscaPorId(pessoaId);
 
                 PagamentoRecorrente pagamento = new PagamentoRecorrente();
                 pagamento.setId(id);
-                pagamento.setPessoa(buscaPessoaPorId(pessoaId)); // Método para buscar pessoa pelo ID
+                pagamento.setPessoa(pessoa);
                 pagamento.setData(data);
                 pagamento.setCartaoCredito(cartaoCredito);
                 pagamento.setValor(valor);
                 pagamento.setDataInicio(dataInicio);
-                pagamento.setNumMesesAutorizados(numeroMesesAutorizados);
+                pagamento.setDataVencimento(dataVencimento);
+                pagamento.setNumeroMesesAutorizados(numeroMesesAutorizados);
                 pagamento.setDataCriacao(dataCriacao);
                 pagamento.setDataModificacao(dataModificacao);
 
                 pagamentos.add(pagamento);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erro ao listar pagamentos recorrentes: " + e.getMessage());
         }
         return pagamentos;
     }
 
     public PagamentoRecorrente buscaPorId(long id) {
-        String sql = "select * from pagamento_recorrente where id = ?";
+        String sql = "SELECT * FROM pagamentorecorrente WHERE idpagamentorecorrente = ?";
 
-        try (Connection connection = new ConexaoAcademia().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    long pessoaId = rs.getLong("pessoa_id");
+                    long pessoaId = rs.getLong("id_pessoa");
                     LocalDate data = rs.getDate("data").toLocalDate();
-                    String cartaoCredito = rs.getString("cartao_credito");
+                    String cartaoCredito = rs.getString("cartaocredito");
                     double valor = rs.getDouble("valor");
-                    LocalDate dataInicio = rs.getDate("data_inicio").toLocalDate();
-                    int numeroMesesAutorizados = rs.getInt("numero_meses_autorizados");
-                    LocalDateTime dataCriacao = rs.getTimestamp("data_criacao").toLocalDateTime();
-                    LocalDateTime dataModificacao = rs.getTimestamp("data_modificacao").toLocalDateTime();
+                    LocalDate dataInicio = rs.getDate("datainicio").toLocalDate();
+                    LocalDate dataVencimento = rs.getDate("datavencimento").toLocalDate();
+                    int numeroMesesAutorizados = rs.getInt("numeroMesesAutorizados");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                    PessoaDAO pessoaDAO = new PessoaDAO();
+                    Pessoa pessoa = pessoaDAO.buscaPorId(pessoaId);
 
                     PagamentoRecorrente pagamento = new PagamentoRecorrente();
                     pagamento.setId(id);
-                    pagamento.setPessoa(buscaPessoaPorId(pessoaId)); // Método para buscar pessoa pelo ID
+                    pagamento.setPessoa(pessoa);
                     pagamento.setData(data);
                     pagamento.setCartaoCredito(cartaoCredito);
                     pagamento.setValor(valor);
                     pagamento.setDataInicio(dataInicio);
-                    pagamento.setNumMesesAutorizados(numeroMesesAutorizados);
+                    pagamento.setDataVencimento(dataVencimento);
+                    pagamento.setNumeroMesesAutorizados(numeroMesesAutorizados);
                     pagamento.setDataCriacao(dataCriacao);
                     pagamento.setDataModificacao(dataModificacao);
 
@@ -115,53 +122,88 @@ public class PagamentoRecorrenteDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erro ao buscar pagamento recorrente: " + e.getMessage());
         }
         return null;
     }
 
-    public PagamentoRecorrente alterar(PagamentoRecorrente pagamentoRecorrente) {
-        String sql = "update pagamento_recorrente set pessoa_id = ?, data = ?, cartao_credito = ?, valor = ?, data_inicio = ?, numero_meses_autorizados = ?, data_modificacao = ? where id = ?";
+    public boolean alterar(PagamentoRecorrente pr) {
+        String sql = "UPDATE pagamentorecorrente SET id_pessoa = ?, data = ?, cartaocredito = ?, valor = ?, datainicio = ?, datavencimento = ?, numeroMesesAutorizados = ?, datacriacao = ?, datamodificacao = ? WHERE idpagamentorecorrente = ?";
 
-        try (Connection connection = new ConexaoAcademia().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-            stmt.setLong(1, pagamentoRecorrente.getPessoa().getId());
-            stmt.setDate(2, java.sql.Date.valueOf(pagamentoRecorrente.getData()));
-            stmt.setString(3, pagamentoRecorrente.getCartaoCredito());
-            stmt.setDouble(4, pagamentoRecorrente.getValor());
-            stmt.setDate(5, java.sql.Date.valueOf(pagamentoRecorrente.getDataInicio()));
-            stmt.setInt(6, pagamentoRecorrente.getNumMesesAutorizados());
-            stmt.setTimestamp(7, Timestamp.valueOf(pagamentoRecorrente.getDataModificacao()));
-            stmt.setLong(8, pagamentoRecorrente.getId());
+            stmt.setLong(1, pr.getPessoa().getId());
+            stmt.setDate(2, java.sql.Date.valueOf(pr.getData()));
+            stmt.setString(3, pr.getCartaoCredito());
+            stmt.setDouble(4, pr.getValor());
+            stmt.setDate(5, java.sql.Date.valueOf(pr.getDataInicio()));
+            stmt.setDate(6, java.sql.Date.valueOf(pr.getDataVencimento()));
+            stmt.setInt(7, pr.getNumeroMesesAutorizados());
+            stmt.setTimestamp(8, Timestamp.valueOf(pr.getDataCriacao()));
+            stmt.setTimestamp(9, Timestamp.valueOf(pr.getDataModificacao()));
+            stmt.setLong(10, pr.getId());
 
             stmt.execute();
-            return pagamentoRecorrente;
+            return true;
 
         } catch (SQLException e) {
-            throw new RuntimeException("ERRO AO ALTERAR PAGAMENTO RECORRENTE: " + e.getMessage());
+            throw new RuntimeException("Erro ao alterar pagamento recorrente: " + e.getMessage());
         }
     }
 
     public boolean remover(long id) {
-        String sql = "delete from pagamento_recorrente where id = ?";
+        String sql = "DELETE FROM pagamentorecorrente WHERE idpagamentorecorrente = ?";
 
-        try (Connection connection = new ConexaoAcademia().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
 
-            int linhasDeletadas = stmt.executeUpdate();
-            return linhasDeletadas > 0;
+            stmt.execute();
+            return true;
 
         } catch (SQLException e) {
-            throw new RuntimeException("ERRO AO REMOVER PAGAMENTO RECORRENTE: " + e.getMessage());
+            throw new RuntimeException("Erro ao remover pagamento recorrente: " + e.getMessage());
         }
     }
 
-    
-    private Pessoa buscaPessoaPorId(long pessoaId) {
-        PessoaDAO pessoaDAO = new PessoaDAO();
-        return pessoaDAO.buscaPorId(pessoaId);
+    public PagamentoRecorrente buscarUltimoPagamentoDoAluno(long idAluno) {
+        String sql = "SELECT * FROM pagamentorecorrente WHERE id_pessoa = ? ORDER BY datavencimento DESC LIMIT 1";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, idAluno);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    long id = rs.getLong("idpagamentorecorrente");
+                    LocalDate data = rs.getDate("data").toLocalDate();
+                    String cartaoCredito = rs.getString("cartaocredito");
+                    double valor = rs.getDouble("valor");
+                    LocalDate dataInicio = rs.getDate("datainicio").toLocalDate();
+                    LocalDate dataVencimento = rs.getDate("datavencimento").toLocalDate();
+                    int numeroMesesAutorizados = rs.getInt("numeroMesesAutorizados");
+                    LocalDateTime dataCriacao = rs.getTimestamp("datacriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("datamodificacao").toLocalDateTime();
+
+                    PessoaDAO pessoaDAO = new PessoaDAO();
+                    Pessoa pessoa = pessoaDAO.buscaPorId(idAluno);
+
+                    PagamentoRecorrente pagamento = new PagamentoRecorrente();
+                    pagamento.setId(id);
+                    pagamento.setPessoa(pessoa);
+                    pagamento.setData(data);
+                    pagamento.setCartaoCredito(cartaoCredito);
+                    pagamento.setValor(valor);
+                    pagamento.setDataInicio(dataInicio);
+                    pagamento.setDataVencimento(dataVencimento);
+                    pagamento.setNumeroMesesAutorizados(numeroMesesAutorizados);
+                    pagamento.setDataCriacao(dataCriacao);
+                    pagamento.setDataModificacao(dataModificacao);
+
+                    return pagamento;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar pagamento recorrente: " + e.getMessage());
+        }
+        return null;
     }
 }

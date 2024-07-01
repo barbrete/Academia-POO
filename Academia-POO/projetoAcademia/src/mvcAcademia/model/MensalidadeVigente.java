@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
  * @author barbrete e kitotsui
  */
 public class MensalidadeVigente {
+
     static long serial;
     private long id;
     private double valor;
@@ -20,14 +21,23 @@ public class MensalidadeVigente {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
 
-    public MensalidadeVigente(){
+    public MensalidadeVigente(Pessoa pessoa, double valor, LocalDate dataInicio, LocalDate dataTermino, LocalDateTime dataCriacao, LocalDateTime dataModificacao) {
+        this();
+        this.valor = valor;
+        this.dataInicio = dataInicio;
+        this.dataTermino = dataTermino;
+        this.dataCriacao = dataCriacao;
+        this.dataModificacao = dataModificacao;
+    }
+
+    public MensalidadeVigente() {
         id = MensalidadeVigente.serial++;
     }
 
     public void setId(long id) {
         this.id = id;
     }
-    
+
     public long getId() {
         return id;
     }
@@ -35,7 +45,7 @@ public class MensalidadeVigente {
     public double getValor() {
         return valor;
     }
-    
+
     public void setValor(double valor) {
         this.valor = valor;
     }
@@ -55,7 +65,7 @@ public class MensalidadeVigente {
     public void setDataTermino(LocalDate dataTermino) {
         this.dataTermino = dataTermino;
     }
-    
+
     public LocalDateTime getDataCriacao() {
         return dataCriacao;
     }
@@ -74,13 +84,13 @@ public class MensalidadeVigente {
 
     @Override
     public String toString() {
-        return "\n==================INFORMACOES DA MENSALIDADE VIGENTE=================" +
-                "\nID: " + id +
-                "\nVALOR: " + valor +
-                "\nDATA INICIO: " + dataInicio + 
-                "\nDATA TERMINO: " + dataTermino +
-                "\nDATA DE CRIACAO: " + dataCriacao +
-                "\nDATA DE MODIFICACAO: " + dataModificacao;
+        return "\n==================INFORMACOES DA MENSALIDADE VIGENTE================="
+                + "\nID: " + id
+                + "\nVALOR: " + valor
+                + "\nDATA INICIO: " + dataInicio
+                + "\nDATA TERMINO: " + dataTermino
+                + "\nDATA DE CRIACAO: " + dataCriacao
+                + "\nDATA DE MODIFICACAO: " + dataModificacao;
     }
 
     @Override
@@ -104,7 +114,5 @@ public class MensalidadeVigente {
         final MensalidadeVigente other = (MensalidadeVigente) obj;
         return this.id == other.id;
     }
-    
-    
-    
+
 }

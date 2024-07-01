@@ -192,8 +192,7 @@ public class AcademiaController {
         System.out.println("2 - MOSTRAR PAGAMENTOS RECORRENTES");
         System.out.println("3 - ATUALIZAR PAGAMENTOS RECORRENTES");
         System.out.println("4 - EXCLUIR PAGAMENTOS RECORRENTES");
-        System.out.println("5 - ASSOCIAR PAGAMENTO RECORRENTE AA PESSOA");
-        System.out.println("6 - VOLTAR AO MENU ANTERIOR");
+        System.out.println("5 - VOLTAR AO MENU ANTERIOR");
         System.out.print("OPCAO...: ");
 
         return Integer.parseInt(scanner.nextLine());
