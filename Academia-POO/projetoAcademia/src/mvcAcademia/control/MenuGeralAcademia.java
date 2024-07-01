@@ -32,6 +32,7 @@ import mvcAcademia.model.Exercicio;
 import mvcAcademia.model.ExercicioAplicacao;
 import mvcAcademia.model.ExercicioAplicacaoDAO;
 import mvcAcademia.model.ExercicioDAO;
+import mvcAcademia.model.FichaTreinoPDF;
 import mvcAcademia.model.MensalidadeVigente;
 import mvcAcademia.model.MensalidadeVigenteDAO;
 import mvcAcademia.model.MovimentacaoFinanceira;
@@ -299,7 +300,7 @@ public class MenuGeralAcademia {
 
             switch (opcaoUsuario) {
                 case 1:
-                    TreinoAplicacao fichaTreino = treinoAplicacaoDAO.buscaPorId(pessoaLogadaId);
+                    TreinoAplicacao fichaTreino = treinoAplicacaoDAO.buscarUltimoTreinoAplicacao(pessoaLogadaId);
                     if (fichaTreino != null) {
                         System.out.println(fichaTreino);
                     } else {
@@ -307,11 +308,19 @@ public class MenuGeralAcademia {
                     }
                     break;
                 case 2:
-                    // IMPRIMIR FICHA DE TREINO?
-                    System.out.println("FICHA DE TREINO SENDO IMPRESSA............");
+                    TreinoAplicacao fichaTreinoParaPDF = treinoAplicacaoDAO.buscarUltimoTreinoAplicacao(pessoaLogadaId);
+                    if (fichaTreinoParaPDF != null) {
+                        System.out.println("FICHA DE TREINO SENDO IMPRESSA............");
+                        String caminhoArquivo = "ficha_de_treino2.pdf";
+                        FichaTreinoPDF.gerarPdf(fichaTreinoParaPDF, caminhoArquivo);
+                        System.out.println("FICHA DE TREINO IMPRESSA COM SUCESSO! VERIFIQUE SEU DIRETORIO.");
+                        
+                    } else {
+                        System.out.println("NENHUMA FICHA DE TREINO ASSOCIADA A ESSA PESSOA.");
+                    }
                     break;
                 case 3:
-                    AvaliacaoFisica avaliacaoFisica = avFisDAO.buscaPorId(pessoaLogadaId);
+                    AvaliacaoFisica avaliacaoFisica = avFisDAO.buscarUltimaAvaliacaoDoAluno(pessoaLogadaId);
                     if (avaliacaoFisica != null) {
                         System.out.println(avaliacaoFisica);
                     } else {

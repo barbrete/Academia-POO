@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  *
- * @author Rogério
+ * @author Rogério e Barbara
  */
 public class Calendario {
 
@@ -52,20 +52,4 @@ public class Calendario {
             }
         }
     }
-
-    private void registrarPagamentoMensalidade(Pessoa aluno, double valor) {
-        AlunoPagamentoMensalidade apm = new AlunoPagamentoMensalidade();
-        apm.setAluno(aluno);
-        apm.setValorPago(valor);
-        apm.setDataPagamento(dataAtual);
-        apm.setModalidade(1);
-        apm.setDataCriacao(LocalDateTime.now());
-        apm.setDataModificacao(LocalDateTime.now());
-
-        AlunoPagamentoMensalidadeDAO alunoPagamentoMensalidadeDAO = new AlunoPagamentoMensalidadeDAO();
-        alunoPagamentoMensalidadeDAO.adiciona(apm);
-
-        System.out.println("Pagamento registrado para: " + aluno.getNome());
-    }
-
 }

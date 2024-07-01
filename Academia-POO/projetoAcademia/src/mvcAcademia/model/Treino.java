@@ -6,6 +6,7 @@ package mvcAcademia.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,10 +24,13 @@ public class Treino {
     private LocalDate dataTermino;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataModificacao;
+    
 
     public Treino() {
         id = Treino.serial++;
     }
+    
+
 
     public void setId(long id) {
         this.id = id;

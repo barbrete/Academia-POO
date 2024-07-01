@@ -176,4 +176,54 @@ public class TreinoAplicacaoDAO {
             throw new RuntimeException("ERRO AO REMOVER FICHA DE TREINO " + e.getMessage());
         }
     }
+
+    public TreinoAplicacao buscarUltimoTreinoAplicacao(long alunoId) {
+        String sql = "SELECT * FROM TreinoAplicacao WHERE pessoa_id = ? ORDER BY dataModificacao DESC LIMIT 1";
+
+        try (Connection connection = new ConexaoAcademia().getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setLong(1, alunoId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    long id = rs.getLong("id");
+                    LocalDateTime dataCriacao = rs.getTimestamp("dataCriacao").toLocalDateTime();
+                    LocalDateTime dataModificacao = rs.getTimestamp("dataModificacao").toLocalDateTime();
+                    long academiaId = rs.getLong("academia_id");
+                    long treinoId = rs.getLong("treino_id");
+                    long exercicioId = rs.getLong("exercicio_id");
+                    long exAplicacaoId = rs.getLong("exAplicacao_id");
+                    long divTreinoId = rs.getLong("divTreino_id");
+                    long divTreinoMuscId = rs.getLong("divTreinoMusc_id");
+
+                    Pessoa pessoa = new PessoaDAO().buscaPorId(alunoId);
+                    Academia academia = new AcademiaDAO().buscaPorId(academiaId);
+                    Treino treino = new TreinoDAO().buscaPorId(treinoId);
+                    Exercicio exercicio = new ExercicioDAO().buscaPorId(exercicioId);
+                    ExercicioAplicacao exAplicacao = new ExercicioAplicacaoDAO().buscaPorId(exAplicacaoId);
+                    DivisaoTreino divTreino = new DivisaoTreinoDAO().buscaPorId(divTreinoId);
+                    DivisaoTreinoMusculo divTreinoMusc = new DivisaoTreinoMusculoDAO().buscaPorId(divTreinoMuscId);
+
+                    TreinoAplicacao treinoAplicacao = new TreinoAplicacao();
+                    treinoAplicacao.setId(id);
+                    treinoAplicacao.setDataCriacao(dataCriacao);
+                    treinoAplicacao.setDataModificacao(dataModificacao);
+                    treinoAplicacao.setPessoa(pessoa);
+                    treinoAplicacao.setAcademia(academia);
+                    treinoAplicacao.setTreino(treino);
+                    treinoAplicacao.setExercicio(exercicio);
+                    treinoAplicacao.setExAplicacao(exAplicacao);
+                    treinoAplicacao.setDivTreino(divTreino);
+                    treinoAplicacao.setDivTreinoMusc(divTreinoMusc);
+
+                    return treinoAplicacao;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar último treino aplicado do aluno: " + e.getMessage());
+        }
+
+        return null;
+    }
+
 }
